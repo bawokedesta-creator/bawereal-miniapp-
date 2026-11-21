@@ -223,5 +223,26 @@ document.querySelectorAll("#nav button").forEach(btn=>{
 
 go("home");
 </script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain: "bawereal.firebaseapp.com",
+  projectId: "bawereal",
+  storageBucket: "bawereal.firebasestorage.app",
+  messagingSenderId: "756822160410",
+  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId: "G-VN3D9QM7P8"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+window.baweAuth = getAuth(firebaseApp);
+window.baweDb = getFirestore(firebaseApp);
+
+console.log("BaweReal Firebase initialized");
+</script>
 </body>
 </html>
