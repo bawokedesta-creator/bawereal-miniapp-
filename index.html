@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,12 +70,22 @@ function go(page){
         <h2>Welcome to BaweReal</h2>
         <p>Your personal account dashboard</p>
       </div>
+
       <div class="grid">
-        <div class="tile" onclick="go('packages')"><div class="emoji">▤</div><b>Packages</b></div>
-        <div class="tile" onclick="go('referrals')"><div class="emoji">♧</div><b>Referrals</b></div>
-        <div class="tile" onclick="go('history')"><div class="emoji">◷</div><b>History</b></div>
-        <div class="tile" onclick="go('profile')"><div class="emoji">♙</div><b>Profile</b></div>
+        <div class="tile" onclick="go('packages')">
+          <div class="emoji">▤</div><b>Packages</b>
+        </div>
+        <div class="tile" onclick="go('referrals')">
+          <div class="emoji">♧</div><b>Referrals</b>
+        </div>
+        <div class="tile" onclick="go('history')">
+          <div class="emoji">◷</div><b>History</b>
+        </div>
+        <div class="tile" onclick="go('profile')">
+          <div class="emoji">♙</div><b>Profile</b>
+        </div>
       </div>
+
       <div class="section">
         <div class="section-title">Quick Access</div>
         <div class="panel">
@@ -84,16 +93,32 @@ function go(page){
           <p class="muted">Questions about your account?</p>
           <button class="secondary" onclick="go('chat')">Open Support</button>
         </div>
-      </div>`;
+      </div>
+    `;
   }
 
   else if(page==="packages"){
     app.innerHTML=`
       <div class="section-title">Packages</div>
-      <div class="panel"><h3>Available Services</h3><p class="muted">Explore available platform services and their details.</p></div>
-      <div class="panel"><h3>Basic</h3><p class="muted">Account access and platform features.</p><button class="full" onclick="showInfo('Basic')">View Details</button></div>
-      <div class="panel"><h3>Standard</h3><p class="muted">More platform features and account tools.</p><button class="full" onclick="showInfo('Standard')">View Details</button></div>
-      <div class="panel"><h3>Premium</h3><p class="muted">Premium service information.</p><button class="full" onclick="showInfo('Premium')">View Details</button></div>`;
+      <div class="panel">
+        <h3>Available Services</h3>
+        <p class="muted">Explore available platform services and their details.</p>
+      </div>
+      <div class="panel">
+        <h3>Basic</h3>
+        <p class="muted">Account access and platform features.</p>
+        <button class="full" onclick="showInfo('Basic')">View Details</button>
+      </div>
+      <div class="panel">
+        <h3>Standard</h3>
+        <p class="muted">More platform features and account tools.</p>
+        <button class="full" onclick="showInfo('Standard')">View Details</button>
+      </div>
+      <div class="panel">
+        <h3>Premium</h3>
+        <p class="muted">Premium service information.</p>
+        <button class="full" onclick="showInfo('Premium')">View Details</button>
+      </div>`;
   }
 
   else if(page==="referrals"){
@@ -101,39 +126,65 @@ function go(page){
     app.innerHTML=`
       <div class="section-title">Referrals</div>
       <div class="panel">
-        <h3>Invite Friends</h3><p class="muted">Share the bot link with friends.</p>
+        <h3>Invite Friends</h3>
+        <p class="muted">Share the bot link with friends.</p>
         <input id="inviteLink" value="${link}" readonly>
         <button class="full" onclick="copyInvite()">Copy Invite Link</button>
         <button class="secondary full" onclick="shareInvite()">Share Link</button>
       </div>
-      <div class="panel"><h3>Referral Information</h3><p class="muted">Referral information will be available when the account system is connected.</p></div>`;
+      <div class="panel">
+        <h3>Referral Information</h3>
+        <p class="muted">Referral information will be available when the account system is connected.</p>
+      </div>`;
   }
 
   else if(page==="profile"){
     const user=tg.initDataUnsafe?.user;
-    const name=user?[user.first_name,user.last_name].filter(Boolean).join(" "):"Telegram User";
-    const uname=user?.username?"@"+user.username:"Not provided";
+    const name=user
+      ? [user.first_name,user.last_name].filter(Boolean).join(" ")
+      : "Telegram User";
+    const uname=user?.username ? "@"+user.username : "Not provided";
     app.innerHTML=`
       <div class="section-title">My Profile</div>
-      <div class="panel"><h3>${escapeHtml(name)}</h3><p class="muted">${escapeHtml(uname)}</p><p class="muted">Telegram account profile</p></div>
-      <div class="panel"><b>Account Information</b><p class="muted">Telegram ID: ${user?.id||"Open inside Telegram"}</p></div>`;
+      <div class="panel">
+        <h3>${escapeHtml(name)}</h3>
+        <p class="muted">${escapeHtml(uname)}</p>
+        <p class="muted">Telegram account profile</p>
+      </div>
+      <div class="panel">
+        <b>Account Information</b>
+        <p class="muted">Telegram ID: ${user?.id || "Open inside Telegram"}</p>
+      </div>`;
   }
 
   else if(page==="history"){
     app.innerHTML=`
       <div class="section-title">Activity History</div>
-      <div class="panel"><h3>Your Activity</h3><p class="muted">Activity records will appear here when connected to the database.</p></div>`;
+      <div class="panel">
+        <h3>Your Activity</h3>
+        <p class="muted">Activity records will appear here when connected to the database.</p>
+      </div>`;
   }
 
   else if(page==="chat"){
     app.innerHTML=`
       <div class="section-title">Support</div>
-      <div class="panel"><h3>Customer Support</h3><p class="muted">Need help? Contact support through Telegram.</p><button class="full" onclick="contactSupport()">Contact Support</button></div>
-      <div class="panel"><b>Frequently Asked Questions</b><p class="muted">How do I use the app?</p><p>Choose a section from the navigation bar below.</p></div>`;
+      <div class="panel">
+        <h3>Customer Support</h3>
+        <p class="muted">Need help? Contact support through Telegram.</p>
+        <button class="full" onclick="contactSupport()">Contact Support</button>
+      </div>
+      <div class="panel">
+        <b>Frequently Asked Questions</b>
+        <p class="muted">How do I use the app?</p>
+        <p>Choose a section from the navigation bar below.</p>
+      </div>`;
   }
 }
 
-function showInfo(name){alert(name+" details will be available here.");}
+function showInfo(name){
+  alert(name+" details will be available here.");
+}
 
 function copyInvite(){
   const input=document.getElementById("inviteLink");
@@ -156,7 +207,9 @@ function shareInvite(){
   }
 }
 
-function contactSupport(){alert("Support contact will be configured.");}
+function contactSupport(){
+  alert("Support contact will be configured.");
+}
 
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g,m=>({
@@ -170,29 +223,5 @@ document.querySelectorAll("#nav button").forEach(btn=>{
 
 go("home");
 </script>
-
-<!-- Firebase connection -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
-  authDomain: "bawereal.firebaseapp.com",
-  projectId: "bawereal",
-  storageBucket: "bawereal.firebasestorage.app",
-  messagingSenderId: "756822160410",
-  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
-  measurementId: "G-VN3D9QM7P8"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-window.baweAuth = getAuth(firebaseApp);
-window.baweDb = getFirestore(firebaseApp);
-
-console.log("BaweReal Firebase initialized");
-</script>
-
 </body>
 </html>
