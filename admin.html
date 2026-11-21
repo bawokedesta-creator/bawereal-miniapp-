@@ -124,8 +124,8 @@
     <!-- LOGIN CARD -->
     <div id="login-card" class="card">
       <h3>Admin Sign In</h3>
-      <input type="email" id="admin-email" placeholder="Admin Email" autocomplete="email" />
-      <input type="password" id="admin-password" placeholder="Admin Password" autocomplete="current-password" />
+      <input type="email" id="admin-email" value="bawokedesta@gmail.com" placeholder="Admin Email" autocomplete="email" />
+      <input type="password" id="admin-password" value="Abrish@187540" placeholder="Admin Password" autocomplete="current-password" />
       <button id="login-btn" class="btn-blue" type="button">Sign In to Admin</button>
       <div id="login-error" class="error-msg"></div>
     </div>
@@ -252,7 +252,7 @@
 
     statusFilter.addEventListener("change", renderRequests);
 
-    document.getElementById("login-btn").addEventListener("click", async () => {
+    async function performAdminLogin() {
       const email = document.getElementById("admin-email").value.trim();
       const pass = document.getElementById("admin-password").value;
       loginError.textContent = "";
@@ -267,7 +267,9 @@
       } catch (err) {
         loginError.textContent = err.message;
       }
-    });
+    }
+
+    document.getElementById("login-btn").addEventListener("click", performAdminLogin);
 
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
