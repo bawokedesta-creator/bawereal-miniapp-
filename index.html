@@ -1,274 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>BaweReal</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f6fb;color:#18243b;font-family:Arial,sans-serif}
-header{padding:20px;background:#fff;font-size:21px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
-main{padding:16px;padding-bottom:100px}
-.hero{background:linear-gradient(135deg,#1457ee,#34328e);color:white;padding:24px;border-radius:24px}
-.hero h2{font-size:24px;margin:12px 0}
-.hero p{opacity:.85;font-size:14px}
-.tag{font-size:12px;background:#ffffff22;padding:7px 12px;border-radius:20px;display:inline-block}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
-.tile{background:white;border-radius:18px;padding:20px 12px;text-align:center;box-shadow:0 3px 12px #172b4a0a;cursor:pointer}
-.tile:active{transform:scale(.97)}
-.tile .emoji{font-size:28px}
-.tile b{display:block;margin-top:10px}
-.section{margin-top:20px}
-.section-title{font-size:18px;font-weight:bold;margin-bottom:12px}
-.panel{background:white;padding:18px;border-radius:18px;margin-bottom:12px}
-.muted{color:#7c8799;font-size:14px}
-button{border:0;border-radius:12px;padding:12px 16px;background:#2055e8;color:white;font-weight:bold;cursor:pointer}
-button.secondary{background:#eef3ff;color:#2055e8}
-button.full{width:100%;margin-top:12px}
-input{width:100%;padding:14px;border:1px solid #dce3ed;border-radius:12px;margin-top:10px;font-size:15px}
-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e6eaf0;display:flex;justify-content:space-around;padding:9px 2px calc(9px + env(safe-area-inset-bottom));z-index:5}
-nav button{background:none;color:#77849a;padding:6px 4px;font-size:11px;font-weight:normal;min-width:50px}
-nav button.active{color:#2055e8;font-weight:bold}
-nav span{display:block;font-size:20px;margin-bottom:3px}
-.hidden{display:none!important}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bawe Mini App - BaweReal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body {
+      background: #f3f4f6;
+      color: #111827;
+      padding-bottom: 76px;
+    }
+
+    /* Top Header */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .menu-btn {
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #111827;
+    }
+
+    /* Main Content */
+    .container {
+      padding: 16px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .card h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .muted {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .stat-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #111827;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    button.primary {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.primary:hover {
+      background: #1d4ed8;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 8px 4px;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      margin: 0;
+      padding: 6px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      color: #6b7280;
+      cursor: pointer;
+    }
+    .nav-btn.active {
+      color: #2563eb;
+      font-weight: 700;
+    }
+    .nav-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <span>BaweReal</span>
-  <span style="font-size:14px;color:#7c8799">☰</span>
-</header>
+  <header class="topbar">
+    <div class="brand">BaweReal</div>
+    <button class="menu-btn" id="top-menu-btn" type="button" aria-label="Menu">&#9776;</button>
+  </header>
 
-<main id="app"></main>
-
-<nav id="nav">
-<button data-page="home" class="active"><span>⌂</span>Home</button>
-<button data-page="packages"><span>▤</span>Packages</button>
-<button data-page="referrals"><span>♧</span>Referrals</button>
-<button data-page="profile"><span>♙</span>Profile</button>
-<button data-page="chat"><span>☏</span>Chat</button>
-</nav>
-
-<script>
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
-
-const app = document.getElementById("app");
-
-function go(page){
-  document.querySelectorAll("#nav button").forEach(b=>{
-    b.classList.toggle("active",b.dataset.page===page);
-  });
-
-  if(page==="home"){
-    app.innerHTML=`
-      <div class="hero">
-        <span class="tag">WELCOME</span>
-        <h2>Welcome to BaweReal</h2>
-        <p>Your personal account dashboard</p>
-      </div>
-
-      <div class="grid">
-        <div class="tile" onclick="go('packages')">
-          <div class="emoji">▤</div><b>Packages</b>
-        </div>
-        <div class="tile" onclick="go('referrals')">
-          <div class="emoji">♧</div><b>Referrals</b>
-        </div>
-        <div class="tile" onclick="go('history')">
-          <div class="emoji">◷</div><b>History</b>
-        </div>
-        <div class="tile" onclick="go('profile')">
-          <div class="emoji">♙</div><b>Profile</b>
+  <main class="container">
+    <!-- HOME / DASHBOARD -->
+    <section id="page-home" class="page">
+      <div class="card">
+        <h3>Dashboard</h3>
+        <p class="muted">Welcome to BaweReal Mini App. Your account and Firebase connection are active.</p>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Balance</div>
+            <div class="stat-value" id="dash-balance">0.00</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Referrals</div>
+            <div class="stat-value" id="dash-referrals">0</div>
+          </div>
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Quick Access</div>
-        <div class="panel">
-          <b>Help & Support</b>
-          <p class="muted">Questions about your account?</p>
-          <button class="secondary" onclick="go('chat')">Open Support</button>
-        </div>
+      <div class="card">
+        <h3>Quick Support Request</h3>
+        <p class="muted">Send a message to support if you need help.</p>
+        <textarea id="support-msg" rows="3" placeholder="Write your message..."></textarea>
+        <button class="primary" id="send-support-btn" type="button">Send Support Request</button>
       </div>
-    `;
-  }
+    </section>
 
-  else if(page==="packages"){
-    app.innerHTML=`
-      <div class="section-title">Packages</div>
-      <div class="panel">
-        <h3>Available Services</h3>
-        <p class="muted">Explore available platform services and their details.</p>
+    <!-- PACKAGES -->
+    <section id="page-packages" class="page hidden">
+      <div class="card">
+        <h3>Packages</h3>
+        <p class="muted">Available packages will appear here.</p>
       </div>
-      <div class="panel">
-        <h3>Basic</h3>
-        <p class="muted">Account access and platform features.</p>
-        <button class="full" onclick="showInfo('Basic')">View Details</button>
+    </section>
+
+    <!-- REFERRALS -->
+    <section id="page-referrals" class="page hidden">
+      <div class="card">
+        <h3>Referrals</h3>
+        <p class="muted">Invite friends and track your referrals here.</p>
       </div>
-      <div class="panel">
-        <h3>Standard</h3>
-        <p class="muted">More platform features and account tools.</p>
-        <button class="full" onclick="showInfo('Standard')">View Details</button>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="page-profile" class="page hidden">
+      <div class="card">
+        <h3>Profile</h3>
+        <p class="muted" id="profile-status">Checking session...</p>
       </div>
-      <div class="panel">
-        <h3>Premium</h3>
-        <p class="muted">Premium service information.</p>
-        <button class="full" onclick="showInfo('Premium')">View Details</button>
-      </div>`;
-  }
+    </section>
 
-  else if(page==="referrals"){
-    const link="https://t.me/BaweRealBot";
-    app.innerHTML=`
-      <div class="section-title">Referrals</div>
-      <div class="panel">
-        <h3>Invite Friends</h3>
-        <p class="muted">Share the bot link with friends.</p>
-        <input id="inviteLink" value="${link}" readonly>
-        <button class="full" onclick="copyInvite()">Copy Invite Link</button>
-        <button class="secondary full" onclick="shareInvite()">Share Link</button>
+    <!-- CHAT -->
+    <section id="page-chat" class="page hidden">
+      <div class="card">
+        <h3>Chat &amp; Support</h3>
+        <p class="muted">Use the support form on Home or contact support here.</p>
       </div>
-      <div class="panel">
-        <h3>Referral Information</h3>
-        <p class="muted">Referral information will be available when the account system is connected.</p>
-      </div>`;
-  }
-else if(page==="profile"){
-  const user=tg.initDataUnsafe?.user;
-  const name=user
-    ? [user.first_name,user.last_name].filter(Boolean).join(" ")
-    : "Telegram User";
-  const uname=user?.username ? "@"+user.username : "Not provided";
+    </section>
+  </main>
 
-  app.innerHTML=`
-    <div class="section-title">My Profile</div>
-    <div class="panel">
-      <h3>${escapeHtml(name)}</h3>
-      <p class="muted">${escapeHtml(uname)}</p>
-      <p class="muted">Telegram account profile</p>
-    </div>
-    <div class="panel">
-      <b>Account Information</b>
-      <p class="muted">Telegram ID: ${user?.id || "Open inside Telegram"}</p>
-    </div>
-    <div class="panel">
-      <button onclick="showAdminLogin()">Admin Panel</button>
-    </div>`;
-}
-    app.innerHTML=`
-      <div class="section-title">Activity History</div>
-      <div class="panel">
-        <h3>Your Activity</h3>
-        <p class="muted">Activity records will appear here when connected to the database.</p>
-      </div>`;
-  }
+  <nav id="nav" class="bottom-nav">
+    <button class="nav-btn active" data-page="home" type="button">
+      <span class="nav-icon">&#8962;</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" data-page="packages" type="button">
+      <span class="nav-icon">&#9776;</span>
+      <span>Packages</span>
+    </button>
+    <button class="nav-btn" data-page="referrals" type="button">
+      <span class="nav-icon">&#9827;</span>
+      <span>Referrals</span>
+    </button>
+    <button class="nav-btn" data-page="profile" type="button">
+      <span class="nav-icon">&#9817;</span>
+      <span>Profile</span>
+    </button>
+    <button class="nav-btn" data-page="chat" type="button">
+      <span class="nav-icon">&#9742;</span>
+      <span>Chat</span>
+    </button>
+  </nav>
 
-  else if(page==="chat"){
-    app.innerHTML=`
-      <div class="section-title">Support</div>
-      <div class="panel">
-        <h3>Customer Support</h3>
-        <p class="muted">Need help? Contact support through Telegram.</p>
-        <button class="full" onclick="contactSupport()">Contact Support</button>
-      </div>
-      <div class="panel">
-        <b>Frequently Asked Questions</b>
-        <p class="muted">How do I use the app?</p>
-        <p>Choose a section from the navigation bar below.</p>
-      </div>`;
-  }
-}
+  <script>
+    function go(pageName) {
+      const target = pageName || "home";
+      document.querySelectorAll(".page").forEach((sec) => {
+        sec.classList.toggle("hidden", sec.id !== "page-" + target);
+      });
+      document.querySelectorAll("#nav .nav-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.page === target);
+      });
+    }
 
-function showInfo(name){
-  alert(name+" details will be available here.");
-}
-
-function copyInvite(){
-  const input=document.getElementById("inviteLink");
-  if(!input)return;
-  navigator.clipboard.writeText(input.value)
-    .then(()=>alert("Link copied!"))
-    .catch(()=>{
-      input.select();
-      document.execCommand("copy");
-      alert("Link copied!");
+    document.querySelectorAll("#nav .nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => go(btn.dataset.page));
     });
-}
 
-function shareInvite(){
-  const url="https://t.me/BaweRealBot";
-  if(tg.openTelegramLink){
-    tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(url));
-  }else{
-    window.open(url);
-  }
-}
+    go("home");
+  </script>
 
-function contactSupport(){
-  tg.openTelegramLink("https://t.me/b7540");
-}
-
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g,m=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  })[m]);
-}
-
-document.querySelectorAll("#nav button").forEach(btn=>{
-  btn.addEventListener("click",()=>go(btn.dataset.page));
-});
-
-go("home");
-</script>
   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
-  authDomain: "bawereal.firebaseapp.com",
-  projectId: "bawereal",
-  storageBucket: "bawereal.firebasestorage.app",
-  messagingSenderId: "756822160410",
-  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
-  measurementId: "G-VN3D9QM7P8"
-};
+    // የራስህን apiKey እዚህ አስገባ
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "bawereal.firebaseapp.com",
+      projectId: "bawereal",
+      storageBucket: "bawereal.firebasestorage.app",
+      messagingSenderId: "756822160410",
+      appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+      measurementId: "G-VN3D9QM7P8"
+    };
 
-const firebaseApp = initializeApp(firebaseConfig);
-window.baweAuth = getAuth(firebaseApp);
-window.baweDb = getFirestore(firebaseApp);
+    const firebaseApp = initializeApp(firebaseConfig);
+    window.baweAuth = getAuth(firebaseApp);
+    window.baweDb = getFirestore(firebaseApp);
 
-console.log("BaweReal Firebase initialized");
-</script>
-  <script type="module">
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
-
-window.submitSupportRequest = async function(message) {
-  const user = window.baweAuth.currentUser;
-
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(window.baweDb, "supportRequests"), {
-      userId: user.uid,
-      message: message,
-      status: "pending",
-      createdAt: serverTimestamp()
+    const profileStatus = document.getElementById("profile-status");
+    onAuthStateChanged(window.baweAuth, (user) => {
+      if (profileStatus) {
+        profileStatus.textContent = user
+          ? `Signed in: ${user.email || user.uid}`
+          : "Not signed in yet.";
+      }
     });
-    alert("Message sent successfully!");
-  } catch (error) {
-    alert("Error: " + error.message);
-  }
-};
-</script>
+
+    window.submitSupportRequest = async function (message) {
+      const user = window.baweAuth.currentUser;
+      if (!user) {
+        alert("Please sign in first.");
+        return;
+      }
+      try {
+        await addDoc(collection(window.baweDb, "supportRequests"), {
+          userId: user.uid,
+          message: message,
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+        alert("Message sent successfully!");
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    };
+
+    document.getElementById("send-support-btn")?.addEventListener("click", async () => {
+      const input = document.getElementById("support-msg");
+      const text = (input?.value || "").trim();
+      if (!text) {
+        alert("Please enter a message.");
+        return;
+      }
+      await window.submitSupportRequest(text);
+      if (input) input.value = "";
+    });
+  </script>
 </body>
 </html>
