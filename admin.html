@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BaweReal Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .topbar {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .topbar h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    button {
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-blue { background: #2563eb; color: #fff; }
+    .btn-green { background: #16a34a; color: #fff; width: auto; padding: 8px 12px; margin-top: 0; }
+    .btn-red { background: #dc2626; color: #fff; width: auto; padding: 8px 12px; margin-top: 0; }
+    .btn-gray { background: #475569; color: #fff; width: auto; padding: 8px 12px; margin-top: 0; }
+    .req-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .req-meta {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .req-msg {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      color: #e2e8f0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .st-pending { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+    .st-resolved { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .st-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .error-msg {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h2>BaweReal Admin Panel</h2>
+        <div class="sub" id="admin-session-text">Not signed in</div>
+      </div>
+      <button id="logout-btn" class="btn-red hidden" type="button">Logout</button>
+    </div>
+
+    <!-- LOGIN CARD -->
+    <div id="login-card" class="card">
+      <h3>Admin Sign In</h3>
+      <input type="email" id="admin-email" placeholder="Admin Email" autocomplete="email" />
+      <input type="password" id="admin-password" placeholder="Admin Password" autocomplete="current-password" />
+      <button id="login-btn" class="btn-blue" type="button">Sign In to Admin</button>
+      <div id="login-error" class="error-msg"></div>
+    </div>
+
+    <!-- DASHBOARD CARD -->
+    <div id="admin-dashboard" class="hidden">
+      <div class="card">
+        <h3>Filter Support Requests</h3>
+        <select id="status-filter">
+          <option value="all">All Requests</option>
+          <option value="pending">Pending</option>
+          <option value="resolved">Resolved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <h3>Support Requests</h3>
+        <div id="requests-container">Loading requests...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      orderBy,
+      onSnapshot,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // የራስህን apiKey እዚህ አስገባ
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "bawereal.firebaseapp.com",
+      projectId: "bawereal",
+      storageBucket: "bawereal.firebasestorage.app",
+      messagingSenderId: "756822160410",
+      appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+      measurementId: "G-VN3D9QM7P8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginCard = document.getElementById("login-card");
+    const adminDashboard = document.getElementById("admin-dashboard");
+    const logoutBtn = document.getElementById("logout-btn");
+    const sessionText = document.getElementById("admin-session-text");
+    const loginError = document.getElementById("login-error");
+    const requestsContainer = document.getElementById("requests-container");
+    const statusFilter = document.getElementById("status-filter");
+
+    let allRequests = [];
+    let unsubscribe = null;
+
+    function renderRequests() {
+      const filterVal = statusFilter.value;
+      const filtered = filterVal === "all"
+        ? allRequests
+        : allRequests.filter((item) => (item.status || "pending") === filterVal);
+
+      if (filtered.length === 0) {
+        requestsContainer.innerHTML = `<p class="sub">No ${filterVal === "all" ? "" : filterVal + " "}requests found.</p>`;
+        return;
+      }
+
+      requestsContainer.innerHTML = "";
+      filtered.forEach((item) => {
+        const st = item.status || "pending";
+        const badgeClass = st === "resolved" ? "st-resolved" : st === "rejected" ? "st-rejected" : "st-pending";
+
+        const div = document.createElement("div");
+        div.className = "req-item";
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="badge ${badgeClass}">${st}</span>
+            <span class="req-meta">ID: ${item.id}</span>
+          </div>
+          <div class="req-meta">User ID: ${item.userId || "N/A"}</div>
+          <div class="req-msg">${escapeHtml(item.message || "")}</div>
+          <div class="btn-row">
+            <button class="btn-green" type="button" data-id="${item.id}" data-status="resolved">Resolve</button>
+            <button class="btn-red" type="button" data-id="${item.id}" data-status="rejected">Reject</button>
+            <button class="btn-gray" type="button" data-id="${item.id}" data-status="pending">Pending</button>
+          </div>
+        `;
+        requestsContainer.appendChild(div);
+      });
+
+      requestsContainer.querySelectorAll("button[data-id]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          const nextStatus = btn.dataset.status;
+          try {
+            await updateDoc(doc(db, "supportRequests", id), { status: nextStatus });
+          } catch (err) {
+            alert("Update failed: " + err.message);
+          }
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, (m) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[m]));
+    }
+
+    statusFilter.addEventListener("change", renderRequests);
+
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const email = document.getElementById("admin-email").value.trim();
+      const pass = document.getElementById("admin-password").value;
+      loginError.textContent = "";
+
+      if (!email || !pass) {
+        loginError.textContent = "Please enter email and password.";
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        loginError.textContent = err.message;
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        if (unsubscribe) unsubscribe();
+        allRequests = [];
+        sessionText.textContent = "Not signed in";
+        logoutBtn.classList.add("hidden");
+        adminDashboard.classList.add("hidden");
+        loginCard.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        const adminSnap = await getDoc(doc(db, "admins", user.uid));
+        if (!adminSnap.exists() || adminSnap.data().role !== "admin") {
+          loginError.textContent = "Access denied: This account is not set as admin in Firestore (admins/{uid}).";
+          await signOut(auth);
+          return;
+        }
+      } catch (err) {
+        loginError.textContent = "Permission check error: " + err.message;
+        await signOut(auth);
+        return;
+      }
+
+      loginCard.classList.add("hidden");
+      adminDashboard.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      sessionText.textContent = `Admin: ${user.email}`;
+
+      const q = query(collection(db, "supportRequests"), orderBy("createdAt", "desc"));
+      unsubscribe = onSnapshot(q, (snap) => {
+        allRequests = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        renderRequests();
+      }, (err) => {
+        requestsContainer.innerHTML = `<p class="error-msg">Error loading requests: ${err.message}</p>`;
+      });
+    });
+  </script>
+</body>
+</html>
