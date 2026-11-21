@@ -244,5 +244,30 @@ window.baweDb = getFirestore(firebaseApp);
 
 console.log("BaweReal Firebase initialized");
 </script>
+  <script type="module">
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+window.submitSupportRequest = async function(message) {
+  const user = window.baweAuth.currentUser;
+
+  if (!user) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(window.baweDb, "supportRequests"), {
+      userId: user.uid,
+      message: message,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+    alert("Message sent successfully!");
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+</script>
 </body>
 </html>
