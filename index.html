@@ -137,27 +137,28 @@ function go(page){
         <p class="muted">Referral information will be available when the account system is connected.</p>
       </div>`;
   }
+else if(page==="profile"){
+  const user=tg.initDataUnsafe?.user;
+  const name=user
+    ? [user.first_name,user.last_name].filter(Boolean).join(" ")
+    : "Telegram User";
+  const uname=user?.username ? "@"+user.username : "Not provided";
 
-  else if(page==="profile"){
-    const user=tg.initDataUnsafe?.user;
-    const name=user
-      ? [user.first_name,user.last_name].filter(Boolean).join(" ")
-      : "Telegram User";
-    const uname=user?.username ? "@"+user.username : "Not provided";
-    app.innerHTML=`
-      <div class="section-title">My Profile</div>
-      <div class="panel">
-        <h3>${escapeHtml(name)}</h3>
-        <p class="muted">${escapeHtml(uname)}</p>
-        <p class="muted">Telegram account profile</p>
-      </div>
-      <div class="panel">
-        <b>Account Information</b>
-        <p class="muted">Telegram ID: ${user?.id || "Open inside Telegram"}</p>
-      </div>`;
-  }
-
-  else if(page==="history"){
+  app.innerHTML=`
+    <div class="section-title">My Profile</div>
+    <div class="panel">
+      <h3>${escapeHtml(name)}</h3>
+      <p class="muted">${escapeHtml(uname)}</p>
+      <p class="muted">Telegram account profile</p>
+    </div>
+    <div class="panel">
+      <b>Account Information</b>
+      <p class="muted">Telegram ID: ${user?.id || "Open inside Telegram"}</p>
+    </div>
+    <div class="panel">
+      <button onclick="showAdminLogin()">Admin Panel</button>
+    </div>`;
+}
     app.innerHTML=`
       <div class="section-title">Activity History</div>
       <div class="panel">
