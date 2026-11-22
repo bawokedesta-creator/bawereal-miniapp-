@@ -11,14 +11,13 @@
   --primary:#635bff;
   --dark:#17172b;
   --bg:#f4f5fb;
-  --card:#ffffff;
-  --muted:#77788a;
   --green:#159b69;
   --red:#d94c59;
+  --muted:#77788a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:var(--bg);
   color:var(--dark);
   padding-bottom:85px;
@@ -69,11 +68,7 @@ textarea{resize:vertical;min-height:85px}
 .btn.danger{background:#ffe9eb;color:var(--red)}
 .btn.small{width:auto;padding:8px 12px;font-size:12px}
 .link{color:var(--primary);cursor:pointer;font-size:14px}
-.auth-wrap{
-  max-width:420px;
-  margin:45px auto;
-  padding:20px;
-}
+.auth-wrap{max-width:420px;margin:45px auto;padding:20px}
 .auth-wrap .card{padding:25px}
 .logo{
   text-align:center;
@@ -82,11 +77,7 @@ textarea{resize:vertical;min-height:85px}
   color:var(--primary);
   margin-bottom:20px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .action{
   background:white;
   padding:18px 10px;
@@ -126,20 +117,21 @@ textarea{resize:vertical;min-height:85px}
   font-size:11px;
   margin-top:7px;
 }
-.status.pending,.status.request-recorded{background:#fff0ce;color:#946000}
-.status.approved,.status.completed{background:#d9f7e9;color:#087b4c}
-.status.rejected,.status.failed{background:#ffe1e4;color:#bd2636}
-.item{
-  border-bottom:1px solid #eee;
-  padding:13px 0;
+.status.pending,.status.request-recorded,.status.processing{
+  background:#fff0ce;color:#946000
 }
+.status.approved,.status.completed{
+  background:#d9f7e9;color:#087b4c
+}
+.status.rejected,.status.failed,.status.cancelled{
+  background:#ffe1e4;color:#bd2636
+}
+.item{border-bottom:1px solid #eee;padding:13px 0}
 .item:last-child{border:0}
 .item-top{display:flex;justify-content:space-between;gap:10px}
 .bottom-nav{
   position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+  bottom:0;left:0;right:0;
   background:white;
   border-top:1px solid #eee;
   display:flex;
@@ -148,44 +140,37 @@ textarea{resize:vertical;min-height:85px}
   z-index:10;
 }
 .nav-btn{
-  background:none;
-  border:0;
-  color:#777;
-  font-size:11px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
+  background:none;border:0;color:#777;
+  font-size:11px;display:flex;
+  flex-direction:column;align-items:center;gap:4px;
 }
 .nav-btn span{font-size:20px}
 .nav-btn.active{color:var(--primary);font-weight:bold}
 .preview{
-  max-width:100%;
-  max-height:220px;
-  border-radius:12px;
-  display:block;
-  margin:10px 0;
+  max-width:100%;max-height:220px;
+  border-radius:12px;display:block;margin:10px 0;
 }
 .notice{
-  padding:12px;
-  border-radius:10px;
-  background:#f1f0ff;
-  color:#4841a8;
-  font-size:13px;
-  margin:10px 0;
+  padding:12px;border-radius:10px;
+  background:#f1f0ff;color:#4841a8;
+  font-size:13px;margin:10px 0;
 }
 .empty{text-align:center;color:var(--muted);padding:20px}
 .page-title{margin:5px 0 17px}
 small{color:var(--muted)}
 @media(min-width:650px){
-  .bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
+  .bottom-nav{
+    max-width:650px;left:50%;
+    transform:translateX(-50%);
+    border-radius:15px 15px 0 0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
+<!-- AUTHENTICATION -->
 <section id="auth" class="auth-wrap">
   <div class="logo">BaweReal</div>
 
@@ -229,7 +214,7 @@ small{color:var(--muted)}
   </div>
 </section>
 
-<!-- APPLICATION -->
+<!-- MAIN APPLICATION -->
 <section id="application" class="hidden">
   <header>
     <div>
@@ -246,7 +231,7 @@ small{color:var(--muted)}
       <div class="balance">
         <p>Account Balance</p>
         <h1 id="balanceText">0.00 ETB</h1>
-        <small style="color:#eee">Only verified account balance is displayed.</small>
+        <small style="color:#eee">Verified balance</small>
       </div>
 
       <div class="grid">
@@ -289,7 +274,8 @@ small{color:var(--muted)}
       <div class="card">
         <h3>Select Payment Method</h3>
 
-        <div class="method" id="telebirrCard" onclick="chooseMethod('Telebirr')">
+        <div class="method" id="telebirrCard"
+             onclick="chooseMethod('Telebirr')">
           <div class="method-left">
             <span class="brand">📱</span>
             <div>
@@ -300,7 +286,8 @@ small{color:var(--muted)}
           <strong>›</strong>
         </div>
 
-        <div class="method" id="cbeCard" onclick="chooseMethod('CBE')">
+        <div class="method" id="cbeCard"
+             onclick="chooseMethod('CBE')">
           <div class="method-left">
             <span class="brand">🏦</span>
             <div>
@@ -318,33 +305,44 @@ small{color:var(--muted)}
         </select>
 
         <div class="notice">
-          Select your payment method. Use the account details below and attach your payment receipt for review.
+          Select your payment method and attach your receipt for review.
         </div>
 
         <div class="card" style="background:#f7f7fc">
           <strong>Telebirr Account</strong>
           <p style="font-size:20px;margin:10px 0">0964488470</p>
-          <button class="btn secondary" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
+          <button class="btn secondary"
+            onclick="copyAccount('0964488470')">
+            Copy Telebirr Number
+          </button>
         </div>
 
         <div class="card" style="background:#f7f7fc">
           <strong>CBE Account</strong>
           <p style="font-size:20px;margin:10px 0">10000298833585</p>
-          <button class="btn secondary" onclick="copyAccount('10000298833585')">Copy CBE Number</button>
+          <button class="btn secondary"
+            onclick="copyAccount('10000298833585')">
+            Copy CBE Number
+          </button>
         </div>
 
         <label>Deposit Amount (ETB)</label>
-        <input id="depositAmount" type="number" min="300" max="10000" placeholder="Enter amount">
+        <input id="depositAmount" type="number"
+               min="300" max="10000" placeholder="Enter amount">
 
         <label>Payment Receipt Photo</label>
         <input id="receiptFile" type="file" accept="image/*">
-        <img id="receiptPreview" class="preview hidden" alt="Receipt preview">
+        <img id="receiptPreview" class="preview hidden"
+             alt="Receipt preview">
         <small>Image only. Maximum file size: 5 MB.</small>
 
         <label>Note (optional)</label>
-        <textarea id="depositNote" placeholder="Additional information"></textarea>
+        <textarea id="depositNote"
+          placeholder="Additional information"></textarea>
 
-        <button class="btn" id="depositBtn">Submit Deposit Request</button>
+        <button class="btn" id="depositBtn">
+          Submit Deposit Request
+        </button>
 
         <p class="muted" style="margin-top:12px">
           Your request will be submitted for review. Submission does not mean payment has been verified.
@@ -352,30 +350,59 @@ small{color:var(--muted)}
       </div>
     </section>
 
-    <!-- WITHDRAW -->
+    <!-- WITHDRAWAL -->
     <section id="withdrawPage" class="hidden">
       <h2 class="page-title">Withdrawal</h2>
 
       <div class="card">
         <h3>Withdrawal Request</h3>
+        <p class="muted">Enter your payment details carefully.</p>
 
         <label>Payment Method</label>
         <select id="withdrawMethod">
-          <option value="">Choose method</option>
+          <option value="">Choose payment method</option>
           <option value="Telebirr">Telebirr</option>
           <option value="CBE">CBE</option>
         </select>
 
-        <label>Account Number</label>
-        <input id="withdrawAccount" placeholder="Enter your account number">
+        <label>Account Holder Name</label>
+        <input id="withdrawName" placeholder="Full name">
 
-        <label>Amount (ETB)</label>
-        <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
+        <label>Account Number / Phone Number</label>
+        <input id="withdrawAccount"
+               placeholder="Telebirr or CBE account">
 
-        <button class="btn" id="withdrawBtn">Submit Withdrawal Request</button>
+        <label>Withdrawal Amount (ETB)</label>
+        <input id="withdrawAmount" type="number"
+               min="100" max="5000" placeholder="Enter amount">
+
+        <label>Transaction Fee (ETB)</label>
+        <input id="withdrawFee" type="text"
+               value="0.00 ETB" readonly>
+
+        <label>Net Amount (ETB)</label>
+        <input id="withdrawNet" type="text"
+               value="0.00 ETB" readonly>
+
+        <label>Additional Note (Optional)</label>
+        <textarea id="withdrawNote"
+          placeholder="Write additional information"></textarea>
 
         <div class="notice">
-          Withdrawal requests are submitted for review. No money is transferred automatically by this form.
+          Minimum withdrawal: 100 ETB.
+          Maximum withdrawal: 5,000 ETB.
+          The fee is shown before submission.
+        </div>
+
+        <button class="btn" id="withdrawBtn">
+          Submit Withdrawal Request
+        </button>
+      </div>
+
+      <div class="card">
+        <h3>My Withdrawal History</h3>
+        <div id="withdrawHistory">
+          <div class="empty">Loading...</div>
         </div>
       </div>
     </section>
@@ -389,7 +416,9 @@ small{color:var(--muted)}
         <br>
         <h2 id="referralCode">Loading...</h2>
         <br>
-        <button class="btn" id="copyReferralBtn">Copy Referral Code</button>
+        <button class="btn" id="copyReferralBtn">
+          Copy Referral Code
+        </button>
       </div>
     </section>
 
@@ -399,7 +428,7 @@ small{color:var(--muted)}
       <div class="card">
         <h3>Packages</h3>
         <p class="muted">
-          Package information will appear here when it is officially configured.
+          Package information will appear here when officially configured.
         </p>
       </div>
     </section>
@@ -431,7 +460,8 @@ small{color:var(--muted)}
         <p id="profileEmail" style="margin:6px 0 15px">-</p>
 
         <p class="muted">User ID</p>
-        <p id="profileUid" style="margin:6px 0 15px;word-break:break-all">-</p>
+        <p id="profileUid"
+           style="margin:6px 0 15px;word-break:break-all">-</p>
 
         <p class="muted">Account Status</p>
         <p id="profileStatus" style="margin-top:6px">-</p>
@@ -443,7 +473,8 @@ small{color:var(--muted)}
       <h2 class="page-title">Support</h2>
       <div class="card">
         <h3>Contact Support</h3>
-        <textarea id="supportMessage" placeholder="Write your message..."></textarea>
+        <textarea id="supportMessage"
+          placeholder="Write your message..."></textarea>
         <button class="btn" id="supportBtn">Send Message</button>
       </div>
 
@@ -459,19 +490,24 @@ small{color:var(--muted)}
 
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="home" onclick="openPage('home')">
+    <button class="nav-btn active" data-page="home"
+      onclick="openPage('home')">
       <span>🏠</span>Home
     </button>
-    <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')">
+    <button class="nav-btn" data-page="deposit"
+      onclick="openPage('deposit')">
       <span>💳</span>Deposit
     </button>
-    <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')">
+    <button class="nav-btn" data-page="withdraw"
+      onclick="openPage('withdraw')">
       <span>💸</span>Withdraw
     </button>
-    <button class="nav-btn" data-page="history" onclick="openPage('history')">
+    <button class="nav-btn" data-page="history"
+      onclick="openPage('history')">
       <span>📋</span>History
     </button>
-    <button class="nav-btn" data-page="profile" onclick="openPage('profile')">
+    <button class="nav-btn" data-page="profile"
+      onclick="openPage('profile')">
       <span>👤</span>Profile
     </button>
   </nav>
@@ -493,17 +529,27 @@ function showForgot(){
   document.getElementById("registerBox").classList.add("hidden");
   document.getElementById("forgotBox").classList.remove("hidden");
 }
+
 function openPage(page){
-  const pages=["home","deposit","withdraw","referral","packages","history","profile","support"];
+  const pages=[
+    "home","deposit","withdraw","referral",
+    "packages","history","profile","support"
+  ];
+
   pages.forEach(p=>{
     const el=document.getElementById(p+"Page");
     if(el) el.classList.toggle("hidden",p!==page);
   });
+
   document.querySelectorAll(".nav-btn").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.page===page);
   });
+
   if(page==="history" && window.loadHistory) window.loadHistory();
-  if(page==="support" && window.loadSupportHistory) window.loadSupportHistory();
+  if(page==="withdraw" && window.loadWithdrawalHistory)
+    window.loadWithdrawalHistory();
+  if(page==="support" && window.loadSupportHistory)
+    window.loadSupportHistory();
 }
 window.openPage=openPage;
 
@@ -524,14 +570,17 @@ window.copyAccount=async function(number){
 
 window.chooseMethod=function(method){
   document.getElementById("depositMethod").value=method;
-  document.getElementById("telebirrCard").classList.toggle("selected",method==="Telebirr");
-  document.getElementById("cbeCard").classList.toggle("selected",method==="CBE");
+  document.getElementById("telebirrCard")
+    .classList.toggle("selected",method==="Telebirr");
+  document.getElementById("cbeCard")
+    .classList.toggle("selected",method==="CBE");
   document.getElementById("receiptFile").click();
 };
 </script>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
   getAuth,
@@ -546,12 +595,12 @@ import {
   getFirestore,
   doc,
   setDoc,
+  updateDoc,
   getDoc,
   addDoc,
   collection,
   query,
   where,
-  orderBy,
   getDocs,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -584,9 +633,7 @@ let selectedReceipt=null;
 
 const $=id=>document.getElementById(id);
 
-function notify(message){
-  alert(message);
-}
+function notify(message){alert(message);}
 
 function setLoading(button,loading,label){
   button.disabled=loading;
@@ -609,8 +656,11 @@ function safeText(value){
 
 function statusClass(status){
   const s=String(status||"request-recorded").toLowerCase();
+
   if(["approved","completed","paid"].includes(s)) return "approved";
-  if(["rejected","failed"].includes(s)) return "rejected";
+  if(["rejected","failed","cancelled"].includes(s)) return "rejected";
+  if(s==="processing") return "processing";
+
   return "pending";
 }
 
@@ -627,21 +677,23 @@ $("registerBtn").addEventListener("click",async()=>{
   const password=$("regPassword").value;
   const confirm=$("regConfirm").value;
 
-  if(!name||!email||!password||!confirm){
+  if(!name||!email||!password||!confirm)
     return notify("Please complete all fields.");
-  }
-  if(password.length<6){
+
+  if(password.length<6)
     return notify("Password must be at least 6 characters.");
-  }
-  if(password!==confirm){
+
+  if(password!==confirm)
     return notify("Passwords do not match.");
-  }
 
   const btn=$("registerBtn");
   setLoading(btn,true,"Register");
 
   try{
-    const result=await createUserWithEmailAndPassword(auth,email,password);
+    const result=await createUserWithEmailAndPassword(
+      auth,email,password
+    );
+
     const uid=result.user.uid;
 
     await setDoc(doc(db,"users",uid),{
@@ -654,6 +706,7 @@ $("registerBtn").addEventListener("click",async()=>{
     });
 
     notify("Account created successfully.");
+
   }catch(error){
     notify(error.message);
   }finally{
@@ -666,7 +719,8 @@ $("loginBtn").addEventListener("click",async()=>{
   const email=$("loginEmail").value.trim();
   const password=$("loginPassword").value;
 
-  if(!email||!password) return notify("Enter email and password.");
+  if(!email||!password)
+    return notify("Enter email and password.");
 
   const btn=$("loginBtn");
   setLoading(btn,true,"Login");
@@ -683,6 +737,7 @@ $("loginBtn").addEventListener("click",async()=>{
 /* PASSWORD RESET */
 $("resetBtn").addEventListener("click",async()=>{
   const email=$("forgotEmail").value.trim();
+
   if(!email) return notify("Enter your email address.");
 
   const btn=$("resetBtn");
@@ -721,6 +776,7 @@ onAuthStateChanged(auth,async user=>{
 
   await loadUserProfile();
   await loadHistory();
+  await loadWithdrawalHistory();
   await loadSupportHistory();
 });
 
@@ -769,7 +825,7 @@ async function loadUserProfile(){
   }
 }
 
-/* DEPOSIT RECEIPT PREVIEW */
+/* RECEIPT PREVIEW */
 $("receiptFile").addEventListener("change",event=>{
   const file=event.target.files[0];
   selectedReceipt=file;
@@ -794,14 +850,16 @@ $("receiptFile").addEventListener("change",event=>{
   }
 
   const reader=new FileReader();
+
   reader.onload=()=>{
     $("receiptPreview").src=reader.result;
     $("receiptPreview").classList.remove("hidden");
   };
+
   reader.readAsDataURL(file);
 });
 
-/* UPLOAD RECEIPT TO FIREBASE STORAGE */
+/* RECEIPT UPLOAD */
 async function uploadReceipt(file){
   if(!currentUser) throw new Error("Please login first.");
 
@@ -827,9 +885,11 @@ $("depositBtn").addEventListener("click",async()=>{
   const note=$("depositNote").value.trim();
 
   if(!method) return notify("Choose a payment method.");
+
   if(!Number.isFinite(amount)||amount<300||amount>10000){
     return notify("Deposit amount must be between 300 and 10,000 ETB.");
   }
+
   if(!selectedReceipt){
     return notify("Please attach your payment receipt photo.");
   }
@@ -873,50 +933,229 @@ $("depositBtn").addEventListener("click",async()=>{
   }
 });
 
+/* WITHDRAWAL CALCULATOR */
+function calculateWithdrawal(){
+  const amount=Number($("withdrawAmount").value||0);
+
+  // Fee is currently zero until an official fee is configured.
+  const fee=0;
+  const net=Math.max(0,amount-fee);
+
+  $("withdrawFee").value=fee.toFixed(2)+" ETB";
+  $("withdrawNet").value=net.toFixed(2)+" ETB";
+}
+
+$("withdrawAmount").addEventListener("input",calculateWithdrawal);
+
 /* WITHDRAWAL REQUEST */
 $("withdrawBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
 
   const method=$("withdrawMethod").value;
+  const name=$("withdrawName").value.trim();
   const account=$("withdrawAccount").value.trim();
   const amount=Number($("withdrawAmount").value);
+  const fee=0;
+  const note=$("withdrawNote").value.trim();
 
   if(!method) return notify("Choose withdrawal method.");
+  if(!name) return notify("Enter account holder name.");
   if(!account) return notify("Enter account number.");
+
   if(!Number.isFinite(amount)||amount<100||amount>5000){
-    return notify("Withdrawal amount must be between 100 and 5,000 ETB.");
+    return notify("Withdrawal must be between 100 and 5,000 ETB.");
   }
 
+  const netAmount=amount-fee;
   const btn=$("withdrawBtn");
+
   setLoading(btn,true,"Submit Withdrawal Request");
 
   try{
+    const transactionId="BW-WD-"+Date.now();
+
     await addDoc(collection(db,"transactionRequests"),{
       userId:currentUser.uid,
       email:currentUser.email,
       type:"withdrawal",
-      amount,
+      transactionId,
+      accountHolderName:name,
       method,
       account,
+      amount,
+      fee,
+      netAmount,
+      note,
       status:"request-recorded",
+      adminNote:"",
       createdAt:serverTimestamp()
     });
 
-    notify("Withdrawal request submitted for review.");
+    notify("Withdrawal request submitted. ID: "+transactionId);
 
     $("withdrawMethod").value="";
+    $("withdrawName").value="";
     $("withdrawAccount").value="";
     $("withdrawAmount").value="";
+    $("withdrawNote").value="";
 
+    calculateWithdrawal();
+
+    await loadWithdrawalHistory();
     await loadHistory();
-    openPage("history");
 
   }catch(error){
+    console.error(error);
     notify("Could not submit request: "+error.message);
   }finally{
     setLoading(btn,false,"Submit Withdrawal Request");
   }
 });
+
+/* WITHDRAWAL HISTORY */
+async function loadWithdrawalHistory(){
+  if(!currentUser) return;
+
+  const container=$("withdrawHistory");
+  container.innerHTML='<div class="empty">Loading...</div>';
+
+  try{
+    const q=query(
+      collection(db,"transactionRequests"),
+      where("userId","==",currentUser.uid),
+      where("type","==","withdrawal")
+    );
+
+    const snapshot=await getDocs(q);
+    let records=[];
+
+    snapshot.forEach(item=>{
+      records.push({id:item.id,...item.data()});
+    });
+
+    records.sort((a,b)=>
+      (b.createdAt?.toMillis?.()||0)-
+      (a.createdAt?.toMillis?.()||0)
+    );
+
+    if(!records.length){
+      container.innerHTML=
+        '<div class="empty">No withdrawal requests yet.</div>';
+      return;
+    }
+
+    container.innerHTML=records.map(record=>{
+      const date=record.createdAt?.toDate
+        ?record.createdAt.toDate().toLocaleString()
+        :"Date unavailable";
+
+      const status=String(record.status||"request-recorded");
+      const canCancel=["request-recorded","pending"].includes(status);
+
+      return `
+        <div class="item">
+          <div class="item-top">
+            <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
+            <strong>${safeText(record.method||"")}</strong>
+          </div>
+
+          <p class="muted">
+            Account holder: ${safeText(record.accountHolderName||"")}
+          </p>
+
+          <p class="muted">
+            Account: ${safeText(record.account||"")}
+          </p>
+
+          <p class="muted">
+            Fee: ${Number(record.fee||0).toFixed(2)} ETB
+          </p>
+
+          <p class="muted">
+            Net amount: ${Number(record.netAmount||0).toFixed(2)} ETB
+          </p>
+
+          <p class="muted">
+            ID: ${safeText(record.transactionId||record.id)}
+          </p>
+
+          <span class="status ${statusClass(status)}">
+            ${safeText(readableStatus(status))}
+          </span>
+
+          <p class="muted" style="margin-top:7px">
+            ${safeText(date)}
+          </p>
+
+          ${record.note?`
+            <p class="muted">Note: ${safeText(record.note)}</p>
+          `:""}
+
+          ${record.adminNote?`
+            <p class="notice">
+              Admin Note: ${safeText(record.adminNote)}
+            </p>
+          `:""}
+
+          ${canCancel?`
+            <button class="btn danger"
+              style="margin-top:10px"
+              onclick="cancelWithdrawal('${record.id}')">
+              Cancel Request
+            </button>
+          `:""}
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    console.error(error);
+    container.innerHTML=
+      '<div class="empty">Could not load withdrawal history.</div>';
+  }
+}
+
+window.loadWithdrawalHistory=loadWithdrawalHistory;
+
+/* CANCEL WITHDRAWAL */
+window.cancelWithdrawal=async function(id){
+  if(!currentUser) return;
+
+  if(!confirm("Cancel this withdrawal request?")) return;
+
+  try{
+    const requestRef=doc(db,"transactionRequests",id);
+    const snapshot=await getDoc(requestRef);
+
+    if(!snapshot.exists()){
+      return notify("Request not found.");
+    }
+
+    const data=snapshot.data();
+
+    if(data.userId!==currentUser.uid){
+      return notify("You cannot cancel this request.");
+    }
+
+    if(!["request-recorded","pending"].includes(data.status)){
+      return notify("This request can no longer be cancelled.");
+    }
+
+    await updateDoc(requestRef,{
+      status:"cancelled",
+      cancelledAt:serverTimestamp()
+    });
+
+    notify("Withdrawal request cancelled.");
+
+    await loadWithdrawalHistory();
+    await loadHistory();
+
+  }catch(error){
+    console.error(error);
+    notify("Could not cancel request: "+error.message);
+  }
+};
 
 /* REFERRAL COPY */
 $("copyReferralBtn").addEventListener("click",async()=>{
@@ -930,7 +1169,7 @@ $("copyReferralBtn").addEventListener("click",async()=>{
   }
 });
 
-/* HISTORY */
+/* TRANSACTION HISTORY */
 async function loadHistory(){
   if(!currentUser) return;
 
@@ -952,15 +1191,15 @@ async function loadHistory(){
       records.push({id:item.id,...item.data()});
     });
 
-    records.sort((a,b)=>{
-      const ta=a.createdAt?.toMillis?.()||0;
-      const tb=b.createdAt?.toMillis?.()||0;
-      return tb-ta;
-    });
+    records.sort((a,b)=>
+      (b.createdAt?.toMillis?.()||0)-
+      (a.createdAt?.toMillis?.()||0)
+    );
 
     renderHistory(records);
 
     const recentRecords=records.slice(0,3);
+
     if(recentRecords.length){
       recent.innerHTML=recentRecords.map(record=>`
         <div class="item">
@@ -992,7 +1231,8 @@ function renderHistory(records){
   });
 
   if(!filtered.length){
-    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
+    $("historyList").innerHTML=
+      '<div class="empty">No requests found.</div>';
     return;
   }
 
@@ -1007,17 +1247,25 @@ function renderHistory(records){
           <strong>${safeText(record.type||"Request")}</strong>
           <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
         </div>
+
         <p class="muted">${safeText(record.method||"")}</p>
+
         <span class="status ${statusClass(record.status)}">
           ${safeText(readableStatus(record.status))}
         </span>
-        <p class="muted" style="margin-top:7px">${safeText(date)}</p>
+
+        <p class="muted" style="margin-top:7px">
+          ${safeText(date)}
+        </p>
+
         ${record.receiptUrl?`
           <p style="margin-top:7px">
-            <a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">
+            <a href="${safeText(record.receiptUrl)}"
+               target="_blank" rel="noopener">
               View submitted receipt
             </a>
-          </p>`:""}
+          </p>
+        `:""}
       </div>
     `;
   }).join("");
@@ -1031,6 +1279,7 @@ $("supportBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
 
   const message=$("supportMessage").value.trim();
+
   if(!message) return notify("Write your message first.");
 
   const btn=$("supportBtn");
@@ -1047,6 +1296,7 @@ $("supportBtn").addEventListener("click",async()=>{
 
     $("supportMessage").value="";
     notify("Your support message has been sent.");
+
     await loadSupportHistory();
 
   }catch(error){
@@ -1076,13 +1326,14 @@ async function loadSupportHistory(){
       records.push(item.data());
     });
 
-    records.sort((a,b)=>{
-      return (b.createdAt?.toMillis?.()||0)-
-             (a.createdAt?.toMillis?.()||0);
-    });
+    records.sort((a,b)=>
+      (b.createdAt?.toMillis?.()||0)-
+      (a.createdAt?.toMillis?.()||0)
+    );
 
     if(!records.length){
-      container.innerHTML='<div class="empty">No support messages yet.</div>';
+      container.innerHTML=
+        '<div class="empty">No support messages yet.</div>';
       return;
     }
 
@@ -1097,14 +1348,17 @@ async function loadSupportHistory(){
           <span class="status ${statusClass(record.status)}">
             ${safeText(readableStatus(record.status))}
           </span>
-          <p class="muted" style="margin-top:7px">${safeText(date)}</p>
+          <p class="muted" style="margin-top:7px">
+            ${safeText(date)}
+          </p>
         </div>
       `;
     }).join("");
 
   }catch(error){
     console.error(error);
-    container.innerHTML='<div class="empty">Could not load support history.</div>';
+    container.innerHTML=
+      '<div class="empty">Could not load support history.</div>';
   }
 }
 
