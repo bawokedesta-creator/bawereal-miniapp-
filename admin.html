@@ -6,10 +6,7 @@
 <title>Admin Login</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:Arial,sans-serif;
@@ -20,7 +17,6 @@ body{
   justify-content:center;
   color:white;
 }
-
 .login-box{
   width:90%;
   max-width:380px;
@@ -30,18 +26,8 @@ body{
   border:1px solid #334155;
   box-shadow:0 15px 45px rgba(0,0,0,.4);
 }
-
-h2{
-  text-align:center;
-  margin-bottom:8px;
-}
-
-.subtitle{
-  text-align:center;
-  color:#94a3b8;
-  margin-bottom:25px;
-}
-
+h2{text-align:center;margin-bottom:8px}
+.subtitle{text-align:center;color:#94a3b8;margin-bottom:25px}
 input{
   width:100%;
   padding:14px;
@@ -52,7 +38,6 @@ input{
   color:white;
   outline:none;
 }
-
 button{
   width:100%;
   padding:14px;
@@ -64,15 +49,13 @@ button{
   cursor:pointer;
   margin-top:15px;
 }
-
-button:hover{
-  background:#1d4ed8;
-}
-
+button:hover{background:#1d4ed8}
+button:disabled{opacity:.6;cursor:wait}
 #error{
   color:#f87171;
   text-align:center;
   margin-top:12px;
+  overflow-wrap:anywhere;
 }
 </style>
 </head>
@@ -84,34 +67,89 @@ button:hover{
   <div class="subtitle">Authorized access only</div>
 
   <form id="loginForm">
-    <input
-      type="email"
-      id="email"
-      placeholder="Admin Email"
-      required
-    >
-
-    <input
-      type="password"
-      id="password"
-      placeholder="Password"
-      required
-    >
-
-    <button type="submit">Login</button>
+    <input type="email" id="email" placeholder="Admin Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit" id="loginButton">Login</button>
     <p id="error"></p>
   </form>
 </div>
 
-<script>
-document.getElementById("loginForm")
-.addEventListener("submit", function(e){
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain: "bawereal.firebaseapp.com",
+  projectId: "bawereal",
+  storageBucket: "bawereal.firebasestorage.app",
+  messagingSenderId: "756822160410",
+  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId: "G-VN3D9QM7P8"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Your authorized admin UID
+const ADMIN_UID = "hpjWfkOX1ETA1TVsN94OkAGLWuy1";
+
+const form = document.getElementById("loginForm");
+const errorBox = document.getElementById("error");
+const loginButton = document.getElementById("loginButton");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  document.getElementById("error").textContent =
-  "Connect this login to your secure authentication service.";
+  errorBox.textContent = "";
+  loginButton.disabled = true;
+  loginButton.textContent = "Checking...";
 
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    const result = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    // Verify that this account is the authorized admin
+    if (result.user.uid !== ADMIN_UID) {
+      await signOut(auth);
+      throw new Error("This account is not authorized as admin.");
+    }
+
+    errorBox.style.color = "#4ade80";
+    errorBox.textContent = "Login successful!";
+
+    // Replace dashboard.html with your actual dashboard filename
+    window.location.href = "dashboard.html";
+
+  } catch (error) {
+    errorBox.style.color = "#f87171";
+
+    if (error.code === "auth/invalid-credential") {
+      errorBox.textContent = "Incorrect email or password.";
+    } else if (error.code === "auth/too-many-requests") {
+      errorBox.textContent = "Too many attempts. Please try later.";
+    } else {
+      errorBox.textContent = error.message;
+    }
+
+  } finally {
+    loginButton.disabled = false;
+    loginButton.textContent = "Login";
+  }
 });
 </script>
 
