@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BAWEREAL - Admin Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;background:#0b1120;
+  color:#f1f5f9
+}
+header{
+  padding:20px;background:#111c30;border-bottom:1px solid #263650;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px
+}
+header h2{margin:0;color:#38bdf8}
+button{
+  padding:10px 15px;border:0;border-radius:8px;
+  cursor:pointer;font-weight:bold
+}
+.logout{background:#ef4444;color:white}
+.refresh{background:#2563eb;color:white}
+main{padding:20px;max-width:1200px;margin:auto}
+.welcome{margin-bottom:20px;color:#a5b4fc}
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;margin-bottom:25px
+}
+.card{
+  background:#162238;padding:22px;border-radius:14px;
+  border:1px solid #263650
+}
+.card p{color:#94a3b8;margin:0 0 10px}
+.card h1{margin:0;color:#38bdf8;font-size:32px}
+.section{
+  background:#111c30;padding:18px;border-radius:14px;
+  margin:20px 0;border:1px solid #263650;overflow-x:auto
+}
+.section h3{margin-top:0;color:#38bdf8}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #263650}
+th{color:#93c5fd}
+td{color:#e2e8f0;word-break:break-word}
+.status{padding:6px 10px;background:#1e293b;border-radius:20px}
+#message{color:#fbbf24;margin:12px 0}
+.empty{color:#94a3b8;padding:15px}
+@media(max-width:600px){
+  main{padding:12px}
+  header{padding:15px}
+  .card{padding:15px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>BAWEREAL ADMIN</h2>
+  <div>
+    <button class="refresh" id="refreshBtn">Refresh</button>
+    <button class="logout" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<main>
+  <div class="welcome" id="welcome">Checking administrator access...</div>
+  <div id="message"></div>
+
+  <div class="cards">
+    <div class="card"><p>Total Users</p><h1 id="usersCount">—</h1></div>
+    <div class="card"><p>Support Requests</p><h1 id="supportCount">—</h1></div>
+    <div class="card"><p>Demo Transactions</p><h1 id="transactionsCount">—</h1></div>
+  </div>
+
+  <div class="section">
+    <h3>Support Requests</h3>
+    <table>
+      <thead><tr><th>User ID</th><th>Message</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody id="supportTable"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Registered Users</h3>
+    <table>
+      <thead><tr><th>User ID</th><th>Account Details</th></tr></thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Demo Transactions</h3>
+    <table>
+      <thead><tr><th>User ID</th><th>Transaction Details</th></tr></thead>
+      <tbody id="transactionsTable"></tbody>
+    </table>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain: "bawereal.firebaseapp.com",
+  projectId: "bawereal",
+  storageBucket: "bawereal.firebasestorage.app",
+  messagingSenderId: "756822160410",
+  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId: "G-VN3D9QM7P8"
+};
+
+const ADMIN_UID = "hpjWfkOX1ETA1TVsN94OkAGLWuy1";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const message = document.getElementById("message");
+
+function cell(row, value) {
+  const td = document.createElement("td");
+  td.textContent = value == null ? "" : String(value);
+  row.appendChild(td);
+}
+
+function showRows(targetId, rows, fields) {
+  const tbody = document.getElementById(targetId);
+  tbody.replaceChildren();
+
+  if (!rows.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = fields.length;
+    td.className = "empty";
+    td.textContent = "No records found.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  rows.forEach(item => {
+    const tr = document.createElement("tr");
+    fields.forEach(field => cell(tr, field(item)));
+    tbody.appendChild(tr);
+  });
+}
+
+function safeDate(value) {
+  if (!value) return "";
+  try {
+    if (value.toDate) return value.toDate().toLocaleString();
+    return new Date(value).toLocaleString();
+  } catch {
+    return "";
+  }
+}
+
+async function loadDashboard() {
+  message.textContent = "Loading dashboard data...";
+  try {
+    const [usersSnap, supportSnap, transactionsSnap] = await Promise.all([
+      getDocs(collection(db, "users")),
+      getDocs(collection(db, "supportRequests")),
+      getDocs(collection(db, "demoTransactions"))
+    ]);
+
+    document.getElementById("usersCount").textContent = usersSnap.size;
+    document.getElementById("supportCount").textContent = supportSnap.size;
+    document.getElementById("transactionsCount").textContent = transactionsSnap.size;
+
+    const supportRows = supportSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    showRows("supportTable", supportRows, [
+      r => r.userId || "",
+      r => r.message || "",
+      r => r.status || "",
+      r => safeDate(r.createdAt)
+    ]);
+
+    const userRows = usersSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    showRows("usersTable", userRows, [
+      r => r.id,
+      r => JSON.stringify(r)
+    ]);
+
+    const transactionRows = transactionsSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    showRows("transactionsTable", transactionRows, [
+      r => r.userId || "",
+      r => JSON.stringify(r)
+    ]);
+
+    message.textContent = "Dashboard loaded successfully.";
+  } catch (error) {
+    console.error(error);
+    message.textContent = "Data loading failed: " + error.message;
+  }
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    window.location.replace("admin.html");
+    return;
+  }
+
+  if (user.uid !== ADMIN_UID) {
+    await signOut(auth);
+    window.location.replace("admin.html");
+    return;
+  }
+
+  document.getElementById("welcome").textContent =
+    "Welcome Administrator: " + user.email;
+
+  await loadDashboard();
+});
+
+document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.replace("admin.html");
+});
+</script>
+</body>
+</html>
