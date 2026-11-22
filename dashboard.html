@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BAWEREAL - Admin Dashboard</title>
+
 <style>
 *{box-sizing:border-box}
 body{
@@ -46,6 +47,9 @@ td{color:#e2e8f0;word-break:break-word}
 .status{padding:6px 10px;background:#1e293b;border-radius:20px}
 #message{color:#fbbf24;margin:12px 0}
 .empty{color:#94a3b8;padding:15px}
+.user-name{font-weight:bold;color:#38bdf8}
+.user-email{color:#cbd5e1}
+.user-id{font-size:11px;color:#64748b;max-width:250px}
 @media(max-width:600px){
   main{padding:12px}
   header{padding:15px}
@@ -53,6 +57,7 @@ td{color:#e2e8f0;word-break:break-word}
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -76,7 +81,15 @@ td{color:#e2e8f0;word-break:break-word}
   <div class="section">
     <h3>Support Requests</h3>
     <table>
-      <thead><tr><th>User ID</th><th>Message</th><th>Status</th><th>Date</th></tr></thead>
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Email</th>
+          <th>Message</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
       <tbody id="supportTable"></tbody>
     </table>
   </div>
@@ -84,7 +97,15 @@ td{color:#e2e8f0;word-break:break-word}
   <div class="section">
     <h3>Registered Users</h3>
     <table>
-      <thead><tr><th>User ID</th><th>Account Details</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>User ID</th>
+          <th>Status</th>
+          <th>Registration Date</th>
+        </tr>
+      </thead>
       <tbody id="usersTable"></tbody>
     </table>
   </div>
@@ -92,7 +113,13 @@ td{color:#e2e8f0;word-break:break-word}
   <div class="section">
     <h3>Demo Transactions</h3>
     <table>
-      <thead><tr><th>User ID</th><th>Transaction Details</th></tr></thead>
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>User ID</th>
+          <th>Transaction Details</th>
+        </tr>
+      </thead>
       <tbody id="transactionsTable"></tbody>
     </table>
   </div>
@@ -100,11 +127,17 @@ td{color:#e2e8f0;word-break:break-word}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
-  getAuth, onAuthStateChanged, signOut
+  getAuth,
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 import {
-  getFirestore, collection, getDocs
+  getFirestore,
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -125,9 +158,12 @@ const db = getFirestore(app);
 
 const message = document.getElementById("message");
 
-function cell(row, value) {
+let userNameMap = {};
+
+function cell(row, value, className = "") {
   const td = document.createElement("td");
   td.textContent = value == null ? "" : String(value);
+  if(className) td.className = className;
   row.appendChild(td);
 }
 
@@ -148,7 +184,10 @@ function showRows(targetId, rows, fields) {
 
   rows.forEach(item => {
     const tr = document.createElement("tr");
-    fields.forEach(field => cell(tr, field(item)));
+    fields.forEach(field => {
+      const result = field(item);
+      cell(tr, result.value, result.className || "");
+    });
     tbody.appendChild(tr);
   });
 }
@@ -163,8 +202,13 @@ function safeDate(value) {
   }
 }
 
+function getUserName(userId) {
+  return userNameMap[userId] || "Unknown User";
+}
+
 async function loadDashboard() {
   message.textContent = "Loading dashboard data...";
+
   try {
     const [usersSnap, supportSnap, transactionsSnap] = await Promise.all([
       getDocs(collection(db, "users")),
@@ -172,31 +216,83 @@ async function loadDashboard() {
       getDocs(collection(db, "demoTransactions"))
     ]);
 
+    const userRows = usersSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    // Build a map of UID to full name
+    userNameMap = {};
+
+    userRows.forEach(user => {
+      const name =
+        user.fullName ||
+        user.name ||
+        (user.email ? user.email.split("@")[0] : "Unnamed User");
+
+      userNameMap[user.id] = name;
+    });
+
     document.getElementById("usersCount").textContent = usersSnap.size;
     document.getElementById("supportCount").textContent = supportSnap.size;
     document.getElementById("transactionsCount").textContent = transactionsSnap.size;
 
-    const supportRows = supportSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    // Support requests
+    const supportRows = supportSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
     showRows("supportTable", supportRows, [
-      r => r.userId || "",
-      r => r.message || "",
-      r => r.status || "",
-      r => safeDate(r.createdAt)
+      r => ({
+        value: getUserName(r.userId),
+        className: "user-name"
+      }),
+      r => ({value: r.email || ""}),
+      r => ({value: r.message || ""}),
+      r => ({value: r.status || ""}),
+      r => ({value: safeDate(r.createdAt)})
     ]);
 
-    const userRows = usersSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    // Registered users
     showRows("usersTable", userRows, [
-      r => r.id,
-      r => JSON.stringify(r)
+      r => ({
+        value: r.fullName || r.name ||
+          (r.email ? r.email.split("@")[0] : "Unnamed User"),
+        className: "user-name"
+      }),
+      r => ({
+        value: r.email || ""
+      }),
+      r => ({
+        value: r.id,
+        className: "user-id"
+      }),
+      r => ({
+        value: r.status || "active"
+      }),
+      r => ({
+        value: safeDate(r.createdAt)
+      })
     ]);
 
-    const transactionRows = transactionsSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    // Demo transactions
+    const transactionRows = transactionsSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
     showRows("transactionsTable", transactionRows, [
-      r => r.userId || "",
-      r => JSON.stringify(r)
+      r => ({
+        value: getUserName(r.userId),
+        className: "user-name"
+      }),
+      r => ({value: r.userId || ""}),
+      r => ({value: JSON.stringify(r)})
     ]);
 
     message.textContent = "Dashboard loaded successfully.";
+
   } catch (error) {
     console.error(error);
     message.textContent = "Data loading failed: " + error.message;
@@ -228,5 +324,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   window.location.replace("admin.html");
 });
 </script>
+
 </body>
 </html>
