@@ -87,7 +87,8 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 
 <div id="register-form" class="hidden">
 <h3>Create Account</h3>
-<p>Register with your email and create a password.</p>
+<p>Enter your name, email and create a password.</p>
+<input type="text" id="register-name" placeholder="Full Name" autocomplete="name">
 <input type="email" id="register-email" placeholder="Email address" autocomplete="email">
 <input type="password" id="register-password" placeholder="Create password (at least 6 characters)" autocomplete="new-password">
 <input type="password" id="register-confirm" placeholder="Confirm password" autocomplete="new-password">
@@ -209,7 +210,8 @@ collection,
 addDoc,
 serverTimestamp,
 doc,
-setDoc
+setDoc,
+getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -247,11 +249,12 @@ $("show-register").addEventListener("click",()=>showAuthTab("register"));
 
 $("register-btn").addEventListener("click",async()=>{
 const btn=$("register-btn");
+const fullName=$("register-name").value.trim();
 const email=$("register-email").value.trim().toLowerCase();
 const password=$("register-password").value;
 const confirm=$("register-confirm").value;
 
-if(!email||!password||!confirm){
+if(!fullName||!email||!password||!confirm){
 message("Please fill in all fields.",true);
 return;
 }
@@ -271,9 +274,9 @@ btn.textContent="Creating Account...";
 const result=await createUserWithEmailAndPassword(auth,email,password);
 const user=result.user;
 
-/* Save the new user's profile in Firestore */
 await setDoc(doc(db,"users",user.uid),{
 uid:user.uid,
+fullName:fullName,
 email:user.email,
 createdAt:serverTimestamp(),
 status:"active"
@@ -289,7 +292,7 @@ message("Please enter a valid email address.",true);
 }else if(error.code==="auth/weak-password"){
 message("Password is too weak. Use at least 6 characters.",true);
 }else if(error.code==="permission-denied"){
-message("Account created, but Firestore permission denied. Check Firestore Rules.",true);
+message("Account created, but Firestore permission denied. Update Firestore Rules.",true);
 }else{
 message("Registration error: "+error.message,true);
 }
@@ -343,16 +346,30 @@ message("Could not send reset email: "+error.message,true);
 }
 });
 
-onAuthStateChanged(auth,user=>{
+onAuthStateChanged(auth,async user=>{
 if(user){
 $("auth-section").classList.add("hidden");
 $("app-header").classList.remove("hidden");
 $("app-content").classList.remove("hidden");
 
-const displayName=user.email||"BaweReal User";
+let displayName=user.displayName||"";
+
+try{
+const userDoc=await getDoc(doc(db,"users",user.uid));
+if(userDoc.exists()){
+displayName=userDoc.data().fullName||displayName;
+}
+}catch(error){
+console.error("Could not load user profile:",error);
+}
+
+if(!displayName){
+displayName=user.email?user.email.split("@")[0]:"BaweReal User";
+}
+
 $("user-display-name").textContent=displayName;
-$("user-avatar").textContent=displayName.substring(0,2).toUpperCase();
-$("profile-auth-info").textContent="Signed in: "+displayName;
+$("user-avatar").textContent=displayName.trim().split(/\s+/).map(part=>part[0]).join("").substring(0,2).toUpperCase();
+$("profile-auth-info").textContent="Name: "+displayName+" | Email: "+(user.email||"");
 go("home");
 }else{
 $("auth-section").classList.remove("hidden");
