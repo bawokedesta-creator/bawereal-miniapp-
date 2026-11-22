@@ -235,9 +235,6 @@ small{color:var(--muted)}
         <span class="live-dot"></span>Activity Display
       </span>
     </div>
-    <p style="font-size:11px;color:#b9b9ca;margin-bottom:12px">
-      Sample Activity — Not Verified Deposits
-    </p>
     <div class="activity-window">
       <div class="activity-track" id="activityTrack"></div>
     </div>
@@ -649,10 +646,10 @@ const activityTrack=document.getElementById("activityTrack");
 if(activityTrack){
   const entries=[...activityNumbers,...activityNumbers];
 
-  activityTrack.innerHTML=entries.map((number,index)=>`
+  activityTrack.innerHTML=entries.map(number=>`
     <div class="activity-entry">
       <span>📱 ${number}</span>
-      <strong>Sample #${(index%9)+1}</strong>
+      <strong>Deposit</strong>
     </div>
   `).join("");
 }
