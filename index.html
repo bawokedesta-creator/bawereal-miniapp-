@@ -65,6 +65,11 @@ small{color:var(--muted)}
 .stat{background:#f5f5fb;padding:13px;border-radius:12px}
 .stat strong{display:block;font-size:19px;margin-top:7px}
 .account-box{background:#f7f7fc;padding:14px;border-radius:12px;margin:10px 0}
+.feature-row{display:flex;gap:9px;margin:10px 0}
+.feature-row .btn{flex:1}
+.faq-item{padding:13px 0;border-bottom:1px solid #eee}
+.faq-item:last-child{border:0}
+.faq-item strong{display:block;margin-bottom:7px}
 @media(min-width:650px){
 .bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
 }
@@ -125,6 +130,9 @@ small{color:var(--muted)}
     <p>Current Balance</p>
     <h1 id="balanceText">0.00 ETB</h1>
     <small style="color:#eee">Verified balance</small>
+    <button class="btn secondary" style="margin-top:15px" id="refreshBalanceBtn">
+      ↻ Refresh Balance
+    </button>
   </div>
 
   <div class="grid">
@@ -134,6 +142,8 @@ small{color:var(--muted)}
     <div class="action" onclick="openPage('referral')"><span class="emoji">👥</span><strong>Referral</strong></div>
     <div class="action" onclick="openPage('packages')"><span class="emoji">📦</span><strong>Packages</strong></div>
     <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong>Support</strong></div>
+    <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong>Notifications</strong></div>
+    <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong>Help / FAQ</strong></div>
   </div>
 
   <div class="card" style="margin-top:17px">
@@ -253,6 +263,7 @@ small{color:var(--muted)}
   <p class="muted">Share your code with others.</p><br>
   <h2 id="referralCode">Loading...</h2><br>
   <button class="btn" id="copyReferralBtn">Copy Referral Code</button>
+  <div class="notice">Referral code copying is available. Referral rewards and tracking require a separate verified backend system.</div>
 </div>
 </section>
 
@@ -262,6 +273,7 @@ small{color:var(--muted)}
 <div class="card">
   <h3>Packages</h3>
   <p class="muted">Package information will appear here when officially configured.</p>
+  <div class="notice">No package purchase or earning feature is currently active.</div>
 </div>
 </section>
 
@@ -286,6 +298,7 @@ small{color:var(--muted)}
   <p>Current Balance</p>
   <h1 id="profileBalance">0.00 ETB</h1>
   <small style="color:#eee">Verified balance</small>
+  <button class="btn secondary" style="margin-top:15px" id="profileRefreshBtn">↻ Refresh Balance</button>
 </div>
 
 <div class="card">
@@ -306,11 +319,23 @@ small{color:var(--muted)}
   <p class="muted">Email Address</p>
   <p id="profileEmail" style="margin:6px 0 15px">-</p>
 
-  <p class="muted">User ID</p>
-  <p id="profileUid" style="margin:6px 0 15px;word-break:break-all">-</p>
+  <p class="muted">Email Verification</p>
+  <p id="emailVerificationStatus" style="margin:6px 0 10px">-</p>
+  <button class="btn secondary" id="verifyEmailBtn">Send Verification Email</button>
 
-  <p class="muted">Account Status</p>
+  <p class="muted" style="margin-top:17px">User ID</p>
+  <p id="profileUid" style="margin:6px 0 10px;word-break:break-all">-</p>
+  <button class="btn secondary" id="copyUidBtn">Copy User ID</button>
+
+  <p class="muted" style="margin-top:17px">Account Status</p>
   <p id="profileStatus" style="margin-top:6px">-</p>
+</div>
+
+<div class="card">
+  <h3>Account Security</h3>
+  <p class="muted">To change your password, use the secure password reset link sent to your email.</p>
+  <button class="btn secondary" id="profileResetPasswordBtn" style="margin-top:12px">Send Password Reset Link</button>
+  <div class="notice">Never share your password or verification code with anyone.</div>
 </div>
 </section>
 
@@ -325,6 +350,62 @@ small{color:var(--muted)}
 <div class="card">
   <h3>My Support Requests</h3>
   <div id="supportHistory"><div class="empty">No support messages yet.</div></div>
+</div>
+</section>
+
+<!-- NOTIFICATIONS -->
+<section id="notificationsPage" class="hidden">
+<h2 class="page-title">Notifications</h2>
+<div class="card">
+  <h3>My Request Updates</h3>
+  <p class="muted">Updates about your deposit and withdrawal requests.</p>
+  <div class="feature-row">
+    <button class="btn secondary" id="refreshNotificationsBtn">↻ Refresh</button>
+  </div>
+  <div id="notificationsList"><div class="empty">Loading notifications...</div></div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faqPage" class="hidden">
+<h2 class="page-title">Help / FAQ</h2>
+<div class="card">
+  <h3>Frequently Asked Questions</h3>
+
+  <div class="faq-item">
+    <strong>1. How do I deposit?</strong>
+    <p class="muted">Choose Deposit, select a payment method, transfer the amount, enter the transaction ID and submit your request.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>2. When will my deposit be approved?</strong>
+    <p class="muted">Your request must be reviewed and the payment verified before the balance can be updated.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>3. Why is my deposit pending?</strong>
+    <p class="muted">It means the request has been submitted but has not yet been reviewed.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>4. How do I request a withdrawal?</strong>
+    <p class="muted">Open Withdrawal, enter your payment details and submit your request.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>5. How can I reset my password?</strong>
+    <p class="muted">Use Forgot Password on the login screen or the password reset button in your profile.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>6. How can I contact support?</strong>
+    <p class="muted">Open Support, write your message and submit it.</p>
+  </div>
+
+  <div class="faq-item">
+    <strong>7. Does submitting a request update my balance immediately?</strong>
+    <p class="muted">No. A deposit request does not change your balance until it is verified and approved through the secure admin process.</p>
+  </div>
 </div>
 </section>
 
@@ -357,7 +438,7 @@ function showForgot(){
 }
 
 function openPage(page){
-  const pages=["home","deposit","withdraw","referral","packages","history","profile","support"];
+  const pages=["home","deposit","withdraw","referral","packages","history","profile","support","notifications","faq"];
   pages.forEach(p=>{
     const el=document.getElementById(p+"Page");
     if(el) el.classList.toggle("hidden",p!==page);
@@ -372,6 +453,7 @@ function openPage(page){
   if(page==="deposit" && window.loadDepositHistory) window.loadDepositHistory();
   if(page==="profile" && window.loadDepositSummary) window.loadDepositSummary();
   if(page==="support" && window.loadSupportHistory) window.loadSupportHistory();
+  if(page==="notifications" && window.loadNotifications) window.loadNotifications();
 }
 window.openPage=openPage;
 
@@ -402,7 +484,8 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 import {
   getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,
-  sendPasswordResetEmail,onAuthStateChanged,signOut
+  sendPasswordResetEmail,onAuthStateChanged,signOut,
+  sendEmailVerification, reload
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
@@ -499,7 +582,12 @@ $("registerBtn").addEventListener("click",async()=>{
       createdAt:serverTimestamp()
     });
 
-    notify("Account created successfully.");
+    try{
+      await sendEmailVerification(result.user);
+      notify("Account created. A verification email has been sent.");
+    }catch(e){
+      notify("Account created successfully. You can request email verification from your profile.");
+    }
   }catch(error){
     notify(error.message);
   }finally{
@@ -525,6 +613,16 @@ $("loginBtn").addEventListener("click",async()=>{
 });
 
 /* PASSWORD RESET */
+async function sendReset(email){
+  if(!email) return notify("Email address is not available.");
+  try{
+    await sendPasswordResetEmail(auth,email);
+    notify("Password reset link sent. Check your email.");
+  }catch(error){
+    notify(error.message);
+  }
+}
+
 $("resetBtn").addEventListener("click",async()=>{
   const email=$("forgotEmail").value.trim();
   if(!email) return notify("Enter your email address.");
@@ -539,6 +637,26 @@ $("resetBtn").addEventListener("click",async()=>{
     notify(error.message);
   }finally{
     setLoading(btn,false,"Send Reset Link");
+  }
+});
+
+$("profileResetPasswordBtn").addEventListener("click",async()=>{
+  if(!currentUser) return;
+  await sendReset(currentUser.email);
+});
+
+/* EMAIL VERIFICATION */
+$("verifyEmailBtn").addEventListener("click",async()=>{
+  if(!currentUser) return;
+  const btn=$("verifyEmailBtn");
+  setLoading(btn,true,"Send Verification Email");
+  try{
+    await sendEmailVerification(currentUser);
+    notify("Verification email sent. Check your inbox.");
+  }catch(error){
+    notify(error.message);
+  }finally{
+    setLoading(btn,false,"Send Verification Email");
   }
 });
 
@@ -606,9 +724,25 @@ async function loadUserProfile(){
     $("balanceText").textContent=formatMoney(balance);
     $("profileBalance").textContent=formatMoney(balance);
 
+    await updateEmailVerificationStatus();
+
   }catch(error){
     console.error(error);
     notify("Could not load your profile.");
+  }
+}
+
+/* EMAIL VERIFICATION STATUS */
+async function updateEmailVerificationStatus(){
+  if(!currentUser) return;
+  try{
+    await reload(currentUser);
+    const verified=auth.currentUser.emailVerified;
+    $("emailVerificationStatus").textContent=verified?"Verified ✓":"Not verified";
+    $("emailVerificationStatus").style.color=verified?"#087b4c":"#bd2636";
+    $("verifyEmailBtn").style.display=verified?"none":"block";
+  }catch(error){
+    $("emailVerificationStatus").textContent="Unable to check";
   }
 }
 
@@ -622,11 +756,33 @@ async function refreshBalance(){
       const balance=Number(currentUserData.balance||0);
       $("balanceText").textContent=formatMoney(balance);
       $("profileBalance").textContent=formatMoney(balance);
+      notify("Balance refreshed.");
     }
   }catch(error){
     console.error("Balance refresh error:",error);
+    notify("Could not refresh balance.");
   }
 }
+
+$("refreshBalanceBtn").addEventListener("click",refreshBalance);
+$("profileRefreshBtn").addEventListener("click",refreshBalance);
+
+/* COPY USER ID */
+$("copyUidBtn").addEventListener("click",async()=>{
+  if(!currentUser) return;
+  try{
+    await navigator.clipboard.writeText(currentUser.uid);
+    notify("User ID copied.");
+  }catch(error){
+    const temp=document.createElement("textarea");
+    temp.value=currentUser.uid;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    temp.remove();
+    notify("User ID copied.");
+  }
+});
 
 /* DEPOSIT REQUEST */
 $("depositBtn").addEventListener("click",async()=>{
@@ -887,7 +1043,7 @@ async function loadWithdrawalHistory(){
         ${record.note?`<p class="muted">Note: ${safeText(record.note)}</p>`:""}
         ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
         ${canCancel?`
-          <button class="btn danger" style="margin-top:10px" onclick="cancelWithdrawal('${record.id}')">Cancel Request</button>
+          <p class="muted" style="margin-top:9px">To cancel this request, contact Support.</p>
         `:""}
       </div>`;
     }).join("");
@@ -898,37 +1054,6 @@ async function loadWithdrawalHistory(){
   }
 }
 window.loadWithdrawalHistory=loadWithdrawalHistory;
-
-/* CANCEL WITHDRAWAL */
-window.cancelWithdrawal=async function(id){
-  if(!currentUser) return;
-  if(!confirm("Cancel this withdrawal request?")) return;
-
-  try{
-    const requestRef=doc(db,"transactionRequests",id);
-    const snapshot=await getDoc(requestRef);
-
-    if(!snapshot.exists()) return notify("Request not found.");
-
-    const data=snapshot.data();
-    if(data.userId!==currentUser.uid) return notify("You cannot cancel this request.");
-    if(!["request-recorded","pending"].includes(data.status))
-      return notify("This request can no longer be cancelled.");
-
-    await updateDoc(requestRef,{
-      status:"cancelled",
-      cancelledAt:serverTimestamp()
-    });
-
-    notify("Withdrawal request cancelled.");
-    await loadWithdrawalHistory();
-    await loadHistory();
-
-  }catch(error){
-    console.error(error);
-    notify("Could not cancel request: "+error.message);
-  }
-};
 
 /* REFERRAL COPY */
 $("copyReferralBtn").addEventListener("click",async()=>{
@@ -1018,6 +1143,76 @@ function renderHistory(records){
 
 $("historyFilter").addEventListener("change",loadHistory);
 window.loadHistory=loadHistory;
+
+/* NOTIFICATIONS */
+async function loadNotifications(){
+  if(!currentUser) return;
+
+  const container=$("notificationsList");
+  container.innerHTML='<div class="empty">Loading notifications...</div>';
+
+  try{
+    const q=query(
+      collection(db,"transactionRequests"),
+      where("userId","==",currentUser.uid)
+    );
+
+    const snapshot=await getDocs(q);
+    const records=[];
+
+    snapshot.forEach(item=>{
+      const record=item.data();
+      records.push({id:item.id,...record});
+    });
+
+    records.sort((a,b)=>
+      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
+    );
+
+    if(!records.length){
+      container.innerHTML='<div class="empty">You have no notifications yet.</div>';
+      return;
+    }
+
+    container.innerHTML=records.map(record=>{
+      const type=String(record.type||"request");
+      const status=String(record.status||"pending");
+      let message="Your request has been received.";
+
+      if(["approved","completed","paid"].includes(status)){
+        message="Your request has been approved.";
+      }else if(["rejected","failed"].includes(status)){
+        message="Your request was not approved. Check the admin note if available.";
+      }else if(status==="cancelled"){
+        message="This request has been cancelled.";
+      }else if(type==="withdrawal"){
+        message="Your withdrawal request is waiting for review.";
+      }else{
+        message="Your deposit request is waiting for review.";
+      }
+
+      return `
+        <div class="item">
+          <div class="item-top">
+            <strong>${safeText(type.toUpperCase())}</strong>
+            <strong>${formatMoney(record.amount)}</strong>
+          </div>
+          <p class="muted" style="margin-top:7px">${safeText(message)}</p>
+          <span class="status ${statusClass(status)}">${safeText(readableStatus(status))}</span>
+          <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
+          ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    console.error(error);
+    container.innerHTML='<div class="empty">Could not load notifications.</div>';
+  }
+}
+window.loadNotifications=loadNotifications;
+
+$("refreshNotificationsBtn").addEventListener("click",loadNotifications);
 
 /* SUPPORT REQUEST */
 $("supportBtn").addEventListener("click",async()=>{
