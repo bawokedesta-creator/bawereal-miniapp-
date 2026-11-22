@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,6 +110,7 @@ td{color:#334155}
  border:0;border-radius:7px;padding:7px 10px;
  margin:2px;font-size:12px;font-weight:bold;
 }
+.action:disabled{opacity:.5;cursor:not-allowed}
 .approve{background:#dcfce7;color:#166534}
 .reject{background:#fee2e2;color:#991b1b}
 .review{background:#dbeafe;color:#1e40af}
@@ -254,7 +254,7 @@ import {
  getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
- getFirestore,collection,getDocs,doc,getDoc,updateDoc,
+ getFirestore,collection,getDocs,doc,updateDoc,runTransaction,
  query,where,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -379,7 +379,9 @@ function renderAll(){
    <td><span class="status approved">Registered</span></td>
   </tr>`).join("")||'<tr><td colspan="5" class="empty">No users found</td></tr>';
 
- $("depositsTable").innerHTML=depositData.map(d=>`
+ $("depositsTable").innerHTML=depositData.map(d=>{
+  const isApproved=String(d.status||"").toLowerCase()==="approved";
+  return `
   <tr>
    <td>${userName(d.userId,d.email)}</td>
    <td>${safe(d.amount)} ETB</td>
@@ -389,11 +391,12 @@ function renderAll(){
    <td><span class="status ${statusClass(d.status)}">${statusLabel(d.status)}</span></td>
    <td><input class="note-input" id="note-${safe(d.id)}" value="${safe(d.adminNote||"")}" placeholder="Admin note"></td>
    <td>
-    <button class="action review" data-id="${safe(d.id)}" data-action="review">Review</button>
-    <button class="action approve" data-id="${safe(d.id)}" data-action="approve">Approve</button>
-    <button class="action reject" data-id="${safe(d.id)}" data-action="reject">Reject</button>
+    <button class="action review" data-id="${safe(d.id)}" data-action="review" ${isApproved?"disabled":""}>Review</button>
+    <button class="action approve" data-id="${safe(d.id)}" data-action="approve" ${isApproved?"disabled":""}>Approve</button>
+    <button class="action reject" data-id="${safe(d.id)}" data-action="reject" ${isApproved?"disabled":""}>Reject</button>
    </td>
-  </tr>`).join("")||'<tr><td colspan="8" class="empty">No deposit requests</td></tr>';
+  </tr>`;
+ }).join("")||'<tr><td colspan="8" class="empty">No deposit requests</td></tr>';
 
  $("withdrawalsTable").innerHTML=withdrawalData.map(w=>`
   <tr>
@@ -434,9 +437,67 @@ $("depositsTable").addEventListener("click",async e=>{
   return;
  }
  if(action==="approve"){
-  alert("Approval and balance credit must be performed by a trusted server-side function. This dashboard does not change balances directly.");
+  await approveDeposit(id,d,note,btn);
  }
 });
+
+async function approveDeposit(id,d,note,btn){
+ if(String(d.status||"").toLowerCase()==="approved"){
+  $("message").textContent="This deposit is already approved.";
+  return;
+ }
+ const amount=Number(d.amount);
+ if(!d.userId||!Number.isFinite(amount)||amount<=0){
+  $("message").textContent="Approval failed: invalid userId or amount.";
+  return;
+ }
+ if(!confirm(`Approve deposit of ${amount} ETB and credit user balance?`))return;
+
+ btn.disabled=true;
+ $("message").textContent="Approving deposit and updating balance...";
+
+ try{
+  const depositRef=doc(db,"transactionRequests",id);
+  const userRef=doc(db,"users",d.userId);
+
+  await runTransaction(db,async tx=>{
+   const depositSnap=await tx.get(depositRef);
+   if(!depositSnap.exists())throw new Error("Deposit request not found.");
+   const currentDeposit=depositSnap.data();
+   if(String(currentDeposit.status||"").toLowerCase()==="approved"){
+    throw new Error("Deposit already approved.");
+   }
+
+   const userSnap=await tx.get(userRef);
+   if(!userSnap.exists())throw new Error("User document not found.");
+
+   const currentBalance=Number(userSnap.data().balance??0);
+   const safeBalance=Number.isFinite(currentBalance)?currentBalance:0;
+   const txAmount=Number(currentDeposit.amount);
+   if(!Number.isFinite(txAmount)||txAmount<=0){
+    throw new Error("Invalid deposit amount in database.");
+   }
+
+   tx.update(userRef,{
+    balance:safeBalance+txAmount,
+    updatedAt:serverTimestamp()
+   });
+   tx.update(depositRef,{
+    status:"approved",
+    adminNote:note,
+    approvedBy:auth.currentUser?.uid||ADMIN_UID,
+    approvedAt:serverTimestamp(),
+    reviewedAt:serverTimestamp()
+   });
+  });
+
+  $("message").textContent=`Approved ${amount} ETB and updated user balance.`;
+  await loadAll();
+ }catch(err){
+  btn.disabled=false;
+  $("message").textContent="Approval failed: "+err.message;
+ }
+}
 
 async function saveDepositStatus(id,status,note){
  try{
