@@ -145,6 +145,47 @@ small{color:var(--muted)}
   to{transform:translateY(-50%)}
 }
 
+/* 25% -> 50% -> 75% -> 100% LOADER */
+#stepLoader{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:linear-gradient(135deg,#17172b,#302b9d,#635bff);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.step-box{
+  width:100%;
+  max-width:320px;
+  background:rgba(23,23,43,.88);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+}
+.step-pct{
+  font-size:30px;
+  font-weight:bold;
+  margin-bottom:12px;
+}
+.step-track{
+  width:100%;
+  height:11px;
+  background:rgba(255,255,255,.18);
+  border-radius:999px;
+  overflow:hidden;
+}
+.step-fill{
+  width:25%;
+  height:100%;
+  background:#fff;
+  border-radius:999px;
+  transition:width .2s ease;
+}
+
 @media(min-width:650px){
 .bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
 }
@@ -152,6 +193,16 @@ small{color:var(--muted)}
 </head>
 
 <body>
+
+<!-- 25% -> 50% -> 75% -> 100% LOADER -->
+<div id="stepLoader" class="hidden">
+  <div class="step-box">
+    <div class="step-pct" id="stepPct">25%</div>
+    <div class="step-track">
+      <div class="step-fill" id="stepFill"></div>
+    </div>
+  </div>
+</div>
 
 <section id="auth" class="auth-wrap">
   <div class="logo">BaweReal</div>
@@ -298,7 +349,7 @@ small{color:var(--muted)}
 
 <div class="card">
   <h3>My Deposit History</h3>
-  <div id="depositHistory"><div class="empty">Loading...</div></div>
+  <div id="depositHistory"><div class="empty">Tap Refresh Balance or open when needed.</div></div>
 </div>
 </section>
 
@@ -325,7 +376,7 @@ small{color:var(--muted)}
   <label>Withdrawal Amount (ETB)</label>
   <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
 
-  <label>Transaction Fee (ETB)</label>
+  <label>Transaction Fee (0.04%)</label>
   <input id="withdrawFee" type="text" value="0.00 ETB" readonly>
 
   <label>Net Amount (ETB)</label>
@@ -334,13 +385,13 @@ small{color:var(--muted)}
   <label>Additional Note (Optional)</label>
   <textarea id="withdrawNote" placeholder="Write additional information"></textarea>
 
-  <div class="notice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is currently 0 ETB.</div>
+  <div class="notice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.</div>
   <button class="btn" id="withdrawBtn">Submit Withdrawal Request</button>
 </div>
 
 <div class="card">
   <h3>My Withdrawal History</h3>
-  <div id="withdrawHistory"><div class="empty">Loading...</div></div>
+  <div id="withdrawHistory"><div class="empty">No withdrawal history loaded yet.</div></div>
 </div>
 </section>
 
@@ -431,7 +482,7 @@ small{color:var(--muted)}
     <option value="deposit">Deposits</option>
     <option value="withdrawal">Withdrawals</option>
   </select>
-  <div id="historyList"><div class="empty">Loading history...</div></div>
+  <div id="historyList"><div class="empty">No history loaded yet.</div></div>
 </div>
 </section>
 
@@ -507,7 +558,7 @@ small{color:var(--muted)}
   <div class="feature-row">
     <button class="btn secondary" id="refreshNotificationsBtn">↻ Refresh</button>
   </div>
-  <div id="notificationsList"><div class="empty">Loading notifications...</div></div>
+  <div id="notificationsList"><div class="empty">No notifications loaded yet.</div></div>
 </div>
 </section>
 
@@ -597,13 +648,6 @@ function openPage(page){
   document.querySelectorAll(".nav-btn").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.page===page);
   });
-
-  if(page==="history" && window.loadHistory) window.loadHistory();
-  if(page==="withdraw" && window.loadWithdrawalHistory) window.loadWithdrawalHistory();
-  if(page==="deposit" && window.loadDepositHistory) window.loadDepositHistory();
-  if(page==="profile" && window.loadDepositSummary) window.loadDepositSummary();
-  if(page==="support" && window.loadSupportHistory) window.loadSupportHistory();
-  if(page==="notifications" && window.loadNotifications) window.loadNotifications();
 }
 window.openPage=openPage;
 
@@ -661,12 +705,12 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 import {
   getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,
   sendPasswordResetEmail,onAuthStateChanged,signOut,
-  sendEmailVerification, reload
+  sendEmailVerification,reload
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
   getFirestore,doc,setDoc,getDoc,addDoc,collection,query,
-  where,getDocs,serverTimestamp,updateDoc
+  where,getDocs,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -685,6 +729,7 @@ const db=getFirestore(app);
 
 let currentUser=null;
 let currentUserData={};
+let hasPlayedBootLoader=false;
 
 const $=id=>document.getElementById(id);
 function notify(message){alert(message);}
@@ -728,6 +773,49 @@ function getDate(record){
     ?record.createdAt.toDate().toLocaleString()
     :"Date unavailable";
 }
+
+/* 25% -> 50% -> 75% -> 100% LOADER */
+function playStepLoader(){
+  return new Promise(resolve=>{
+    const loader=$("stepLoader");
+    const pct=$("stepPct");
+    const fill=$("stepFill");
+    loader.classList.remove("hidden");
+    const steps=[25,50,75,100];
+    let idx=0;
+    function next(){
+      const v=steps[idx];
+      pct.textContent=v+"%";
+      fill.style.width=v+"%";
+      idx++;
+      if(idx<steps.length){
+        setTimeout(next,140);
+      }else{
+        setTimeout(()=>{
+          loader.classList.add("hidden");
+          resolve();
+        },160);
+      }
+    }
+    next();
+  });
+}
+
+/* WITHDRAWAL FEE (0.04%) */
+function calcWithdrawFee(amount){
+  const amt=Number(amount)||0;
+  if(amt<=0) return 0;
+  return Number((amt*0.0004).toFixed(4));
+}
+
+function updateWithdrawFeePreview(){
+  const amt=Math.max(0,Number($("withdrawAmount").value)||0);
+  const fee=Math.min(amt,calcWithdrawFee(amt));
+  const net=Number(Math.max(0,amt-fee).toFixed(4));
+  $("withdrawFee").value=fee.toFixed(2)+" ETB";
+  $("withdrawNet").value=net.toFixed(2)+" ETB";
+}
+$("withdrawAmount").addEventListener("input",updateWithdrawFeePreview);
 
 /* REGISTER */
 $("registerBtn").addEventListener("click",async()=>{
@@ -838,13 +926,17 @@ $("verifyEmailBtn").addEventListener("click",async()=>{
 
 /* LOGOUT */
 $("logoutBtn").addEventListener("click",async()=>{
-  if(confirm("Are you sure you want to logout?")) await signOut(auth);
+  if(confirm("Are you sure you want to logout?")){
+    hasPlayedBootLoader=false;
+    await signOut(auth);
+  }
 });
 
-/* AUTH STATE */
+/* AUTH STATE — NO AUTO REFRESH ON ENTRY */
 onAuthStateChanged(auth,async user=>{
   currentUser=user;
   if(!user){
+    hasPlayedBootLoader=false;
     $("auth").classList.remove("hidden");
     $("application").classList.add("hidden");
     return;
@@ -853,60 +945,16 @@ onAuthStateChanged(auth,async user=>{
   $("auth").classList.add("hidden");
   $("application").classList.remove("hidden");
 
-  await loadUserProfile();
-  await loadHistory();
-  await loadDepositHistory();
-  await loadDepositSummary();
-  await loadWithdrawalHistory();
-  await loadSupportHistory();
-});
+  $("headerName").textContent="Hello, "+(user.email||"User");
+  $("profileEmail").textContent=user.email||"-";
+  $("profileUid").textContent=user.uid;
+  $("referralCode").textContent=makeReferral(user.uid);
 
-/* USER PROFILE AND BALANCE */
-async function loadUserProfile(){
-  if(!currentUser) return;
-
-  try{
-    const userRef=doc(db,"users",currentUser.uid);
-    const snap=await getDoc(userRef);
-
-    if(!snap.exists()){
-      currentUserData={
-        uid:currentUser.uid,
-        email:currentUser.email,
-        fullName:"User",
-        status:"active"
-      };
-      await setDoc(userRef,{
-        uid:currentUser.uid,
-        fullName:"User",
-        email:currentUser.email,
-        status:"active",
-        createdAt:serverTimestamp()
-      });
-    }else{
-      currentUserData=snap.data();
-    }
-
-    const name=currentUserData.fullName||"User";
-    const balance=Number(currentUserData.balance||0);
-
-    $("headerName").textContent="Hello, "+name;
-    $("profileName").textContent=name;
-    $("profileEmail").textContent=currentUser.email||"-";
-    $("profileUid").textContent=currentUser.uid;
-    $("profileStatus").textContent=currentUserData.status||"Active";
-    $("referralCode").textContent=currentUserData.referralCode||makeReferral(currentUser.uid);
-
-    $("balanceText").textContent=formatMoney(balance);
-    $("profileBalance").textContent=formatMoney(balance);
-
-    await updateEmailVerificationStatus();
-
-  }catch(error){
-    console.error(error);
-    notify("Could not load your profile.");
+  if(!hasPlayedBootLoader){
+    hasPlayedBootLoader=true;
+    await playStepLoader();
   }
-}
+});
 
 /* EMAIL VERIFICATION STATUS */
 async function updateEmailVerificationStatus(){
@@ -922,18 +970,40 @@ async function updateEmailVerificationStatus(){
   }
 }
 
-/* REFRESH BALANCE */
+/* MANUAL REFRESH BALANCE (ONLY ON BUTTON CLICK) */
 async function refreshBalance(){
   if(!currentUser) return;
   try{
-    const snap=await getDoc(doc(db,"users",currentUser.uid));
-    if(snap.exists()){
-      currentUserData=snap.data();
-      const balance=Number(currentUserData.balance||0);
-      $("balanceText").textContent=formatMoney(balance);
-      $("profileBalance").textContent=formatMoney(balance);
-      notify("Balance refreshed.");
+    const userRef=doc(db,"users",currentUser.uid);
+    let snap=await getDoc(userRef);
+
+    if(!snap.exists()){
+      await setDoc(userRef,{
+        uid:currentUser.uid,
+        fullName:"User",
+        email:currentUser.email,
+        status:"active",
+        createdAt:serverTimestamp()
+      });
+      snap=await getDoc(userRef);
     }
+
+    currentUserData=snap.exists()?snap.data():{};
+    const name=currentUserData.fullName||"User";
+    const balance=Number(currentUserData.balance||0);
+
+    $("headerName").textContent="Hello, "+name;
+    $("profileName").textContent=name;
+    $("profileEmail").textContent=currentUser.email||"-";
+    $("profileUid").textContent=currentUser.uid;
+    $("profileStatus").textContent=currentUserData.status||"Active";
+    $("referralCode").textContent=currentUserData.referralCode||makeReferral(currentUser.uid);
+
+    $("balanceText").textContent=formatMoney(balance);
+    $("profileBalance").textContent=formatMoney(balance);
+
+    await updateEmailVerificationStatus();
+    notify("Balance refreshed.");
   }catch(error){
     console.error("Balance refresh error:",error);
     notify("Could not refresh balance.");
@@ -943,20 +1013,24 @@ async function refreshBalance(){
 $("refreshBalanceBtn").addEventListener("click",refreshBalance);
 $("profileRefreshBtn").addEventListener("click",refreshBalance);
 
-/* COPY USER ID */
+/* COPY USER ID & REFERRAL */
 $("copyUidBtn").addEventListener("click",async()=>{
   if(!currentUser) return;
   try{
     await navigator.clipboard.writeText(currentUser.uid);
     notify("User ID copied.");
   }catch(error){
-    const temp=document.createElement("textarea");
-    temp.value=currentUser.uid;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    temp.remove();
     notify("User ID copied.");
+  }
+});
+
+$("copyReferralBtn").addEventListener("click",async()=>{
+  const code=$("referralCode").textContent;
+  try{
+    await navigator.clipboard.writeText(code);
+    notify("Referral code copied: "+code);
+  }catch(error){
+    notify("Referral code copied.");
   }
 });
 
@@ -966,501 +1040,237 @@ $("depositBtn").addEventListener("click",async()=>{
 
   const method=$("depositMethod").value;
   const amount=Number($("depositAmount").value);
-  const transactionId=$("depositTransactionId").value.trim();
+  const txId=$("depositTransactionId").value.trim();
   const note=$("depositNote").value.trim();
 
-  if(!method) return notify("Choose a payment method.");
+  if(!method) return notify("Please select a payment method.");
   if(!Number.isFinite(amount)||amount<300||amount>10000)
     return notify("Deposit amount must be between 300 and 10,000 ETB.");
-  if(!transactionId)
-    return notify("Enter your payment transaction ID.");
+  if(!txId) return notify("Please enter transaction ID.");
 
   const btn=$("depositBtn");
   setLoading(btn,true,"Submit Deposit Request");
-
   try{
     await addDoc(collection(db,"transactionRequests"),{
       userId:currentUser.uid,
-      email:currentUser.email,
+      email:currentUser.email||"",
       type:"deposit",
       amount,
       method,
-      transactionId,
+      transactionId:txId,
       note,
       status:"pending",
-      adminNote:"",
       createdAt:serverTimestamp()
     });
-
-    notify("Deposit request submitted successfully. It is waiting for review.");
-
     $("depositAmount").value="";
     $("depositTransactionId").value="";
     $("depositNote").value="";
-
-    await loadDepositHistory();
-    await loadDepositSummary();
-    await loadHistory();
-    openPage("deposit");
-
+    notify("Deposit request submitted.");
   }catch(error){
-    console.error(error);
-    notify("Could not submit deposit request: "+error.message);
+    notify("Deposit failed: "+error.message);
   }finally{
     setLoading(btn,false,"Submit Deposit Request");
   }
 });
-
-/* DEPOSIT HISTORY */
-async function loadDepositHistory(){
-  if(!currentUser) return;
-
-  const container=$("depositHistory");
-  container.innerHTML='<div class="empty">Loading...</div>';
-
-  try{
-    const q=query(
-      collection(db,"transactionRequests"),
-      where("userId","==",currentUser.uid),
-      where("type","==","deposit")
-    );
-
-    const snapshot=await getDocs(q);
-    const records=[];
-    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
-
-    records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
-    );
-
-    if(!records.length){
-      container.innerHTML='<div class="empty">No deposit requests yet.</div>';
-      return;
-    }
-
-    container.innerHTML=records.map(record=>`
-      <div class="item">
-        <div class="item-top">
-          <strong>${formatMoney(record.amount)}</strong>
-          <strong>${safeText(record.method||"")}</strong>
-        </div>
-        <p class="muted">Transaction ID: ${safeText(record.transactionId||"-")}</p>
-        <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
-        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
-        ${record.receiptUrl?`
-          <p style="margin-top:8px">
-            <a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">View submitted receipt</a>
-          </p>`:""}
-        ${record.note?`<p class="muted">Note: ${safeText(record.note)}</p>`:""}
-        ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
-      </div>
-    `).join("");
-
-  }catch(error){
-    console.error(error);
-    container.innerHTML='<div class="empty">Could not load deposit history.</div>';
-  }
-}
-window.loadDepositHistory=loadDepositHistory;
-
-/* DEPOSIT SUMMARY IN PROFILE */
-async function loadDepositSummary(){
-  if(!currentUser) return;
-
-  try{
-    const q=query(
-      collection(db,"transactionRequests"),
-      where("userId","==",currentUser.uid),
-      where("type","==","deposit")
-    );
-
-    const snapshot=await getDocs(q);
-    let total=0,approved=0,pending=0,rejected=0;
-
-    snapshot.forEach(item=>{
-      const record=item.data();
-      const amount=Number(record.amount||0);
-      const status=String(record.status||"pending").toLowerCase();
-
-      total+=amount;
-      if(["approved","completed","paid"].includes(status)) approved+=amount;
-      else if(["rejected","failed","cancelled"].includes(status)) rejected+=amount;
-      else pending+=amount;
-    });
-
-    $("totalDeposits").textContent=formatMoney(total);
-    $("approvedDeposits").textContent=formatMoney(approved);
-    $("pendingDeposits").textContent=formatMoney(pending);
-    $("rejectedDeposits").textContent=formatMoney(rejected);
-
-    await refreshBalance();
-
-  }catch(error){
-    console.error(error);
-  }
-}
-window.loadDepositSummary=loadDepositSummary;
-
-/* WITHDRAWAL CALCULATOR */
-function calculateWithdrawal(){
-  const amount=Number($("withdrawAmount").value||0);
-  const fee=0;
-  const net=Math.max(0,amount-fee);
-  $("withdrawFee").value=formatMoney(fee);
-  $("withdrawNet").value=formatMoney(net);
-}
-$("withdrawAmount").addEventListener("input",calculateWithdrawal);
 
 /* WITHDRAWAL REQUEST */
 $("withdrawBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
 
   const method=$("withdrawMethod").value;
-  const name=$("withdrawName").value.trim();
-  const account=$("withdrawAccount").value.trim();
+  const accountName=$("withdrawName").value.trim();
+  const accountNumber=$("withdrawAccount").value.trim();
   const amount=Number($("withdrawAmount").value);
-  const fee=0;
   const note=$("withdrawNote").value.trim();
 
-  if(!method) return notify("Choose withdrawal method.");
-  if(!name) return notify("Enter account holder name.");
-  if(!account) return notify("Enter account number.");
+  if(!method) return notify("Please select a payment method.");
+  if(!accountName||!accountNumber) return notify("Please enter account holder name and account number.");
   if(!Number.isFinite(amount)||amount<100||amount>5000)
-    return notify("Withdrawal must be between 100 and 5,000 ETB.");
+    return notify("Withdrawal amount must be between 100 and 5,000 ETB.");
 
-  const netAmount=amount-fee;
+  const withdrawalFee=Math.min(amount,calcWithdrawFee(amount));
+  const netAmount=Number(Math.max(0,amount-withdrawalFee).toFixed(4));
+
   const btn=$("withdrawBtn");
   setLoading(btn,true,"Submit Withdrawal Request");
-
   try{
-    const transactionId="BW-WD-"+Date.now();
-
     await addDoc(collection(db,"transactionRequests"),{
       userId:currentUser.uid,
-      email:currentUser.email,
+      email:currentUser.email||"",
       type:"withdrawal",
-      transactionId,
-      accountHolderName:name,
-      method,
-      account,
       amount,
-      fee,
+      withdrawalFee,
       netAmount,
+      method,
+      accountName,
+      accountNumber,
       note,
-      status:"request-recorded",
-      adminNote:"",
+      status:"pending",
       createdAt:serverTimestamp()
     });
-
-    notify("Withdrawal request submitted. ID: "+transactionId);
-
-    $("withdrawMethod").value="";
     $("withdrawName").value="";
     $("withdrawAccount").value="";
     $("withdrawAmount").value="";
     $("withdrawNote").value="";
-    calculateWithdrawal();
-
-    await loadWithdrawalHistory();
-    await loadHistory();
-
+    updateWithdrawFeePreview();
+    notify("Withdrawal request submitted.");
   }catch(error){
-    console.error(error);
-    notify("Could not submit request: "+error.message);
+    notify("Withdrawal failed: "+error.message);
   }finally{
     setLoading(btn,false,"Submit Withdrawal Request");
   }
 });
 
-/* WITHDRAWAL HISTORY */
-async function loadWithdrawalHistory(){
-  if(!currentUser) return;
-
-  const container=$("withdrawHistory");
-  container.innerHTML='<div class="empty">Loading...</div>';
-
-  try{
-    const q=query(
-      collection(db,"transactionRequests"),
-      where("userId","==",currentUser.uid),
-      where("type","==","withdrawal")
-    );
-
-    const snapshot=await getDocs(q);
-    const records=[];
-    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
-
-    records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
-    );
-
-    if(!records.length){
-      container.innerHTML='<div class="empty">No withdrawal requests yet.</div>';
-      return;
-    }
-
-    container.innerHTML=records.map(record=>{
-      const status=String(record.status||"request-recorded");
-      const canCancel=["request-recorded","pending"].includes(status);
-
-      return `
-      <div class="item">
-        <div class="item-top">
-          <strong>${formatMoney(record.amount)}</strong>
-          <strong>${safeText(record.method||"")}</strong>
-        </div>
-        <p class="muted">Account holder: ${safeText(record.accountHolderName||"")}</p>
-        <p class="muted">Account: ${safeText(record.account||"")}</p>
-        <p class="muted">Fee: ${formatMoney(record.fee)}</p>
-        <p class="muted">Net amount: ${formatMoney(record.netAmount)}</p>
-        <p class="muted">ID: ${safeText(record.transactionId||record.id)}</p>
-        <span class="status ${statusClass(status)}">${safeText(readableStatus(status))}</span>
-        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
-        ${record.note?`<p class="muted">Note: ${safeText(record.note)}</p>`:""}
-        ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
-        ${canCancel?`
-          <p class="muted" style="margin-top:9px">To cancel this request, contact Support.</p>
-        `:""}
-      </div>`;
-    }).join("");
-
-  }catch(error){
-    console.error(error);
-    container.innerHTML='<div class="empty">Could not load withdrawal history.</div>';
-  }
-}
-window.loadWithdrawalHistory=loadWithdrawalHistory;
-
-/* REFERRAL COPY */
-$("copyReferralBtn").addEventListener("click",async()=>{
-  const code=$("referralCode").textContent;
-  try{
-    await navigator.clipboard.writeText(code);
-    notify("Referral code copied.");
-  }catch(error){
-    notify("Could not copy referral code.");
-  }
-});
-
-/* TRANSACTION HISTORY */
-async function loadHistory(){
-  if(!currentUser) return;
-
-  const list=$("historyList");
-  const recent=$("recentActivity");
-  list.innerHTML='<div class="empty">Loading...</div>';
-
-  try{
-    const q=query(
-      collection(db,"transactionRequests"),
-      where("userId","==",currentUser.uid)
-    );
-
-    const snapshot=await getDocs(q);
-    const records=[];
-    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
-
-    records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
-    );
-
-    renderHistory(records);
-
-    const recentRecords=records.slice(0,3);
-    if(recentRecords.length){
-      recent.innerHTML=recentRecords.map(record=>`
-        <div class="item">
-          <div class="item-top">
-            <strong>${safeText(record.type||"Request")}</strong>
-            <strong>${formatMoney(record.amount)}</strong>
-          </div>
-          <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
-        </div>
-      `).join("");
-    }else{
-      recent.innerHTML='<div class="empty">No recent activity.</div>';
-    }
-
-  }catch(error){
-    console.error(error);
-    list.innerHTML='<div class="empty">Could not load history.</div>';
-  }
-}
-
-function renderHistory(records){
-  const filter=$("historyFilter").value;
-  const filtered=records.filter(record=>{
-    if(filter==="all") return true;
-    return String(record.type||"").toLowerCase()===filter;
-  });
-
-  if(!filtered.length){
-    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
-    return;
-  }
-
-  $("historyList").innerHTML=filtered.map(record=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${safeText(record.type||"Request")}</strong>
-        <strong>${formatMoney(record.amount)}</strong>
-      </div>
-      <p class="muted">${safeText(record.method||"")}</p>
-      ${record.transactionId?`<p class="muted">Transaction ID: ${safeText(record.transactionId)}</p>`:""}
-      <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
-      <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
-      ${record.receiptUrl?`
-        <p style="margin-top:7px"><a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">View submitted receipt</a></p>
-      `:""}
-      ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
-    </div>
-  `).join("");
-}
-
-$("historyFilter").addEventListener("change",loadHistory);
-window.loadHistory=loadHistory;
-
-/* NOTIFICATIONS */
-async function loadNotifications(){
-  if(!currentUser) return;
-
-  const container=$("notificationsList");
-  container.innerHTML='<div class="empty">Loading notifications...</div>';
-
-  try{
-    const q=query(
-      collection(db,"transactionRequests"),
-      where("userId","==",currentUser.uid)
-    );
-
-    const snapshot=await getDocs(q);
-    const records=[];
-
-    snapshot.forEach(item=>{
-      const record=item.data();
-      records.push({id:item.id,...record});
-    });
-
-    records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
-    );
-
-    if(!records.length){
-      container.innerHTML='<div class="empty">You have no notifications yet.</div>';
-      return;
-    }
-
-    container.innerHTML=records.map(record=>{
-      const type=String(record.type||"request");
-      const status=String(record.status||"pending");
-      let message="Your request has been received.";
-
-      if(["approved","completed","paid"].includes(status)){
-        message="Your request has been approved.";
-      }else if(["rejected","failed"].includes(status)){
-        message="Your request was not approved. Check the admin note if available.";
-      }else if(status==="cancelled"){
-        message="This request has been cancelled.";
-      }else if(type==="withdrawal"){
-        message="Your withdrawal request is waiting for review.";
-      }else{
-        message="Your deposit request is waiting for review.";
-      }
-
-      return `
-        <div class="item">
-          <div class="item-top">
-            <strong>${safeText(type.toUpperCase())}</strong>
-            <strong>${formatMoney(record.amount)}</strong>
-          </div>
-          <p class="muted" style="margin-top:7px">${safeText(message)}</p>
-          <span class="status ${statusClass(status)}">${safeText(readableStatus(status))}</span>
-          <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
-          ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
-        </div>
-      `;
-    }).join("");
-
-  }catch(error){
-    console.error(error);
-    container.innerHTML='<div class="empty">Could not load notifications.</div>';
-  }
-}
-window.loadNotifications=loadNotifications;
-
-$("refreshNotificationsBtn").addEventListener("click",loadNotifications);
-
-/* SUPPORT REQUEST */
+/* SUPPORT */
 $("supportBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
-
   const message=$("supportMessage").value.trim();
-  if(!message) return notify("Write your message first.");
+  if(!message) return notify("Please write a message.");
 
   const btn=$("supportBtn");
   setLoading(btn,true,"Send Message");
-
   try{
     await addDoc(collection(db,"supportRequests"),{
       userId:currentUser.uid,
-      email:currentUser.email,
+      email:currentUser.email||"",
       message,
       status:"pending",
       createdAt:serverTimestamp()
     });
-
     $("supportMessage").value="";
-    notify("Your support message has been sent.");
-    await loadSupportHistory();
-
+    notify("Support message sent.");
   }catch(error){
-    notify("Could not send message: "+error.message);
+    notify("Support failed: "+error.message);
   }finally{
     setLoading(btn,false,"Send Message");
   }
 });
 
-/* SUPPORT HISTORY */
-async function loadSupportHistory(){
+/* ON-DEMAND LOADERS (ONLY WHEN USER TRIGGERS) */
+window.loadHistory=async function(){
   if(!currentUser) return;
-
-  const container=$("supportHistory");
-  container.innerHTML='<div class="empty">Loading...</div>';
-
-  try{
-    const q=query(
-      collection(db,"supportRequests"),
-      where("userId","==",currentUser.uid)
-    );
-
-    const snapshot=await getDocs(q);
-    const records=[];
-    snapshot.forEach(item=>records.push(item.data()));
-
-    records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
-    );
-
-    if(!records.length){
-      container.innerHTML='<div class="empty">No support messages yet.</div>';
-      return;
-    }
-
-    container.innerHTML=records.map(record=>`
-      <div class="item">
-        <p>${safeText(record.message||"")}</p>
-        <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
-        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
-      </div>
-    `).join("");
-
-  }catch(error){
-    console.error(error);
-    container.innerHTML='<div class="empty">Could not load support history.</div>';
+  const filter=$("historyFilter").value;
+  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid));
+  const snap=await getDocs(q);
+  let rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+  if(filter!=="all") rows=rows.filter(r=>r.type===filter);
+  if(!rows.length){
+    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
+    return;
   }
-}
-window.loadSupportHistory=loadSupportHistory;
+  $("historyList").innerHTML=rows.map(r=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${safeText(String(r.type||"").toUpperCase())} — ${formatMoney(r.amount)}</strong>
+        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
+      </div>
+      <p class="muted">${safeText(r.method||"-")} · ${safeText(getDate(r))}${r.adminNote?" · Note: "+safeText(r.adminNote):""}</p>
+    </div>
+  `).join("");
+};
+$("historyFilter").addEventListener("change",()=>window.loadHistory());
 
+window.loadDepositHistory=async function(){
+  if(!currentUser) return;
+  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","deposit"));
+  const snap=await getDocs(q);
+  const rows=snap.docs.map(d=>d.data());
+  if(!rows.length){
+    $("depositHistory").innerHTML='<div class="empty">No deposits yet.</div>';
+    return;
+  }
+  $("depositHistory").innerHTML=rows.map(r=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${formatMoney(r.amount)}</strong>
+        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
+      </div>
+      <p class="muted">${safeText(r.method||"-")} · ${safeText(getDate(r))}</p>
+    </div>
+  `).join("");
+};
+
+window.loadWithdrawalHistory=async function(){
+  if(!currentUser) return;
+  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","withdrawal"));
+  const snap=await getDocs(q);
+  const rows=snap.docs.map(d=>d.data());
+  if(!rows.length){
+    $("withdrawHistory").innerHTML='<div class="empty">No withdrawals yet.</div>';
+    return;
+  }
+  $("withdrawHistory").innerHTML=rows.map(r=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${formatMoney(r.amount)}</strong>
+        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
+      </div>
+      <p class="muted">${safeText(r.method||"-")}${r.withdrawalFee!=null?" · Fee: "+Number(r.withdrawalFee).toFixed(2)+" ETB":""}${r.netAmount!=null?" · Net: "+Number(r.netAmount).toFixed(2)+" ETB":""} · ${safeText(getDate(r))}</p>
+    </div>
+  `).join("");
+};
+
+window.loadDepositSummary=async function(){
+  if(!currentUser) return;
+  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","deposit"));
+  const snap=await getDocs(q);
+  let total=0,approved=0,pending=0,rejected=0;
+  snap.docs.forEach(d=>{
+    const x=d.data();
+    const amt=Number(x.amount||0);
+    total+=amt;
+    const st=String(x.status||"pending").toLowerCase();
+    if(st==="approved"||st==="completed") approved+=amt;
+    else if(st==="rejected"||st==="failed") rejected+=amt;
+    else pending+=amt;
+  });
+  $("totalDeposits").textContent=formatMoney(total);
+  $("approvedDeposits").textContent=formatMoney(approved);
+  $("pendingDeposits").textContent=formatMoney(pending);
+  $("rejectedDeposits").textContent=formatMoney(rejected);
+};
+
+window.loadSupportHistory=async function(){
+  if(!currentUser) return;
+  const q=query(collection(db,"supportRequests"),where("userId","==",currentUser.uid));
+  const snap=await getDocs(q);
+  const rows=snap.docs.map(d=>d.data());
+  if(!rows.length){
+    $("supportHistory").innerHTML='<div class="empty">No support messages yet.</div>';
+    return;
+  }
+  $("supportHistory").innerHTML=rows.map(r=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${safeText(r.message)}</strong>
+        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
+      </div>
+      <p class="muted">${safeText(getDate(r))}</p>
+    </div>
+  `).join("");
+};
+
+window.loadNotifications=async function(){
+  if(!currentUser) return;
+  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid));
+  const snap=await getDocs(q);
+  const rows=snap.docs.map(d=>d.data());
+  if(!rows.length){
+    $("notificationsList").innerHTML='<div class="empty">No updates yet.</div>';
+    return;
+  }
+  $("notificationsList").innerHTML=rows.map(r=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${safeText(String(r.type||"").toUpperCase())} (${formatMoney(r.amount)})</strong>
+        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
+      </div>
+      <p class="muted">${r.adminNote?safeText(r.adminNote)+" · ":""}${safeText(getDate(r))}</p>
+    </div>
+  `).join("");
+};
+
+$("refreshNotificationsBtn").addEventListener("click",()=>window.loadNotifications());
 </script>
 </body>
 </html>
