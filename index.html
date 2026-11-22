@@ -3,216 +3,187 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BaweReal Mini App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BaweReal</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-body{background:#f4f7fb;color:#111827;padding-bottom:85px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f3f6fb;color:#172033;padding-bottom:80px}
 .hidden{display:none!important}
-.header{background:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eef2f6;position:sticky;top:0;z-index:20}
-.user-info{display:flex;align-items:center;gap:12px}
-.avatar{width:44px;height:44px;border-radius:50%;background:#2563eb;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
-.user-name{font-size:17px;font-weight:700}
-.status-dot{width:10px;height:10px;border:2px solid #111827;border-radius:50%;display:inline-block}
-.user-tier{font-size:12px;color:#6b7280;margin-top:2px}
-.header-actions{display:flex;gap:8px}
-.icon-pill{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600;cursor:pointer}
-.container{padding:14px 16px;max-width:520px;margin:0 auto}
-.auth-container{max-width:420px;margin:45px auto;padding:16px}
-.auth-card{background:#fff;border-radius:20px;padding:25px 20px;box-shadow:0 5px 25px rgba(0,0,0,.06)}
-.auth-logo{text-align:center;font-size:30px;font-weight:800;color:#2563eb;margin-bottom:8px}
-.auth-subtitle{text-align:center;color:#64748b;font-size:14px;margin-bottom:25px}
-.auth-card h3{font-size:19px;margin-bottom:8px}
-.auth-card p{font-size:13px;color:#64748b;margin-bottom:12px}
-.auth-card input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px;margin-top:10px;font-size:15px;outline:none}
-.auth-card input:focus{border-color:#2563eb}
-.btn-primary{width:100%;padding:13px;border:none;border-radius:10px;background:#2563eb;color:white;font-size:15px;font-weight:700;margin-top:14px;cursor:pointer}
-.btn-primary:disabled{opacity:.6;cursor:not-allowed}
-.auth-message{margin-top:15px;font-size:13px;color:#2563eb;text-align:center;overflow-wrap:anywhere}
-.auth-link{display:block;text-align:center;color:#2563eb;margin-top:15px;font-size:14px;cursor:pointer}
-.auth-tabs{display:flex;gap:10px;margin-bottom:22px}
-.auth-tab{flex:1;padding:12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;color:#475569;font-weight:700;font-size:14px;cursor:pointer}
-.auth-tab.active{background:#2563eb;color:white;border-color:#2563eb}
-.welcome-bar{background:#eef4ff;border:1px solid #bfd7ff;border-radius:12px;padding:10px 14px;margin-bottom:14px;overflow:hidden;white-space:nowrap;color:#1d4ed8;font-weight:600;font-size:14px}
-.welcome-text{display:inline-block;padding-left:100%;animation:scrollText 12s linear infinite}
-@keyframes scrollText{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-.wallet-card{background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 55%,#1e3a8a 100%);color:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(37,99,235,.25);margin-bottom:18px}
-.wallet-top{display:flex;justify-content:space-between;align-items:flex-start}
-.wallet-label{font-size:13px;color:#dbeafe}
-.wallet-amount{font-size:30px;font-weight:800;margin:6px 0 12px}
-.eye-btn{background:rgba(255,255,255,.16);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:18px;cursor:pointer}
-.rate-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#dbeafe;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.18)}
-.rate-row strong{display:block;font-size:14px;color:#fff;margin-top:2px}
-.wallet-bottom{display:grid;grid-template-columns:1fr 1fr;padding-top:14px}
-.sub-label{font-size:12px;color:#bfdbfe}
-.sub-val{font-size:16px;font-weight:700;margin-top:4px}
-.profit-val{color:#4ade80}
-.actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.action-item{background:#fff;border-radius:16px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(15,23,42,.04);border:1px solid #f1f5f9;cursor:pointer}
-.action-icon{width:42px;height:42px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.bg-green{background:#ecfdf5;color:#10b981}.bg-red{background:#fef2f2;color:#ef4444}.bg-purple{background:#f5f3ff;color:#8b5cf6}.bg-blue{background:#eff6ff;color:#3b82f6}.bg-yellow{background:#fefce8;color:#eab308}.bg-gray{background:#f8fafc;color:#64748b}
-.action-title{font-size:13px;font-weight:600;color:#1e293b}
-.tx-card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(15,23,42,.04);border:1px solid #f1f5f9}
-.tx-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.tx-header h3{font-size:16px}
-.live-badge{background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px}
-.tx-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #f1f5f9;font-size:14px}
-.tx-phone{font-family:monospace;font-weight:600}.tx-plus{color:#16a34a;font-weight:700}
-.page-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid #e2e8f0}
-textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;margin-top:8px;font-size:14px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px;z-index:30}
-.nav-btn{background:transparent;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#64748b;cursor:pointer}
-.nav-btn.active{color:#2563eb;font-weight:700}.nav-icon{font-size:18px}
+header{background:white;padding:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-bottom:1px solid #ddd;z-index:5}
+.container{max-width:520px;margin:auto;padding:15px}
+.card{background:white;padding:17px;border-radius:15px;margin-bottom:14px;border:1px solid #e5eaf1}
+h2{font-size:19px;margin-bottom:12px}
+h3{font-size:16px;margin-bottom:10px}
+p{font-size:14px;color:#64748b;margin:7px 0}
+input,select,textarea{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:9px;margin:7px 0;font-size:14px}
+button{cursor:pointer}
+.btn{width:100%;padding:13px;border:0;border-radius:9px;background:#2563eb;color:white;font-weight:bold;margin-top:9px}
+.secondary{background:#eef2ff;color:#1d4ed8}
+.wallet{background:linear-gradient(135deg,#2563eb,#172554);color:white;padding:22px;border-radius:17px;margin-bottom:15px}
+.wallet p{color:#dbeafe}
+.amount{font-size:29px;font-weight:bold;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.action{background:white;padding:17px 10px;text-align:center;border:1px solid #e5eaf1;border-radius:13px;font-weight:bold;color:#1e40af}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.method-card{border:1px solid #dbe3ee;background:white;border-radius:13px;padding:14px 8px;text-align:center}
+.method-logo{height:55px;width:70px;object-fit:contain;margin:0 auto 8px;display:block}
+.method-name{font-size:13px;font-weight:bold}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 3px;z-index:10}
+.bottom button{background:none;border:0;color:#64748b;font-size:11px}
+.bottom button span{display:block;font-size:19px;margin-bottom:3px}
+.bottom button.active{color:#2563eb;font-weight:bold}
+.notice{background:#eff6ff;color:#1d4ed8;padding:11px;border-radius:9px;font-size:13px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #eee;font-size:14px}
 </style>
 </head>
 <body>
 
-<section id="auth-section" class="auth-container">
-<div class="auth-card">
-<div class="auth-logo">BaweReal</div>
-<div class="auth-subtitle">Secure Account Access</div>
-<div class="auth-tabs">
-<button type="button" id="show-login" class="auth-tab active">Login</button>
-<button type="button" id="show-register" class="auth-tab">Register</button>
+<section id="auth" class="container" style="max-width:420px;margin-top:40px">
+<div class="card">
+<h2 style="text-align:center;color:#2563eb">BaweReal</h2>
+<p style="text-align:center">Secure Account Access</p>
+<div id="login">
+<h3>Login</h3>
+<input id="email" type="email" placeholder="Email address">
+<input id="password" type="password" placeholder="Password">
+<button class="btn" id="loginBtn">Login</button>
+<p onclick="resetPassword()" style="text-align:center;color:#2563eb;cursor:pointer">Forgot Password?</p>
+<p onclick="showRegister()" style="text-align:center;color:#2563eb;cursor:pointer">Create Account</p>
 </div>
-
-<div id="login-form">
-<h3>Welcome Back</h3>
-<p>Login using your email and password.</p>
-<input type="email" id="login-email" placeholder="Email address" autocomplete="email">
-<input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
-<button class="btn-primary" id="login-btn">Login</button>
-<span class="auth-link" id="forgot-password">Forgot Password?</span>
-</div>
-
-<div id="register-form" class="hidden">
+<div id="register" class="hidden">
 <h3>Create Account</h3>
-<p>Enter your name, email and create a password.</p>
-<input type="text" id="register-name" placeholder="Full Name" autocomplete="name">
-<input type="email" id="register-email" placeholder="Email address" autocomplete="email">
-<input type="password" id="register-password" placeholder="Create password (at least 6 characters)" autocomplete="new-password">
-<input type="password" id="register-confirm" placeholder="Confirm password" autocomplete="new-password">
-<button class="btn-primary" id="register-btn">Create Account</button>
+<input id="fullName" placeholder="Full Name">
+<input id="newEmail" type="email" placeholder="Email">
+<input id="newPassword" type="password" placeholder="Password">
+<button class="btn" id="registerBtn">Register</button>
+<p onclick="showLogin()" style="text-align:center;color:#2563eb">Back to Login</p>
 </div>
-<div id="auth-message" class="auth-message"></div>
+<div id="authMessage"></div>
 </div>
 </section>
 
-<header class="header hidden" id="app-header">
-<div class="user-info">
-<div class="avatar" id="user-avatar">BA</div>
-<div>
-<div class="user-name"><span id="user-display-name">Bawe</span> <span class="status-dot"></span></div>
-<div class="user-tier" id="user-tier">VIP 1 Starter</div>
-</div>
-</div>
-<div class="header-actions">
-<button class="icon-pill" type="button" onclick="alert('No new notifications')">🔔</button>
-<button class="icon-pill" id="logout-btn">Logout</button>
-</div>
+<div id="application" class="hidden">
+<header>
+<div><strong id="displayName">BaweReal</strong><p id="tier">Account</p></div>
+<button class="btn secondary" style="width:auto;margin:0" id="logoutBtn">Logout</button>
 </header>
 
-<div id="app-content" class="hidden">
 <main class="container">
-<section id="page-home" class="page">
-<div class="welcome-bar"><span class="welcome-text">Welcome to BaweReal! Start earning daily rewards and manage your account easily.</span></div>
-<div class="wallet-card">
-<div class="wallet-top">
-<div><div class="wallet-label">Demo Wallet Balance</div><div class="wallet-amount" id="balance-text">150.00 ETB</div></div>
-<button class="eye-btn" id="toggle-balance-btn">👁</button>
+<section id="home" class="page">
+<div class="wallet">
+<p>Account Balance</p>
+<div class="amount" id="balance">0.00 ETB</div>
+<p>Account overview</p>
 </div>
-<div class="rate-row">
-<div>Daily USD Value:<strong id="usd-text">$0.93</strong></div>
-<div style="text-align:right">1 USD = 161.81 ETB</div>
-</div>
-<div class="wallet-bottom">
-<div><div class="sub-label">Demo Total</div><div class="sub-val" id="invested-text">0.00 ETB</div></div>
-<div><div class="sub-label">Demo Change</div><div class="sub-val profit-val" id="profit-text">+0.00 ETB</div></div>
-</div>
-</div>
-
-<div class="actions-grid">
-<div class="action-item" onclick="go('packages')"><div class="action-icon bg-green">↙</div><div class="action-title">Packages</div></div>
-<div class="action-item" onclick="go('profile')"><div class="action-icon bg-red">👤</div><div class="action-title">Profile</div></div>
-<div class="action-item" onclick="go('referrals')"><div class="action-icon bg-purple">👥</div><div class="action-title">Invitation</div></div>
-<div class="action-item" onclick="go('packages')"><div class="action-icon bg-blue">▣</div><div class="action-title">Packages</div></div>
-<div class="action-item" onclick="alert('This demo feature is not connected.')"><div class="action-icon bg-yellow">📅</div><div class="action-title">Daily Activity</div></div>
-<div class="action-item" onclick="go('profile')"><div class="action-icon bg-gray">🕒</div><div class="action-title">History</div></div>
-</div>
-
-<div class="tx-card">
-<div class="tx-header"><h3>Activity Examples</h3><span class="live-badge">DEMO</span></div>
-<div id="live-tx-list">
-<div class="tx-row"><span class="tx-phone">Example User 1</span><span>Demo activity</span></div>
-<div class="tx-row"><span class="tx-phone">Example User 2</span><span>Demo activity</span></div>
-</div>
+<div class="grid">
+<button class="action" onclick="openPage('deposit')">Deposit</button>
+<button class="action" onclick="openPage('withdrawal')">Withdrawal</button>
+<button class="action" onclick="openPage('referral')">Referral</button>
+<button class="action" onclick="openPage('packages')">Packages</button>
+<button class="action" onclick="openPage('history')">History</button>
+<button class="action" onclick="openPage('profile')">Profile</button>
 </div>
 </section>
 
-<section id="page-packages" class="page hidden">
-<div class="page-card"><h3>Packages</h3><p style="color:#64748b;font-size:14px;margin-top:6px">Demo information only.</p></div>
+<section id="deposit" class="page hidden">
+<div class="card">
+<h2>Deposit Request</h2>
+<div class="notice">Submit a request for review. This does not transfer money.</div>
+<h3>Select Payment Method</h3>
+<div class="method-grid">
+<div class="method-card">
+<img class="method-logo" src="https://www.ethiotelecom.et/wp-content/uploads/2022/06/telebirr-logo.png" alt="Telebirr logo">
+<div class="method-name">Telebirr</div>
+</div>
+<div class="method-card">
+<img class="method-logo" src="https://www.combanketh.et/images/logo.png" alt="CBE logo">
+<div class="method-name">Commercial Bank of Ethiopia</div>
+</div>
+</div>
+<select id="depositMethod">
+<option value="Telebirr">Telebirr</option>
+<option value="CBE">Commercial Bank of Ethiopia</option>
+</select>
+<input id="depositAmount" type="number" placeholder="Amount in ETB">
+<textarea id="depositNote" placeholder="Reference note (optional)"></textarea>
+<button class="btn" onclick="submitRequest('deposit')">Submit Deposit Request</button>
+</div>
 </section>
-<section id="page-referrals" class="page hidden">
-<div class="page-card"><h3>Referrals &amp; Invitation</h3><p style="color:#64748b;font-size:14px;margin-top:6px">Referral information.</p></div>
+
+<section id="withdrawal" class="page hidden">
+<div class="card">
+<h2>Withdrawal Request</h2>
+<div class="notice">Submit a withdrawal request for review. No money is transferred by this form.</div>
+<select id="withdrawMethod">
+<option>Telebirr</option>
+<option>Commercial Bank of Ethiopia</option>
+</select>
+<input id="withdrawAccount" placeholder="Your account number or phone">
+<input id="withdrawAmount" type="number" placeholder="Amount in ETB">
+<button class="btn" onclick="submitRequest('withdrawal')">Submit Withdrawal Request</button>
+</div>
 </section>
-<section id="page-profile" class="page hidden">
-<div class="page-card"><h3>Profile</h3><p id="profile-auth-info" style="color:#64748b;font-size:14px;margin-top:6px">Loading...</p></div>
+
+<section id="referral" class="page hidden">
+<div class="card">
+<h2>Referral</h2>
+<p>Your referral code</p>
+<strong id="referralCode">Loading...</strong>
+<button class="btn secondary" onclick="copyReferral()">Copy Referral Code</button>
+</div>
 </section>
-<section id="page-chat" class="page hidden">
-<div class="page-card">
-<h3>Support Chat</h3>
-<textarea id="support-msg" rows="3" placeholder="Write your support request..."></textarea>
-<button class="btn-primary" id="send-support-btn">Send Support Request</button>
+
+<section id="packages" class="page hidden">
+<div class="card"><h2>Packages</h2><p>Package information</p></div>
+</section>
+
+<section id="history" class="page hidden">
+<div class="card"><h2>Transaction History</h2><div id="historyList">No requests yet.</div></div>
+</section>
+
+<section id="profile" class="page hidden">
+<div class="card"><h2>Profile</h2><p id="profileInfo"></p></div>
+</section>
+
+<section id="support" class="page hidden">
+<div class="card">
+<h2>Support</h2>
+<textarea id="supportMessage" placeholder="Write your message"></textarea>
+<button class="btn" onclick="sendSupport()">Send Message</button>
 </div>
 </section>
 </main>
 
-<nav id="nav" class="bottom-nav">
-<button class="nav-btn active" data-page="home"><span class="nav-icon">⌂</span><span>Home</span></button>
-<button class="nav-btn" data-page="packages"><span class="nav-icon">▣</span><span>Packages</span></button>
-<button class="nav-btn" data-page="referrals"><span class="nav-icon">👥</span><span>Referrals</span></button>
-<button class="nav-btn" data-page="profile"><span class="nav-icon">👤</span><span>Profile</span></button>
-<button class="nav-btn" data-page="chat"><span class="nav-icon">💬</span><span>Chat</span></button>
+<nav class="bottom">
+<button class="active" onclick="openPage('home',this)"><span>⌂</span>Home</button>
+<button onclick="openPage('deposit',this)"><span>＋</span>Deposit</button>
+<button onclick="openPage('withdrawal',this)"><span>↗</span>Withdraw</button>
+<button onclick="openPage('referral',this)"><span>♧</span>Referral</button>
+<button onclick="openPage('profile',this)"><span>👤</span>Profile</button>
 </nav>
 </div>
 
 <script>
-function go(pageName){
-const target=pageName||"home";
-document.querySelectorAll(".page").forEach(sec=>sec.classList.toggle("hidden",sec.id!=="page-"+target));
-document.querySelectorAll("#nav .nav-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.page===target));
+function showRegister(){
+document.getElementById("login").classList.add("hidden");
+document.getElementById("register").classList.remove("hidden");
 }
-document.querySelectorAll("#nav .nav-btn").forEach(btn=>btn.addEventListener("click",()=>go(btn.dataset.page)));
-
-let balanceHidden=false;
-document.getElementById("toggle-balance-btn").addEventListener("click",()=>{
-balanceHidden=!balanceHidden;
-document.getElementById("balance-text").textContent=balanceHidden?"******":"150.00 ETB";
-document.getElementById("usd-text").textContent=balanceHidden?"****":"$0.93";
-});
+function showLogin(){
+document.getElementById("register").classList.add("hidden");
+document.getElementById("login").classList.remove("hidden");
+}
+function openPage(id,button){
+document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
+if(button)button.classList.add("active");
+}
 </script>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getAuth,
-onAuthStateChanged,
-signOut,
-signInWithEmailAndPassword,
-createUserWithEmailAndPassword,
-sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-getFirestore,
-collection,
-addDoc,
-serverTimestamp,
-doc,
-setDoc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,onAuthStateChanged,signOut,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,setDoc,getDoc,addDoc,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
@@ -227,194 +198,115 @@ measurementId:"G-VN3D9QM7P8"
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
-
 const $=id=>document.getElementById(id);
 
-function message(msg,error=false){
-$("auth-message").textContent=msg;
-$("auth-message").style.color=error?"#dc2626":"#2563eb";
-}
-
-function showAuthTab(tab){
-const login=tab==="login";
-$("login-form").classList.toggle("hidden",!login);
-$("register-form").classList.toggle("hidden",login);
-$("show-login").classList.toggle("active",login);
-$("show-register").classList.toggle("active",!login);
-message("");
-}
-
-$("show-login").addEventListener("click",()=>showAuthTab("login"));
-$("show-register").addEventListener("click",()=>showAuthTab("register"));
-
-$("register-btn").addEventListener("click",async()=>{
-const btn=$("register-btn");
-const fullName=$("register-name").value.trim();
-const email=$("register-email").value.trim().toLowerCase();
-const password=$("register-password").value;
-const confirm=$("register-confirm").value;
-
-if(!fullName||!email||!password||!confirm){
-message("Please fill in all fields.",true);
-return;
-}
-if(password.length<6){
-message("Password must be at least 6 characters.",true);
-return;
-}
-if(password!==confirm){
-message("Passwords do not match.",true);
-return;
-}
-
+$("loginBtn").onclick=async()=>{
 try{
-btn.disabled=true;
-btn.textContent="Creating Account...";
+await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
+}catch(e){$("authMessage").textContent=e.message;}
+};
 
+$("registerBtn").onclick=async()=>{
+try{
+const name=$("fullName").value.trim();
+const email=$("newEmail").value.trim();
+const password=$("newPassword").value;
+if(!name||!email||password.length<6)throw Error("Enter valid details. Password must be at least 6 characters.");
 const result=await createUserWithEmailAndPassword(auth,email,password);
-const user=result.user;
-
-await setDoc(doc(db,"users",user.uid),{
-uid:user.uid,
-fullName:fullName,
-email:user.email,
-createdAt:serverTimestamp(),
-status:"active"
+await setDoc(doc(db,"users",result.user.uid),{
+uid:result.user.uid,fullName:name,email:email,
+createdAt:serverTimestamp(),status:"active"
 });
+}catch(e){$("authMessage").textContent=e.message;}
+};
 
-message("Account created and profile saved successfully!");
-}catch(error){
-console.error("Registration error:",error);
-if(error.code==="auth/email-already-in-use"){
-message("This email is already registered. Please login.",true);
-}else if(error.code==="auth/invalid-email"){
-message("Please enter a valid email address.",true);
-}else if(error.code==="auth/weak-password"){
-message("Password is too weak. Use at least 6 characters.",true);
-}else if(error.code==="permission-denied"){
-message("Account created, but Firestore permission denied. Update Firestore Rules.",true);
-}else{
-message("Registration error: "+error.message,true);
-}
-}finally{
-btn.disabled=false;
-btn.textContent="Create Account";
-}
-});
+window.resetPassword=async()=>{
+const email=$("email").value.trim();
+if(!email)return alert("Enter your email first.");
+try{await sendPasswordResetEmail(auth,email);alert("Reset email sent.");}
+catch(e){alert(e.message);}
+};
 
-$("login-btn").addEventListener("click",async()=>{
-const btn=$("login-btn");
-const email=$("login-email").value.trim().toLowerCase();
-const password=$("login-password").value;
-
-if(!email||!password){
-message("Enter your email and password.",true);
-return;
-}
-try{
-btn.disabled=true;
-btn.textContent="Logging in...";
-await signInWithEmailAndPassword(auth,email,password);
-message("Login successful!");
-}catch(error){
-console.error(error);
-if(error.code==="auth/invalid-credential"||error.code==="auth/wrong-password"||error.code==="auth/user-not-found"){
-message("Incorrect email or password.",true);
-}else if(error.code==="auth/invalid-email"){
-message("Enter a valid email address.",true);
-}else{
-message("Login failed: "+error.message,true);
-}
-}finally{
-btn.disabled=false;
-btn.textContent="Login";
-}
-});
-
-$("forgot-password").addEventListener("click",async()=>{
-const email=$("login-email").value.trim().toLowerCase();
-if(!email){
-message("Enter your email address first.",true);
-return;
-}
-try{
-await sendPasswordResetEmail(auth,email);
-message("Password reset email sent. Check your inbox.");
-}catch(error){
-console.error(error);
-message("Could not send reset email: "+error.message,true);
-}
-});
+$("logoutBtn").onclick=()=>signOut(auth);
 
 onAuthStateChanged(auth,async user=>{
-if(user){
-$("auth-section").classList.add("hidden");
-$("app-header").classList.remove("hidden");
-$("app-content").classList.remove("hidden");
-
-let displayName=user.displayName||"";
-
-try{
-const userDoc=await getDoc(doc(db,"users",user.uid));
-if(userDoc.exists()){
-displayName=userDoc.data().fullName||displayName;
-}
-}catch(error){
-console.error("Could not load user profile:",error);
-}
-
-if(!displayName){
-displayName=user.email?user.email.split("@")[0]:"BaweReal User";
-}
-
-$("user-display-name").textContent=displayName;
-$("user-avatar").textContent=displayName.trim().split(/\s+/).map(part=>part[0]).join("").substring(0,2).toUpperCase();
-$("profile-auth-info").textContent="Name: "+displayName+" | Email: "+(user.email||"");
-go("home");
-}else{
-$("auth-section").classList.remove("hidden");
-$("app-header").classList.add("hidden");
-$("app-content").classList.add("hidden");
-$("profile-auth-info").textContent="Not signed in";
-}
-});
-
-$("logout-btn").addEventListener("click",async()=>{
-try{
-await signOut(auth);
-showAuthTab("login");
-message("Signed out successfully.");
-}catch(error){
-alert(error.message);
-}
-});
-
-$("send-support-btn").addEventListener("click",async()=>{
-const user=auth.currentUser;
-const msg=$("support-msg").value.trim();
-
 if(!user){
-alert("Please sign in first.");
+$("auth").classList.remove("hidden");
+$("application").classList.add("hidden");
 return;
 }
-if(!msg){
-alert("Enter a message.");
-return;
+$("auth").classList.add("hidden");
+$("application").classList.remove("hidden");
+let name=user.email||"User";
+try{
+const snap=await getDoc(doc(db,"users",user.uid));
+if(snap.exists())name=snap.data().fullName||name;
+}catch(e){console.error(e);}
+$("displayName").textContent=name;
+$("profileInfo").textContent="Name: "+name+" | Email: "+(user.email||"");
+$("referralCode").textContent=user.uid.substring(0,8).toUpperCase();
+});
+
+window.submitRequest=async type=>{
+const user=auth.currentUser;
+if(!user)return alert("Please login first.");
+const amount=Number($(type==="deposit"?"depositAmount":"withdrawAmount").value);
+if(!Number.isFinite(amount)||amount<=0)return alert("Enter a valid amount.");
+if(type==="deposit"&&(amount<300||amount>10000))return alert("Deposit range: 300–10,000 ETB.");
+if(type==="withdrawal"&&(amount<100||amount>5000))return alert("Withdrawal range: 100–5,000 ETB.");
+const data={
+userId:user.uid,email:user.email||"",type,
+amount,
+method:type==="deposit"?$("depositMethod").value:$("withdrawMethod").value,
+status:"request-recorded",
+createdAt:serverTimestamp()
+};
+if(type==="withdrawal")data.account=$("withdrawAccount").value.trim();
+if(type==="deposit")data.note=$("depositNote").value.trim();
+try{
+await addDoc(collection(db,"transactionRequests"),data);
+alert("Your request has been recorded for review. No payment has been processed.");
+openPage("history");
+loadHistory(user.uid);
+}catch(e){alert("Could not save request: "+e.message);}
+};
+
+async function loadHistory(uid){
+const {getDocs,query,where,orderBy}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+try{
+const q=query(collection(db,"transactionRequests"),where("userId","==",uid),orderBy("createdAt","desc"));
+const snap=await getDocs(q);
+$("historyList").innerHTML="";
+if(snap.empty){$("historyList").textContent="No requests yet.";return;}
+snap.forEach(d=>{
+const x=d.data();
+const div=document.createElement("div");
+div.className="row";
+div.textContent=x.type+" — "+x.amount+" ETB — "+x.status;
+$("historyList").appendChild(div);
+});
+}catch(e){$("historyList").textContent="Could not load history.";}
 }
+
+window.copyReferral=async()=>{
+const code=$("referralCode").textContent;
+try{await navigator.clipboard.writeText(code);alert("Referral code copied.");}
+catch(e){alert("Your referral code: "+code);}
+};
+
+window.sendSupport=async()=>{
+const user=auth.currentUser;
+const message=$("supportMessage").value.trim();
+if(!message)return alert("Write a message first.");
 try{
 await addDoc(collection(db,"supportRequests"),{
-userId:user.uid,
-email:user.email||"",
-message:msg,
-status:"pending",
-createdAt:serverTimestamp()
+userId:user.uid,email:user.email||"",message,
+status:"pending",createdAt:serverTimestamp()
 });
-alert("Message sent successfully!");
-$("support-msg").value="";
-}catch(error){
-alert("Error: "+error.message);
-}
-});
+$("supportMessage").value="";
+alert("Support message submitted.");
+}catch(e){alert(e.message);}
+};
 </script>
 </body>
 </html>
