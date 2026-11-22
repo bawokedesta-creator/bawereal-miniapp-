@@ -15,110 +15,160 @@
   --muted:#77788a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--dark);padding-bottom:85px}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--dark);padding-bottom:80px;font-size:14px;line-height:1.45}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
-header{background:var(--dark);color:white;padding:20px;display:flex;justify-content:space-between;align-items:center}
-header h2{font-size:21px}
-.container{padding:17px;max-width:650px;margin:auto}
-.card{background:white;padding:18px;border-radius:17px;margin-bottom:15px;box-shadow:0 3px 14px rgba(0,0,0,.045)}
-.card h3{margin-bottom:13px}
-.muted{color:var(--muted);font-size:13px}
-input,select,textarea{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;margin:7px 0 13px;background:white;outline:none}
+header{background:var(--dark);color:white;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+header h2{font-size:18px}
+.header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.lang-switch{
+  display:inline-flex;
+  background:#25253e;
+  border-radius:8px;
+  padding:2px;
+  gap:2px;
+}
+.lang-btn{
+  border:0;
+  background:transparent;
+  color:#cbd5e1;
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:bold;
+}
+.lang-btn.active{
+  background:var(--primary);
+  color:#fff;
+}
+.auth-lang-bar{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+.container{padding:14px;max-width:650px;margin:auto}
+.card{background:white;padding:15px;border-radius:14px;margin-bottom:13px;box-shadow:0 3px 14px rgba(0,0,0,.045)}
+.card h3{margin-bottom:10px;font-size:15px}
+.muted{color:var(--muted);font-size:12px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;background:white;outline:none;font-size:13.5px}
 input:focus,select:focus,textarea:focus{border-color:var(--primary)}
-textarea{resize:vertical;min-height:85px}
-.btn{border:0;padding:13px;border-radius:10px;background:var(--primary);color:white;width:100%;font-weight:bold}
+textarea{resize:vertical;min-height:75px}
+.btn{border:0;padding:11px 14px;border-radius:9px;background:var(--primary);color:white;width:100%;font-weight:bold;font-size:13.5px}
 .btn.secondary{background:#ecebff;color:var(--primary)}
 .btn.danger{background:#ffe9eb;color:var(--red)}
-.btn.small{width:auto;padding:8px 12px;font-size:12px}
-.link{color:var(--primary);cursor:pointer;font-size:14px}
-.auth-wrap{max-width:420px;margin:45px auto;padding:20px}
-.auth-wrap .card{padding:25px}
-.logo{text-align:center;font-size:28px;font-weight:bold;color:var(--primary);margin-bottom:20px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.action{background:white;padding:18px 10px;border-radius:15px;text-align:center;cursor:pointer;border:1px solid #eee}
-.action .emoji{font-size:27px;display:block;margin-bottom:8px}
-.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:23px;border-radius:18px;margin-bottom:17px}
-.balance h1{font-size:30px;margin-top:12px}
-.method{border:2px solid #eee;border-radius:13px;padding:14px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.btn.small{width:auto;padding:6px 10px;font-size:11.5px}
+.link{color:var(--primary);cursor:pointer;font-size:13px}
+.auth-wrap{max-width:420px;margin:25px auto;padding:16px}
+.auth-wrap .card{padding:20px}
+.logo{text-align:center;font-size:24px;font-weight:bold;color:var(--primary);margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.action{background:white;padding:13px 8px;border-radius:12px;text-align:center;cursor:pointer;border:1px solid #eee;font-size:13px}
+.action .emoji{font-size:21px;display:block;margin-bottom:5px}
+.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:18px;border-radius:15px;margin-bottom:14px}
+.balance h1{font-size:24px;margin-top:8px}
+.method{border:2px solid #eee;border-radius:11px;padding:11px 12px;margin:6px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .method.selected{border-color:var(--primary);background:#f5f4ff}
-.method strong{font-size:16px}
-.method .brand{font-size:25px;margin-right:10px}
+.method strong{font-size:14px}
+.method .brand{font-size:20px;margin-right:8px}
 .method-left{display:flex;align-items:center}
-.status{display:inline-block;padding:6px 10px;border-radius:20px;background:#eee;font-size:11px;margin-top:7px}
+.status{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:10.5px;margin-top:5px}
 .status.pending,.status.request-recorded,.status.processing,.status.under-review{background:#fff0ce;color:#946000}
 .status.approved,.status.completed{background:#d9f7e9;color:#087b4c}
 .status.rejected,.status.failed,.status.cancelled{background:#ffe1e4;color:#bd2636}
-.item{border-bottom:1px solid #eee;padding:13px 0}
+.item{border-bottom:1px solid #eee;padding:10px 0}
 .item:last-child{border:0}
-.item-top{display:flex;justify-content:space-between;gap:10px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px 2px;z-index:10}
-.nav-btn{background:none;border:0;color:#777;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.nav-btn span{font-size:20px}
+.item-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:8px 2px;z-index:10}
+.nav-btn{background:none;border:0;color:#777;font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn span{font-size:17px}
 .nav-btn.active{color:var(--primary);font-weight:bold}
-.notice{padding:12px;border-radius:10px;background:#f1f0ff;color:#4841a8;font-size:13px;margin:10px 0}
-.empty{text-align:center;color:var(--muted);padding:20px}
-.page-title{margin:5px 0 17px}
-small{color:var(--muted)}
-.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-.stat{background:#f5f5fb;padding:13px;border-radius:12px}
-.stat strong{display:block;font-size:19px;margin-top:7px}
-.account-box{background:#f7f7fc;padding:14px;border-radius:12px;margin:10px 0}
-.feature-row{display:flex;gap:9px;margin:10px 0}
+.notice{padding:10px 12px;border-radius:9px;background:#f1f0ff;color:#4841a8;font-size:12px;margin:8px 0}
+.empty{text-align:center;color:var(--muted);padding:16px;font-size:12.5px}
+.page-title{margin:4px 0 13px;font-size:18px}
+small{color:var(--muted);font-size:11.5px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.stat{background:#f5f5fb;padding:11px;border-radius:10px}
+.stat strong{display:block;font-size:15px;margin-top:5px}
+.account-box{background:#f7f7fc;padding:12px;border-radius:10px;margin:8px 0}
+.feature-row{display:flex;gap:8px;margin:8px 0}
 .feature-row .btn{flex:1}
-.faq-item{padding:13px 0;border-bottom:1px solid #eee}
+.faq-item{padding:10px 0;border-bottom:1px solid #eee;font-size:13px}
 .faq-item:last-child{border:0}
+
+/* NORMALIZED DASHBOARD FONT SIZES AFTER LOGIN */
+#application{font-size:13.5px}
+#application h2{font-size:17px}
+#application h3{font-size:14.5px}
+#application .balance h1{font-size:23px}
+#application .action{font-size:12.5px}
+#application .action .emoji{font-size:20px}
+#application .btn{font-size:13px;padding:10px 12px}
+#application .btn.small{font-size:11px;padding:6px 9px}
+#application input,#application select,#application textarea{font-size:13px;padding:9px 11px}
 
 /* TASK AND VIP */
 .task-card,.vip-card{
   background:white;
   border:1px solid #eee;
-  border-radius:15px;
-  padding:17px;
-  margin-bottom:12px;
+  border-radius:12px;
+  padding:13px 14px;
+  margin-bottom:10px;
 }
 .vip-card{
   border-left:4px solid #635bff;
 }
+.vip-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:4px;
+}
+.vip-price{
+  font-size:14px;
+  font-weight:bold;
+  color:var(--primary);
+}
 .vip-level{
-  font-size:24px;
-  margin-bottom:8px;
+  font-size:18px;
+  margin-bottom:4px;
 }
 .task-icon{
-  font-size:25px;
-  margin-bottom:8px;
+  font-size:19px;
+  margin-bottom:5px;
 }
 
 /* ACTIVITY DISPLAY */
 .live-activity{
   background:#17172b;
   color:white;
-  padding:18px;
-  border-radius:17px;
-  margin-top:17px;
+  padding:14px;
+  border-radius:14px;
+  margin-top:14px;
   overflow:hidden;
 }
 .live-title{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:14px;
+  margin-bottom:10px;
+  font-size:13px;
 }
 .live-dot{
-  width:9px;
-  height:9px;
+  width:8px;
+  height:8px;
   background:#22c985;
   border-radius:50%;
   display:inline-block;
-  margin-right:6px;
+  margin-right:5px;
   animation:pulse 1.2s infinite;
 }
 @keyframes pulse{
   50%{opacity:.3}
 }
 .activity-window{
-  height:180px;
+  height:150px;
   overflow:hidden;
 }
 .activity-track{
@@ -131,11 +181,11 @@ small{color:var(--muted)}
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:12px 10px;
-  margin-bottom:8px;
+  padding:9px 10px;
+  margin-bottom:6px;
   background:#25253e;
-  border-radius:10px;
-  font-size:13px;
+  border-radius:8px;
+  font-size:12px;
 }
 .activity-entry strong{
   color:#67e5ae;
@@ -159,21 +209,21 @@ small{color:var(--muted)}
 }
 .step-box{
   width:100%;
-  max-width:320px;
+  max-width:300px;
   background:rgba(23,23,43,.88);
   border:1px solid rgba(255,255,255,.15);
-  border-radius:18px;
-  padding:24px;
+  border-radius:16px;
+  padding:20px;
   text-align:center;
 }
 .step-pct{
-  font-size:30px;
+  font-size:24px;
   font-weight:bold;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 .step-track{
   width:100%;
-  height:11px;
+  height:9px;
   background:rgba(255,255,255,.18);
   border-radius:999px;
   overflow:hidden;
@@ -184,6 +234,13 @@ small{color:var(--muted)}
   background:#fff;
   border-radius:999px;
   transition:width .2s ease;
+}
+
+@media(max-width:600px){
+  #application{font-size:13px}
+  #application h2{font-size:16px}
+  #application h3{font-size:14px}
+  #application .balance h1{font-size:21px}
 }
 
 @media(min-width:650px){
@@ -205,38 +262,45 @@ small{color:var(--muted)}
 </div>
 
 <section id="auth" class="auth-wrap">
+  <div class="auth-lang-bar">
+    <div class="lang-switch">
+      <button type="button" class="lang-btn" data-lang="am">አማ</button>
+      <button type="button" class="lang-btn active" data-lang="en">EN</button>
+    </div>
+  </div>
+
   <div class="logo">BaweReal</div>
 
   <div class="card" id="loginBox">
-    <h2>Welcome Back</h2>
-    <p class="muted">Login to your account</p><br>
+    <h2 data-i18n="welcomeBack">Welcome Back</h2>
+    <p class="muted" data-i18n="loginSubtitle">Login to your account</p><br>
     <input id="loginEmail" type="email" placeholder="Email address">
     <input id="loginPassword" type="password" placeholder="Password">
-    <button class="btn" id="loginBtn">Login</button><br><br>
-    <p class="link" onclick="showForgot()">Forgot Password?</p><br>
-    <p class="muted">Don't have an account?
-      <span class="link" onclick="showRegister()">Create Account</span>
+    <button class="btn" id="loginBtn" data-i18n="loginBtn">Login</button><br><br>
+    <p class="link" onclick="showForgot()" data-i18n="forgotPassword">Forgot Password?</p><br>
+    <p class="muted"><span data-i18n="noAccount">Don't have an account?</span>
+      <span class="link" onclick="showRegister()" data-i18n="createAccount">Create Account</span>
     </p>
   </div>
 
   <div class="card hidden" id="registerBox">
-    <h2>Create Account</h2><br>
+    <h2 data-i18n="createAccount">Create Account</h2><br>
     <input id="regName" placeholder="Full name">
     <input id="regEmail" type="email" placeholder="Email address">
     <input id="regPassword" type="password" placeholder="Password">
     <input id="regConfirm" type="password" placeholder="Confirm password">
-    <button class="btn" id="registerBtn">Register</button><br><br>
-    <p class="muted">Already have an account?
-      <span class="link" onclick="showLogin()">Login</span>
+    <button class="btn" id="registerBtn" data-i18n="registerBtn">Register</button><br><br>
+    <p class="muted"><span data-i18n="haveAccount">Already have an account?</span>
+      <span class="link" onclick="showLogin()" data-i18n="loginBtn">Login</span>
     </p>
   </div>
 
   <div class="card hidden" id="forgotBox">
-    <h2>Reset Password</h2>
-    <p class="muted">Enter your registered email address.</p><br>
+    <h2 data-i18n="resetPassword">Reset Password</h2>
+    <p class="muted" data-i18n="resetHint">Enter your registered email address.</p><br>
     <input id="forgotEmail" type="email" placeholder="Email address">
-    <button class="btn" id="resetBtn">Send Reset Link</button><br><br>
-    <p class="link" onclick="showLogin()">Back to Login</p>
+    <button class="btn" id="resetBtn" data-i18n="sendResetLink">Send Reset Link</button><br><br>
+    <p class="link" onclick="showLogin()" data-i18n="backToLogin">Back to Login</p>
   </div>
 </section>
 
@@ -246,44 +310,50 @@ small{color:var(--muted)}
     <h2>BaweReal</h2>
     <small style="color:#ddd" id="headerName">Welcome</small>
   </div>
-  <button class="btn small danger" id="logoutBtn">Logout</button>
+  <div class="header-right">
+    <div class="lang-switch">
+      <button type="button" class="lang-btn" data-lang="am">አማ</button>
+      <button type="button" class="lang-btn active" data-lang="en">EN</button>
+    </div>
+    <button class="btn small danger" id="logoutBtn" data-i18n="logout">Logout</button>
+  </div>
 </header>
 
 <main class="container">
 
 <section id="homePage">
   <div class="balance">
-    <p>Current Balance</p>
+    <p data-i18n="currentBalance">Current Balance</p>
     <h1 id="balanceText">0.00 ETB</h1>
-    <small style="color:#eee">Verified balance</small>
-    <button class="btn secondary" style="margin-top:15px" id="refreshBalanceBtn">
-      ↻ Refresh Balance
+    <small style="color:#eee" data-i18n="verifiedBalance">Verified balance</small>
+    <button class="btn secondary" style="margin-top:12px" id="refreshBalanceBtn">
+      ↻ <span data-i18n="refreshBalance">Refresh Balance</span>
     </button>
   </div>
 
   <div class="grid">
-    <div class="action" onclick="openPage('deposit')"><span class="emoji">💳</span><strong>Deposit</strong></div>
-    <div class="action" onclick="openPage('withdraw')"><span class="emoji">💸</span><strong>Withdrawal</strong></div>
-    <div class="action" onclick="openPage('history')"><span class="emoji">📋</span><strong>History</strong></div>
-    <div class="action" onclick="openPage('referral')"><span class="emoji">👥</span><strong>Referral</strong></div>
-    <div class="action" onclick="openPage('packages')"><span class="emoji">📦</span><strong>Packages</strong></div>
-    <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong>Support</strong></div>
-    <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong>Notifications</strong></div>
-    <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong>Help / FAQ</strong></div>
-    <div class="action" onclick="openPage('task')"><span class="emoji">🎯</span><strong>Task</strong></div>
+    <div class="action" onclick="openPage('deposit')"><span class="emoji">💳</span><strong data-i18n="deposit">Deposit</strong></div>
+    <div class="action" onclick="openPage('withdraw')"><span class="emoji">💸</span><strong data-i18n="withdrawal">Withdrawal</strong></div>
+    <div class="action" onclick="openPage('history')"><span class="emoji">📋</span><strong data-i18n="history">History</strong></div>
+    <div class="action" onclick="openPage('referral')"><span class="emoji">👥</span><strong data-i18n="referral">Referral</strong></div>
+    <div class="action" onclick="openPage('packages')"><span class="emoji">📦</span><strong data-i18n="packages">Packages</strong></div>
+    <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong data-i18n="support">Support</strong></div>
+    <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong data-i18n="notifications">Notifications</strong></div>
+    <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong data-i18n="faq">Help / FAQ</strong></div>
+    <div class="action" onclick="openPage('task')"><span class="emoji">🎯</span><strong data-i18n="task">Task</strong></div>
     <div class="action" onclick="openPage('vip')"><span class="emoji">👑</span><strong>VIP</strong></div>
   </div>
 
-  <div class="card" style="margin-top:17px">
-    <h3>Recent Activity</h3>
-    <div id="recentActivity" class="empty">No recent activity.</div>
+  <div class="card" style="margin-top:14px">
+    <h3 data-i18n="recentActivity">Recent Activity</h3>
+    <div id="recentActivity" class="empty" data-i18n="noRecentActivity">No recent activity.</div>
   </div>
 
   <div class="live-activity">
     <div class="live-title">
-      <strong>Deposit Activity</strong>
-      <span style="font-size:12px;color:#67e5ae">
-        <span class="live-dot"></span>Activity Display
+      <strong data-i18n="depositActivity">Deposit Activity</strong>
+      <span style="font-size:11.5px;color:#67e5ae">
+        <span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span>
       </span>
     </div>
     <div class="activity-window">
@@ -294,13 +364,13 @@ small{color:var(--muted)}
 
 <!-- DEPOSIT -->
 <section id="depositPage" class="hidden">
-<h2 class="page-title">Deposit</h2>
+<h2 class="page-title" data-i18n="deposit">Deposit</h2>
 
 <div class="card">
-  <h3>Select Payment Method</h3>
+  <h3 data-i18n="selectPaymentMethod">Select Payment Method</h3>
 
   <div class="method" id="telebirrCard" onclick="chooseMethod('Telebirr')">
-    <div class="method-left"><span class="brand">📱</span><div><strong>Telebirr</strong><p class="muted">Mobile payment</p></div></div>
+    <div class="method-left"><span class="brand">📱</span><div><strong>Telebirr</strong><p class="muted" data-i18n="mobilePayment">Mobile payment</p></div></div>
     <strong>›</strong>
   </div>
 
@@ -315,65 +385,65 @@ small{color:var(--muted)}
     <option value="CBE">CBE</option>
   </select>
 
-  <div class="notice">
+  <div class="notice" data-i18n="depositNotice">
     Transfer the payment to the selected account and enter your transaction ID. Your request will be reviewed before your balance is updated.
   </div>
 
   <div class="account-box">
     <strong>Telebirr Account</strong>
-    <p style="font-size:20px;margin:10px 0">0964488470</p>
-    <button class="btn secondary" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
+    <p style="font-size:16px;margin:6px 0">0964488470</p>
+    <button class="btn secondary" onclick="copyAccount('0964488470')" data-i18n="copyTelebirr">Copy Telebirr Number</button>
   </div>
 
   <div class="account-box">
     <strong>CBE Account</strong>
-    <p style="font-size:20px;margin:10px 0">10000298833585</p>
-    <button class="btn secondary" onclick="copyAccount('10000298833585')">Copy CBE Number</button>
+    <p style="font-size:16px;margin:6px 0">10000298833585</p>
+    <button class="btn secondary" onclick="copyAccount('10000298833585')" data-i18n="copyCbe">Copy CBE Number</button>
   </div>
 
-  <label>Deposit Amount (ETB)</label>
+  <label data-i18n="depositAmountLabel">Deposit Amount (ETB)</label>
   <input id="depositAmount" type="number" min="300" max="10000" placeholder="Enter amount">
 
-  <label>Transaction ID</label>
+  <label data-i18n="transactionIdLabel">Transaction ID</label>
   <input id="depositTransactionId" type="text" placeholder="Enter payment transaction ID">
 
-  <label>Note (optional)</label>
+  <label data-i18n="noteOptional">Note (optional)</label>
   <textarea id="depositNote" placeholder="Additional information"></textarea>
 
-  <button class="btn" id="depositBtn">Submit Deposit Request</button>
+  <button class="btn" id="depositBtn" data-i18n="submitDeposit">Submit Deposit Request</button>
 
-  <p class="muted" style="margin-top:12px">
+  <p class="muted" style="margin-top:10px" data-i18n="depositDisclaimer">
     Submission does not mean payment has been verified. Your balance changes only after approval.
   </p>
 </div>
 
 <div class="card">
-  <h3>My Deposit History</h3>
-  <div id="depositHistory"><div class="empty">Tap Refresh Balance or open when needed.</div></div>
+  <h3 data-i18n="myDepositHistory">My Deposit History</h3>
+  <div id="depositHistory"><div class="empty">No deposit history loaded yet.</div></div>
 </div>
 </section>
 
 <!-- WITHDRAWAL -->
 <section id="withdrawPage" class="hidden">
-<h2 class="page-title">Withdrawal</h2>
+<h2 class="page-title" data-i18n="withdrawal">Withdrawal</h2>
 <div class="card">
-  <h3>Withdrawal Request</h3>
-  <p class="muted">Enter your payment details carefully.</p>
+  <h3 data-i18n="withdrawalRequest">Withdrawal Request</h3>
+  <p class="muted" data-i18n="enterPaymentDetails">Enter your payment details carefully.</p>
 
-  <label>Payment Method</label>
+  <label data-i18n="paymentMethodLabel">Payment Method</label>
   <select id="withdrawMethod">
     <option value="">Choose payment method</option>
     <option value="Telebirr">Telebirr</option>
     <option value="CBE">CBE</option>
   </select>
 
-  <label>Account Holder Name</label>
+  <label data-i18n="accountHolderName">Account Holder Name</label>
   <input id="withdrawName" placeholder="Full name">
 
-  <label>Account Number / Phone Number</label>
+  <label data-i18n="accountNumberLabel">Account Number / Phone Number</label>
   <input id="withdrawAccount" placeholder="Telebirr or CBE account">
 
-  <label>Withdrawal Amount (ETB)</label>
+  <label data-i18n="withdrawalAmountLabel">Withdrawal Amount (ETB)</label>
   <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
 
   <label>Transaction Fee (0.04%)</label>
@@ -382,46 +452,54 @@ small{color:var(--muted)}
   <label>Net Amount (ETB)</label>
   <input id="withdrawNet" type="text" value="0.00 ETB" readonly>
 
-  <label>Additional Note (Optional)</label>
+  <label data-i18n="additionalNoteOptional">Additional Note (Optional)</label>
   <textarea id="withdrawNote" placeholder="Write additional information"></textarea>
 
-  <div class="notice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.</div>
-  <button class="btn" id="withdrawBtn">Submit Withdrawal Request</button>
+  <div class="notice" data-i18n="withdrawLimitsNotice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.</div>
+  <button class="btn" id="withdrawBtn" data-i18n="submitWithdrawal">Submit Withdrawal Request</button>
 </div>
 
 <div class="card">
-  <h3>My Withdrawal History</h3>
+  <h3 data-i18n="myWithdrawalHistory">My Withdrawal History</h3>
   <div id="withdrawHistory"><div class="empty">No withdrawal history loaded yet.</div></div>
 </div>
 </section>
 
 <!-- REFERRAL -->
 <section id="referralPage" class="hidden">
-<h2 class="page-title">Referral</h2>
+<h2 class="page-title" data-i18n="referral">Referral</h2>
 <div class="card">
-  <h3>Your Referral Code</h3>
-  <p class="muted">Share your code with others.</p><br>
+  <h3 data-i18n="yourReferralCode">Your Referral Code</h3>
+  <p class="muted" data-i18n="inviteRewardInfo">Invite friends and earn 100 ETB per referral! Share your code with others.</p><br>
   <h2 id="referralCode">Loading...</h2><br>
-  <button class="btn" id="copyReferralBtn">Copy Referral Code</button>
-  <div class="notice">Referral code copying is available. Referral rewards and tracking require a separate verified backend system.</div>
+  <button class="btn" id="copyReferralBtn" data-i18n="copyReferralCode">Copy Referral Code</button>
+  <div class="notice" id="referralBonusNotice">
+    Invite bonus: <strong>100 ETB</strong> for inviting a friend.
+  </div>
+
+  <div class="account-box" style="margin-top:12px">
+    <strong data-i18n="enterInviteCodeTitle">Enter Friend's Referral Code</strong>
+    <input id="invitedByCodeInput" type="text" placeholder="e.g. BW12345678">
+    <button class="btn secondary" id="applyReferralBtn" data-i18n="applyInviteCodeBtn">Claim / Record 100 ETB Invite Bonus</button>
+  </div>
 </div>
 </section>
 
-<!-- PACKAGES -->
+<!-- PACKAGES (VIP 1 to VIP 10, stepping by 2000 ETB) -->
 <section id="packagesPage" class="hidden">
-<h2 class="page-title">Packages</h2>
+<h2 class="page-title" data-i18n="packages">Packages</h2>
 <div class="card">
-  <h3>Packages</h3>
-  <p class="muted">Package information will appear here when officially configured.</p>
-  <div class="notice">No package purchase or earning feature is currently active.</div>
+  <h3 data-i18n="vipPackagesTitle">VIP Packages (VIP 1 – VIP 10)</h3>
+  <p class="muted" data-i18n="vipStepDesc">Each VIP level increases by 2,000 ETB starting from VIP 1 (2,000 ETB) up to VIP 10 (20,000 ETB).</p>
 </div>
+<div id="packagesList"></div>
 </section>
 
 <!-- TASK PAGE -->
 <section id="taskPage" class="hidden">
-  <h2 class="page-title">Daily Tasks</h2>
+  <h2 class="page-title" data-i18n="dailyTasks">Daily Tasks</h2>
   <div class="card">
-    <h3>Available Tasks</h3>
+    <h3 data-i18n="availableTasks">Available Tasks</h3>
 
     <div class="task-card">
       <div class="task-icon">📌</div>
@@ -432,9 +510,9 @@ small{color:var(--muted)}
 
     <div class="task-card">
       <div class="task-icon">👥</div>
-      <strong>Referral Task</strong>
-      <p class="muted">Referral task information will appear here.</p>
-      <span class="status pending">Coming Soon</span>
+      <strong>Referral Task — 100 ETB</strong>
+      <p class="muted" data-i18n="inviteRewardDesc">Earn 100 ETB when you invite people to join.</p>
+      <span class="status pending">100 ETB</span>
     </div>
 
     <div class="notice">
@@ -446,36 +524,15 @@ small{color:var(--muted)}
 <!-- VIP PAGE -->
 <section id="vipPage" class="hidden">
   <h2 class="page-title">VIP Membership</h2>
-
-  <div class="vip-card">
-    <div class="vip-level">🥉</div>
-    <h3>VIP 1</h3>
-    <p class="muted">Membership information not configured.</p>
-    <span class="status pending">Coming Soon</span>
-  </div>
-
-  <div class="vip-card">
-    <div class="vip-level">🥈</div>
-    <h3>VIP 2</h3>
-    <p class="muted">Membership information not configured.</p>
-    <span class="status pending">Coming Soon</span>
-  </div>
-
-  <div class="vip-card">
-    <div class="vip-level">🥇</div>
-    <h3>VIP 3</h3>
-    <p class="muted">Membership information not configured.</p>
-    <span class="status pending">Coming Soon</span>
-  </div>
-
+  <div id="vipList"></div>
   <div class="notice">
-    VIP purchases and benefits are not active.
+    VIP 1 starts at 2,000 ETB and increases by 2,000 ETB per level up to VIP 10 (20,000 ETB).
   </div>
 </section>
 
 <!-- HISTORY -->
 <section id="historyPage" class="hidden">
-<h2 class="page-title">Transaction History</h2>
+<h2 class="page-title" data-i18n="transactionHistory">Transaction History</h2>
 <div class="card">
   <select id="historyFilter">
     <option value="all">All Requests</option>
@@ -488,19 +545,21 @@ small{color:var(--muted)}
 
 <!-- PROFILE -->
 <section id="profilePage" class="hidden">
-<h2 class="page-title">My Profile</h2>
+<h2 class="page-title" data-i18n="myProfile">My Profile</h2>
 
 <div class="balance">
-  <p>Current Balance</p>
+  <p data-i18n="currentBalance">Current Balance</p>
   <h1 id="profileBalance">0.00 ETB</h1>
-  <small style="color:#eee">Verified balance</small>
-  <button class="btn secondary" style="margin-top:15px" id="profileRefreshBtn">↻ Refresh Balance</button>
+  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance</small>
+  <button class="btn secondary" style="margin-top:12px" id="profileRefreshBtn">
+    ↻ <span data-i18n="refreshBalance">Refresh Balance</span>
+  </button>
 </div>
 
 <div class="card">
-  <h3>Deposit Summary</h3>
+  <h3 data-i18n="depositSummary">Deposit Summary</h3>
   <div class="stat-grid">
-    <div class="stat"><span class="muted">Total Deposits</span><strong id="totalDeposits">0.00 ETB</strong></div>
+    <div class="stat"><span class="muted" data-i18n="totalDeposits">Total Deposits</span><strong id="totalDeposits">0.00 ETB</strong></div>
     <div class="stat"><span class="muted">Approved</span><strong id="approvedDeposits">0.00 ETB</strong></div>
     <div class="stat"><span class="muted">Pending</span><strong id="pendingDeposits">0.00 ETB</strong></div>
     <div class="stat"><span class="muted">Rejected</span><strong id="rejectedDeposits">0.00 ETB</strong></div>
@@ -508,55 +567,55 @@ small{color:var(--muted)}
 </div>
 
 <div class="card">
-  <h3>Account Information</h3>
-  <p class="muted">Full Name</p>
-  <p id="profileName" style="margin:6px 0 15px">-</p>
+  <h3 data-i18n="accountInformation">Account Information</h3>
+  <p class="muted" data-i18n="fullName">Full Name</p>
+  <p id="profileName" style="margin:4px 0 12px">-</p>
 
-  <p class="muted">Email Address</p>
-  <p id="profileEmail" style="margin:6px 0 15px">-</p>
+  <p class="muted" data-i18n="emailAddress">Email Address</p>
+  <p id="profileEmail" style="margin:4px 0 12px">-</p>
 
-  <p class="muted">Email Verification</p>
-  <p id="emailVerificationStatus" style="margin:6px 0 10px">-</p>
-  <button class="btn secondary" id="verifyEmailBtn">Send Verification Email</button>
+  <p class="muted" data-i18n="emailVerification">Email Verification</p>
+  <p id="emailVerificationStatus" style="margin:4px 0 8px">-</p>
+  <button class="btn secondary" id="verifyEmailBtn" data-i18n="sendVerificationEmail">Send Verification Email</button>
 
-  <p class="muted" style="margin-top:17px">User ID</p>
-  <p id="profileUid" style="margin:6px 0 10px;word-break:break-all">-</p>
-  <button class="btn secondary" id="copyUidBtn">Copy User ID</button>
+  <p class="muted" style="margin-top:14px">User ID</p>
+  <p id="profileUid" style="margin:4px 0 8px;word-break:break-all">-</p>
+  <button class="btn secondary" id="copyUidBtn" data-i18n="copyUserId">Copy User ID</button>
 
-  <p class="muted" style="margin-top:17px">Account Status</p>
-  <p id="profileStatus" style="margin-top:6px">-</p>
+  <p class="muted" style="margin-top:14px" data-i18n="accountStatus">Account Status</p>
+  <p id="profileStatus" style="margin-top:4px">-</p>
 </div>
 
 <div class="card">
-  <h3>Account Security</h3>
-  <p class="muted">To change your password, use the secure password reset link sent to your email.</p>
-  <button class="btn secondary" id="profileResetPasswordBtn" style="margin-top:12px">Send Password Reset Link</button>
-  <div class="notice">Never share your password or verification code with anyone.</div>
+  <h3 data-i18n="accountSecurity">Account Security</h3>
+  <p class="muted" data-i18n="securityHint">To change your password, use the secure password reset link sent to your email.</p>
+  <button class="btn secondary" id="profileResetPasswordBtn" style="margin-top:10px" data-i18n="sendResetLink">Send Password Reset Link</button>
+  <div class="notice" data-i18n="neverSharePass">Never share your password or verification code with anyone.</div>
 </div>
 </section>
 
 <!-- SUPPORT -->
 <section id="supportPage" class="hidden">
-<h2 class="page-title">Support</h2>
+<h2 class="page-title" data-i18n="support">Support</h2>
 <div class="card">
-  <h3>Contact Support</h3>
+  <h3 data-i18n="contactSupport">Contact Support</h3>
   <textarea id="supportMessage" placeholder="Write your message..."></textarea>
-  <button class="btn" id="supportBtn">Send Message</button>
+  <button class="btn" id="supportBtn" data-i18n="sendMessage">Send Message</button>
 </div>
 <div class="card">
-  <h3>My Support Requests</h3>
+  <h3 data-i18n="mySupportRequests">My Support Requests</h3>
   <div id="supportHistory"><div class="empty">No support messages yet.</div></div>
 </div>
 </section>
 
 <!-- NOTIFICATIONS -->
 <section id="notificationsPage" class="hidden">
-<h2 class="page-title">Notifications</h2>
+<h2 class="page-title" data-i18n="notifications">Notifications</h2>
 <div class="card">
-  <h3>My Request Updates</h3>
-  <p class="muted">Updates about your deposit and withdrawal requests.</p>
+  <h3 data-i18n="myRequestUpdates">My Request Updates</h3>
+  <p class="muted" data-i18n="requestUpdatesDesc">Updates about your deposit and withdrawal requests.</p>
   <div class="feature-row">
-    <button class="btn secondary" id="refreshNotificationsBtn">↻ Refresh</button>
+    <button class="btn secondary" id="refreshNotificationsBtn">↻ <span data-i18n="refresh">Refresh</span></button>
   </div>
   <div id="notificationsList"><div class="empty">No notifications loaded yet.</div></div>
 </div>
@@ -564,9 +623,9 @@ small{color:var(--muted)}
 
 <!-- FAQ -->
 <section id="faqPage" class="hidden">
-<h2 class="page-title">Help / FAQ</h2>
+<h2 class="page-title" data-i18n="faq">Help / FAQ</h2>
 <div class="card">
-  <h3>Frequently Asked Questions</h3>
+  <h3 data-i18n="faqTitle">Frequently Asked Questions</h3>
 
   <div class="faq-item">
     <strong>1. How do I deposit?</strong>
@@ -608,15 +667,253 @@ small{color:var(--muted)}
 </main>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-page="home" onclick="openPage('home')"><span>🏠</span>Home</button>
-  <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')"><span>💳</span>Deposit</button>
-  <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')"><span>💸</span>Withdraw</button>
-  <button class="nav-btn" data-page="history" onclick="openPage('history')"><span>📋</span>History</button>
-  <button class="nav-btn" data-page="profile" onclick="openPage('profile')"><span>👤</span>Profile</button>
+  <button class="nav-btn active" data-page="home" onclick="openPage('home')"><span>🏠</span><span data-i18n="navHome">Home</span></button>
+  <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')"><span>💳</span><span data-i18n="deposit">Deposit</span></button>
+  <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')"><span>💸</span><span data-i18n="navWithdraw">Withdraw</span></button>
+  <button class="nav-btn" data-page="history" onclick="openPage('history')"><span>📋</span><span data-i18n="history">History</span></button>
+  <button class="nav-btn" data-page="profile" onclick="openPage('profile')"><span>👤</span><span data-i18n="navProfile">Profile</span></button>
 </nav>
 </section>
 
 <script>
+const TRANSLATIONS = {
+  en: {
+    welcomeBack: "Welcome Back",
+    loginSubtitle: "Login to your account",
+    loginBtn: "Login",
+    forgotPassword: "Forgot Password?",
+    noAccount: "Don't have an account?",
+    createAccount: "Create Account",
+    registerBtn: "Register",
+    haveAccount: "Already have an account?",
+    resetPassword: "Reset Password",
+    resetHint: "Enter your registered email address.",
+    sendResetLink: "Send Reset Link",
+    backToLogin: "Back to Login",
+    logout: "Logout",
+    currentBalance: "Current Balance",
+    verifiedBalance: "Verified balance",
+    refreshBalance: "Refresh Balance",
+    deposit: "Deposit",
+    withdrawal: "Withdrawal",
+    history: "History",
+    referral: "Referral",
+    packages: "Packages",
+    support: "Support",
+    notifications: "Notifications",
+    faq: "Help / FAQ",
+    task: "Task",
+    recentActivity: "Recent Activity",
+    noRecentActivity: "No recent activity.",
+    depositActivity: "Deposit Activity",
+    activityDisplay: "Activity Display",
+    selectPaymentMethod: "Select Payment Method",
+    mobilePayment: "Mobile payment",
+    depositNotice: "Transfer the payment to the selected account and enter your transaction ID. Your request will be reviewed before your balance is updated.",
+    copyTelebirr: "Copy Telebirr Number",
+    copyCbe: "Copy CBE Number",
+    depositAmountLabel: "Deposit Amount (ETB)",
+    transactionIdLabel: "Transaction ID",
+    noteOptional: "Note (optional)",
+    submitDeposit: "Submit Deposit Request",
+    depositDisclaimer: "Submission does not mean payment has been verified. Your balance changes only after approval.",
+    myDepositHistory: "My Deposit History",
+    withdrawalRequest: "Withdrawal Request",
+    enterPaymentDetails: "Enter your payment details carefully.",
+    paymentMethodLabel: "Payment Method",
+    accountHolderName: "Account Holder Name",
+    accountNumberLabel: "Account Number / Phone Number",
+    withdrawalAmountLabel: "Withdrawal Amount (ETB)",
+    additionalNoteOptional: "Additional Note (Optional)",
+    withdrawLimitsNotice: "Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.",
+    submitWithdrawal: "Submit Withdrawal Request",
+    myWithdrawalHistory: "My Withdrawal History",
+    yourReferralCode: "Your Referral Code",
+    inviteRewardInfo: "Invite friends and earn 100 ETB per referral! Share your code with others.",
+    copyReferralCode: "Copy Referral Code",
+    enterInviteCodeTitle: "Enter Friend's Referral Code",
+    applyInviteCodeBtn: "Claim / Record 100 ETB Invite Bonus",
+    vipPackagesTitle: "VIP Packages (VIP 1 – VIP 10)",
+    vipStepDesc: "Each VIP level increases by 2,000 ETB starting from VIP 1 (2,000 ETB) up to VIP 10 (20,000 ETB).",
+    dailyTasks: "Daily Tasks",
+    availableTasks: "Available Tasks",
+    inviteRewardDesc: "Earn 100 ETB when you invite people to join.",
+    transactionHistory: "Transaction History",
+    myProfile: "My Profile",
+    depositSummary: "Deposit Summary",
+    totalDeposits: "Total Deposits",
+    accountInformation: "Account Information",
+    fullName: "Full Name",
+    emailAddress: "Email Address",
+    emailVerification: "Email Verification",
+    sendVerificationEmail: "Send Verification Email",
+    copyUserId: "Copy User ID",
+    accountStatus: "Account Status",
+    accountSecurity: "Account Security",
+    securityHint: "To change your password, use the secure password reset link sent to your email.",
+    neverSharePass: "Never share your password or verification code with anyone.",
+    contactSupport: "Contact Support",
+    sendMessage: "Send Message",
+    mySupportRequests: "My Support Requests",
+    myRequestUpdates: "My Request Updates",
+    requestUpdatesDesc: "Updates about your deposit and withdrawal requests.",
+    refresh: "Refresh",
+    faqTitle: "Frequently Asked Questions",
+    navHome: "Home",
+    navWithdraw: "Withdraw",
+    navProfile: "Profile",
+    buyPackage: "Select / Activate Package"
+  },
+  am: {
+    welcomeBack: "እንኳን ደህና መጡ",
+    loginSubtitle: "ወደ መለያዎ ይግቡ",
+    loginBtn: "ግባ",
+    forgotPassword: "የይለፍ ቃል ረሱ?",
+    noAccount: "መለያ የለዎትም?",
+    createAccount: "መለያ ይፍጠሩ",
+    registerBtn: "ይመዝገቡ",
+    haveAccount: "ቀድሞ መለያ አለዎት?",
+    resetPassword: "የይለፍ ቃል ዳግም ያስጀምሩ",
+    resetHint: "የተመዘገቡበትን ኢሜይል አድራሻ ያስገቡ።",
+    sendResetLink: "የዳግም ማስጀመሪያ ሊንክ ላክ",
+    backToLogin: "ወደ መግቢያ ይመለሱ",
+    logout: "ውጣ",
+    currentBalance: "ያለዎት ቀሪ ገንዘብ",
+    verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ",
+    refreshBalance: "ቀሪ ገንዘብ አድስ",
+    deposit: "ገንዘብ ማስገባት",
+    withdrawal: "ገንዘብ ማውጣት",
+    history: "ታሪክ",
+    referral: "ግብዣ (Referral)",
+    packages: "ፓኬጆች",
+    support: "ድጋፍ",
+    notifications: "ማሳወቂያዎች",
+    faq: "እገዛ / ጥያቄዎች",
+    task: "ተግባር (Task)",
+    recentActivity: "የቅርብ ጊዜ እንቅስቃሴ",
+    noRecentActivity: "ምንም የቅርብ ጊዜ እንቅስቃሴ የለም።",
+    depositActivity: "የተቀማጭ ገንዘብ እንቅስቃሴ",
+    activityDisplay: "የእንቅስቃሴ ማሳያ",
+    selectPaymentMethod: "የመክፈያ ዘዴ ይምረጡ",
+    mobilePayment: "የሞባይል ክፍያ",
+    depositNotice: "ክፍያውን ወደ ተመረጠው አካውንት ያስተላልፉና የትራንዛክሽን መለያ (Transaction ID) ያስገቡ። ቀሪ ገንዘብዎ ከመታደሱ በፊት ጥያቄዎ ይጣራል።",
+    copyTelebirr: "የቴሌብር ቁጥር ቅዳ",
+    copyCbe: "የሲቢኢ ቁጥር ቅዳ",
+    depositAmountLabel: "የሚገባው ገንዘብ መጠን (ETB)",
+    transactionIdLabel: "የትራንዛክሽን መለያ (Transaction ID)",
+    noteOptional: "ማስታወሻ (አማራጭ)",
+    submitDeposit: "የተቀማጭ ጥያቄ ላክ",
+    depositDisclaimer: "ጥያቄ ማስገባት ክፍያ መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከጸደቀ በኋላ ብቻ ነው።",
+    myDepositHistory: "የተቀማጭ ገንዘብ ታሪክ",
+    withdrawalRequest: "የገንዘብ ማውጫ ጥያቄ",
+    enterPaymentDetails: "የክፍያ መረጃዎን በጥንቃቄ ያስገቡ።",
+    paymentMethodLabel: "የመክፈያ ዘዴ",
+    accountHolderName: "የአካውንት ባለቤት ስም",
+    accountNumberLabel: "የአካውንት ቁጥር / ስልክ ቁጥር",
+    withdrawalAmountLabel: "የሚወጣው ገንዘብ መጠን (ETB)",
+    additionalNoteOptional: "ተጨማሪ ማስታወሻ (አማራጭ)",
+    withdrawLimitsNotice: "አነስተኛ ማውጫ፡ 100 ብር። ከፍተኛ ማውጫ፡ 5,000 ብር። ክፍያ፡ 0.04%።",
+    submitWithdrawal: "የማውጫ ጥያቄ ላክ",
+    myWithdrawalHistory: "የማውጫ ታሪክ",
+    yourReferralCode: "የእርስዎ የግብዣ ኮድ",
+    inviteRewardInfo: "ሰዎችን ይጋብዙ እና ለእያንዳንዱ ግብዣ 100 ብር ያግኙ! ኮድዎን ያጋሩ።",
+    copyReferralCode: "የግብዣ ኮድ ቅዳ",
+    enterInviteCodeTitle: "የጋበዘዎትን ሰው ኮድ ያስገቡ",
+    applyInviteCodeBtn: "የ100 ብር ግብዣ ቦነስ መዝግብ",
+    vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10)",
+    vipStepDesc: "እያንዳንዱ VIP ከVIP 1 (2,000 ብር) ጀምሮ በ2,000 ብር እየተበላለጠ እስከ VIP 10 (20,000 ብር) ይደርሳል።",
+    dailyTasks: "ዕለታዊ ተግባራት",
+    availableTasks: "ያሉ ተግባራት",
+    inviteRewardDesc: "ሰው ሲጋብዙ 100 ብር ያግኙ።",
+    transactionHistory: "የትራንዛክሽን ታሪክ",
+    myProfile: "መገለጫዬ (My Profile)",
+    depositSummary: "የተቀማጭ ማጠቃለያ",
+    totalDeposits: "ጠቅላላ የተቀመጠ",
+    accountInformation: "የመለያ መረጃ",
+    fullName: "ሙሉ ስም",
+    emailAddress: "ኢሜይል አድራሻ",
+    emailVerification: "የኢሜይል ማረጋገጫ",
+    sendVerificationEmail: "የማረጋገጫ ኢሜይል ላክ",
+    copyUserId: "የተጠቃሚ መለያ (UID) ቅዳ",
+    accountStatus: "የመለያ ሁኔታ",
+    accountSecurity: "የመለያ ደህንነት",
+    securityHint: "የይለፍ ቃልዎን ለመቀየር ወደ ኢሜይልዎ የሚላከውን ሊንክ ይጠቀሙ።",
+    neverSharePass: "የይለፍ ቃልዎን ወይም የማረጋገጫ ኮድ ለማንም አያጋሩ።",
+    contactSupport: "ድጋፍ ያግኙ",
+    sendMessage: "መልዕክት ላክ",
+    mySupportRequests: "የድጋፍ ጥያቄዎቼ",
+    myRequestUpdates: "የጥያቄዎቼ ዝመናዎች",
+    requestUpdatesDesc: "የገንዘብ ማስገባት እና ማውጣት ጥያቄዎችዎ ሁኔታ።",
+    refresh: "አድስ",
+    faqTitle: "ተደጋግመው የሚጠየቁ ጥያቄዎች",
+    navHome: "መነሻ",
+    navWithdraw: "ማውጣት",
+    navProfile: "መገለጫ",
+    buyPackage: "ፓኬጅ ምረጥ / አንቃ"
+  }
+};
+
+let currentLang = "en";
+
+function setLanguage(lang){
+  currentLang = lang === "am" ? "am" : "en";
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll(".lang-btn").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+
+  const dict = TRANSLATIONS[currentLang];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.dataset.i18n;
+    if(dict[key] !== undefined){
+      el.textContent = dict[key];
+    }
+  });
+
+  renderVipCards();
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>setLanguage(btn.dataset.lang));
+});
+
+const VIP_TIERS = Array.from({length: 10}, (_, idx) => {
+  const level = idx + 1;
+  const price = level * 2000;
+  const badge = level <= 3 ? ["🥉","🥈","🥇"][idx] : "👑";
+  return { level, price, badge };
+});
+
+function renderVipCards(){
+  const btnLabel = TRANSLATIONS[currentLang].buyPackage;
+  const unit = currentLang === "am" ? "ብር" : "ETB";
+  const descText = currentLang === "am"
+    ? "የVIP ፓኬጅ ደረጃ — ከመጀመሪያው በ2,000 ብር የተለየ"
+    : "VIP Package tier — stepping by 2,000 ETB per level";
+
+  const html = VIP_TIERS.map(v => `
+    <div class="vip-card">
+      <div class="vip-top">
+        <div>
+          <span class="vip-level">${v.badge}</span>
+          <h3 style="display:inline-block;margin-left:6px">VIP ${v.level}</h3>
+        </div>
+        <div class="vip-price">${v.price.toLocaleString()} ${unit}</div>
+      </div>
+      <p class="muted">${descText}</p>
+      <button type="button" class="btn secondary" style="margin-top:10px" onclick="window.purchaseVip(${v.level}, ${v.price})">${btnLabel}</button>
+    </div>
+  `).join("");
+
+  const pkgEl = document.getElementById("packagesList");
+  const vipEl = document.getElementById("vipList");
+  if(pkgEl) pkgEl.innerHTML = html;
+  if(vipEl) vipEl.innerHTML = html;
+}
+
+renderVipCards();
+
 function showLogin(){
   loginBox.classList.remove("hidden");
   registerBox.classList.add("hidden");
@@ -710,7 +1007,7 @@ import {
 
 import {
   getFirestore,doc,setDoc,getDoc,addDoc,collection,query,
-  where,getDocs,serverTimestamp
+  where,getDocs,runTransaction,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -816,6 +1113,43 @@ function updateWithdrawFeePreview(){
   $("withdrawNet").value=net.toFixed(2)+" ETB";
 }
 $("withdrawAmount").addEventListener("input",updateWithdrawFeePreview);
+
+/* VIP PACKAGE PURCHASE */
+window.purchaseVip = async function(level, price){
+  if(!currentUser) return notify("Please login first.");
+  if(!confirm(`Activate VIP ${level} for ${price.toLocaleString()} ETB?`)) return;
+
+  try{
+    const userRef = doc(db, "users", currentUser.uid);
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(userRef);
+      const curBal = snap.exists() ? Number(snap.data().balance ?? 0) : 0;
+      const safeBal = Number.isFinite(curBal) ? curBal : 0;
+      if(safeBal < price){
+        throw new Error(`Insufficient balance (${safeBal.toFixed(2)} ETB available, ${price.toFixed(2)} ETB required).`);
+      }
+      tx.set(userRef, {
+        balance: safeBal - price,
+        vipLevel: level,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    });
+
+    await addDoc(collection(db, "transactionRequests"), {
+      userId: currentUser.uid,
+      email: currentUser.email || "",
+      type: "package",
+      packageName: `VIP ${level}`,
+      amount: price,
+      status: "approved",
+      createdAt: serverTimestamp()
+    });
+
+    notify(`VIP ${level} activated (${price.toLocaleString()} ETB). Tap Refresh Balance to view updated balance.`);
+  }catch(err){
+    notify(err.message);
+  }
+};
 
 /* REGISTER */
 $("registerBtn").addEventListener("click",async()=>{
@@ -1013,7 +1347,7 @@ async function refreshBalance(){
 $("refreshBalanceBtn").addEventListener("click",refreshBalance);
 $("profileRefreshBtn").addEventListener("click",refreshBalance);
 
-/* COPY USER ID & REFERRAL */
+/* COPY USER ID & REFERRAL (100 ETB INVITE REWARD) */
 $("copyUidBtn").addEventListener("click",async()=>{
   if(!currentUser) return;
   try{
@@ -1028,9 +1362,34 @@ $("copyReferralBtn").addEventListener("click",async()=>{
   const code=$("referralCode").textContent;
   try{
     await navigator.clipboard.writeText(code);
-    notify("Referral code copied: "+code);
+    notify("Referral code copied ("+code+"). Invite bonus: 100 ETB.");
   }catch(error){
-    notify("Referral code copied.");
+    notify("Referral code copied. Invite bonus: 100 ETB.");
+  }
+});
+
+$("applyReferralBtn").addEventListener("click",async()=>{
+  if(!currentUser) return notify("Please login first.");
+  const invCode=$("invitedByCodeInput").value.trim().toUpperCase();
+  const ownCode=makeReferral(currentUser.uid);
+  if(!invCode) return notify("Please enter a referral code.");
+  if(invCode===ownCode) return notify("You cannot use your own referral code.");
+
+  try{
+    await addDoc(collection(db,"transactionRequests"),{
+      userId:currentUser.uid,
+      email:currentUser.email||"",
+      type:"referral",
+      referralCode:invCode,
+      rewardAmount:100,
+      amount:100,
+      status:"pending",
+      createdAt:serverTimestamp()
+    });
+    $("invitedByCodeInput").value="";
+    notify("Referral recorded (100 ETB invite reward).");
+  }catch(err){
+    notify("Referral error: "+err.message);
   }
 });
 
@@ -1146,7 +1505,7 @@ $("supportBtn").addEventListener("click",async()=>{
   }
 });
 
-/* ON-DEMAND LOADERS (ONLY WHEN USER TRIGGERS) */
+/* ON-DEMAND LOADERS */
 window.loadHistory=async function(){
   if(!currentUser) return;
   const filter=$("historyFilter").value;
