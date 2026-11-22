@@ -16,188 +16,87 @@
   --muted:#77788a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--dark);
-  padding-bottom:85px;
-}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--dark);padding-bottom:85px}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
-header{
-  background:var(--dark);
-  color:white;
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+header{background:var(--dark);color:white;padding:20px;display:flex;justify-content:space-between;align-items:center}
 header h2{font-size:21px}
 .container{padding:17px;max-width:650px;margin:auto}
-.card{
-  background:white;
-  padding:18px;
-  border-radius:17px;
-  margin-bottom:15px;
-  box-shadow:0 3px 14px rgba(0,0,0,.045);
-}
+.card{background:white;padding:18px;border-radius:17px;margin-bottom:15px;box-shadow:0 3px 14px rgba(0,0,0,.045)}
 .card h3{margin-bottom:13px}
 .muted{color:var(--muted);font-size:13px}
-input,select,textarea{
-  width:100%;
-  padding:13px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  margin:7px 0 13px;
-  background:white;
-  outline:none;
-}
+input,select,textarea{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;margin:7px 0 13px;background:white;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--primary)}
 textarea{resize:vertical;min-height:85px}
-.btn{
-  border:0;
-  padding:13px;
-  border-radius:10px;
-  background:var(--primary);
-  color:white;
-  width:100%;
-  font-weight:bold;
-}
+.btn{border:0;padding:13px;border-radius:10px;background:var(--primary);color:white;width:100%;font-weight:bold}
 .btn.secondary{background:#ecebff;color:var(--primary)}
 .btn.danger{background:#ffe9eb;color:var(--red)}
 .btn.small{width:auto;padding:8px 12px;font-size:12px}
 .link{color:var(--primary);cursor:pointer;font-size:14px}
 .auth-wrap{max-width:420px;margin:45px auto;padding:20px}
 .auth-wrap .card{padding:25px}
-.logo{
-  text-align:center;
-  font-size:28px;
-  font-weight:bold;
-  color:var(--primary);
-  margin-bottom:20px;
-}
+.logo{text-align:center;font-size:28px;font-weight:bold;color:var(--primary);margin-bottom:20px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.action{
-  background:white;
-  padding:18px 10px;
-  border-radius:15px;
-  text-align:center;
-  cursor:pointer;
-  border:1px solid #eee;
-}
+.action{background:white;padding:18px 10px;border-radius:15px;text-align:center;cursor:pointer;border:1px solid #eee}
 .action .emoji{font-size:27px;display:block;margin-bottom:8px}
-.balance{
-  background:linear-gradient(130deg,#635bff,#302b9d);
-  color:white;
-  padding:23px;
-  border-radius:18px;
-  margin-bottom:17px;
-}
+.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:23px;border-radius:18px;margin-bottom:17px}
 .balance h1{font-size:30px;margin-top:12px}
-.method{
-  border:2px solid #eee;
-  border-radius:13px;
-  padding:14px;
-  margin:8px 0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  cursor:pointer;
-}
+.method{border:2px solid #eee;border-radius:13px;padding:14px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .method.selected{border-color:var(--primary);background:#f5f4ff}
 .method strong{font-size:16px}
 .method .brand{font-size:25px;margin-right:10px}
 .method-left{display:flex;align-items:center}
-.status{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:20px;
-  background:#eee;
-  font-size:11px;
-  margin-top:7px;
-}
-.status.pending,.status.request-recorded,.status.processing{
-  background:#fff0ce;color:#946000
-}
-.status.approved,.status.completed{
-  background:#d9f7e9;color:#087b4c
-}
-.status.rejected,.status.failed,.status.cancelled{
-  background:#ffe1e4;color:#bd2636
-}
+.status{display:inline-block;padding:6px 10px;border-radius:20px;background:#eee;font-size:11px;margin-top:7px}
+.status.pending,.status.request-recorded,.status.processing,.status.under-review{background:#fff0ce;color:#946000}
+.status.approved,.status.completed{background:#d9f7e9;color:#087b4c}
+.status.rejected,.status.failed,.status.cancelled{background:#ffe1e4;color:#bd2636}
 .item{border-bottom:1px solid #eee;padding:13px 0}
 .item:last-child{border:0}
 .item-top{display:flex;justify-content:space-between;gap:10px}
-.bottom-nav{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  background:white;
-  border-top:1px solid #eee;
-  display:flex;
-  justify-content:space-around;
-  padding:10px 2px;
-  z-index:10;
-}
-.nav-btn{
-  background:none;border:0;color:#777;
-  font-size:11px;display:flex;
-  flex-direction:column;align-items:center;gap:4px;
-}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px 2px;z-index:10}
+.nav-btn{background:none;border:0;color:#777;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .nav-btn span{font-size:20px}
 .nav-btn.active{color:var(--primary);font-weight:bold}
-.preview{
-  max-width:100%;max-height:220px;
-  border-radius:12px;display:block;margin:10px 0;
-}
-.notice{
-  padding:12px;border-radius:10px;
-  background:#f1f0ff;color:#4841a8;
-  font-size:13px;margin:10px 0;
-}
+.preview{max-width:100%;max-height:220px;border-radius:12px;display:block;margin:10px 0}
+.notice{padding:12px;border-radius:10px;background:#f1f0ff;color:#4841a8;font-size:13px;margin:10px 0}
 .empty{text-align:center;color:var(--muted);padding:20px}
 .page-title{margin:5px 0 17px}
 small{color:var(--muted)}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.stat{background:#f5f5fb;padding:13px;border-radius:12px}
+.stat strong{display:block;font-size:19px;margin-top:7px}
+.account-box{background:#f7f7fc;padding:14px;border-radius:12px;margin:10px 0}
 @media(min-width:650px){
-  .bottom-nav{
-    max-width:650px;left:50%;
-    transform:translateX(-50%);
-    border-radius:15px 15px 0 0;
-  }
+.bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUTHENTICATION -->
 <section id="auth" class="auth-wrap">
   <div class="logo">BaweReal</div>
 
   <div class="card" id="loginBox">
     <h2>Welcome Back</h2>
-    <p class="muted">Login to your account</p>
-    <br>
+    <p class="muted">Login to your account</p><br>
     <input id="loginEmail" type="email" placeholder="Email address">
     <input id="loginPassword" type="password" placeholder="Password">
-    <button class="btn" id="loginBtn">Login</button>
-    <br><br>
-    <p class="link" onclick="showForgot()">Forgot Password?</p>
-    <br>
+    <button class="btn" id="loginBtn">Login</button><br><br>
+    <p class="link" onclick="showForgot()">Forgot Password?</p><br>
     <p class="muted">Don't have an account?
       <span class="link" onclick="showRegister()">Create Account</span>
     </p>
   </div>
 
   <div class="card hidden" id="registerBox">
-    <h2>Create Account</h2>
-    <br>
+    <h2>Create Account</h2><br>
     <input id="regName" placeholder="Full name">
     <input id="regEmail" type="email" placeholder="Email address">
     <input id="regPassword" type="password" placeholder="Password">
     <input id="regConfirm" type="password" placeholder="Confirm password">
-    <button class="btn" id="registerBtn">Register</button>
-    <br><br>
+    <button class="btn" id="registerBtn">Register</button><br><br>
     <p class="muted">Already have an account?
       <span class="link" onclick="showLogin()">Login</span>
     </p>
@@ -205,337 +104,267 @@ small{color:var(--muted)}
 
   <div class="card hidden" id="forgotBox">
     <h2>Reset Password</h2>
-    <p class="muted">Enter your registered email address.</p>
-    <br>
+    <p class="muted">Enter your registered email address.</p><br>
     <input id="forgotEmail" type="email" placeholder="Email address">
-    <button class="btn" id="resetBtn">Send Reset Link</button>
-    <br><br>
+    <button class="btn" id="resetBtn">Send Reset Link</button><br><br>
     <p class="link" onclick="showLogin()">Back to Login</p>
   </div>
 </section>
 
-<!-- MAIN APPLICATION -->
 <section id="application" class="hidden">
-  <header>
-    <div>
-      <h2>BaweReal</h2>
-      <small style="color:#ddd" id="headerName">Welcome</small>
-    </div>
-    <button class="btn small danger" id="logoutBtn">Logout</button>
-  </header>
+<header>
+  <div>
+    <h2>BaweReal</h2>
+    <small style="color:#ddd" id="headerName">Welcome</small>
+  </div>
+  <button class="btn small danger" id="logoutBtn">Logout</button>
+</header>
 
-  <main class="container">
+<main class="container">
 
-    <!-- HOME -->
-    <section id="homePage">
-      <div class="balance">
-        <p>Account Balance</p>
-        <h1 id="balanceText">0.00 ETB</h1>
-        <small style="color:#eee">Verified balance</small>
-      </div>
+<section id="homePage">
+  <div class="balance">
+    <p>Current Balance</p>
+    <h1 id="balanceText">0.00 ETB</h1>
+    <small style="color:#eee">Verified balance</small>
+  </div>
 
-      <div class="grid">
-        <div class="action" onclick="openPage('deposit')">
-          <span class="emoji">💳</span>
-          <strong>Deposit</strong>
-        </div>
-        <div class="action" onclick="openPage('withdraw')">
-          <span class="emoji">💸</span>
-          <strong>Withdrawal</strong>
-        </div>
-        <div class="action" onclick="openPage('history')">
-          <span class="emoji">📋</span>
-          <strong>History</strong>
-        </div>
-        <div class="action" onclick="openPage('referral')">
-          <span class="emoji">👥</span>
-          <strong>Referral</strong>
-        </div>
-        <div class="action" onclick="openPage('packages')">
-          <span class="emoji">📦</span>
-          <strong>Packages</strong>
-        </div>
-        <div class="action" onclick="openPage('support')">
-          <span class="emoji">💬</span>
-          <strong>Support</strong>
-        </div>
-      </div>
+  <div class="grid">
+    <div class="action" onclick="openPage('deposit')"><span class="emoji">💳</span><strong>Deposit</strong></div>
+    <div class="action" onclick="openPage('withdraw')"><span class="emoji">💸</span><strong>Withdrawal</strong></div>
+    <div class="action" onclick="openPage('history')"><span class="emoji">📋</span><strong>History</strong></div>
+    <div class="action" onclick="openPage('referral')"><span class="emoji">👥</span><strong>Referral</strong></div>
+    <div class="action" onclick="openPage('packages')"><span class="emoji">📦</span><strong>Packages</strong></div>
+    <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong>Support</strong></div>
+  </div>
 
-      <div class="card" style="margin-top:17px">
-        <h3>Recent Activity</h3>
-        <div id="recentActivity" class="empty">No recent activity.</div>
-      </div>
-    </section>
+  <div class="card" style="margin-top:17px">
+    <h3>Recent Activity</h3>
+    <div id="recentActivity" class="empty">No recent activity.</div>
+  </div>
+</section>
 
-    <!-- DEPOSIT -->
-    <section id="depositPage" class="hidden">
-      <h2 class="page-title">Deposit</h2>
+<!-- DEPOSIT -->
+<section id="depositPage" class="hidden">
+<h2 class="page-title">Deposit</h2>
 
-      <div class="card">
-        <h3>Select Payment Method</h3>
+<div class="card">
+  <h3>Select Payment Method</h3>
 
-        <div class="method" id="telebirrCard"
-             onclick="chooseMethod('Telebirr')">
-          <div class="method-left">
-            <span class="brand">📱</span>
-            <div>
-              <strong>Telebirr</strong>
-              <p class="muted">Mobile payment</p>
-            </div>
-          </div>
-          <strong>›</strong>
-        </div>
+  <div class="method" id="telebirrCard" onclick="chooseMethod('Telebirr')">
+    <div class="method-left"><span class="brand">📱</span><div><strong>Telebirr</strong><p class="muted">Mobile payment</p></div></div>
+    <strong>›</strong>
+  </div>
 
-        <div class="method" id="cbeCard"
-             onclick="chooseMethod('CBE')">
-          <div class="method-left">
-            <span class="brand">🏦</span>
-            <div>
-              <strong>CBE</strong>
-              <p class="muted">Commercial Bank of Ethiopia</p>
-            </div>
-          </div>
-          <strong>›</strong>
-        </div>
+  <div class="method" id="cbeCard" onclick="chooseMethod('CBE')">
+    <div class="method-left"><span class="brand">🏦</span><div><strong>CBE</strong><p class="muted">Commercial Bank of Ethiopia</p></div></div>
+    <strong>›</strong>
+  </div>
 
-        <select id="depositMethod">
-          <option value="">Choose method</option>
-          <option value="Telebirr">Telebirr</option>
-          <option value="CBE">CBE</option>
-        </select>
+  <select id="depositMethod">
+    <option value="">Choose method</option>
+    <option value="Telebirr">Telebirr</option>
+    <option value="CBE">CBE</option>
+  </select>
 
-        <div class="notice">
-          Select your payment method and attach your receipt for review.
-        </div>
+  <div class="notice">
+    Transfer the payment to the selected account. Enter your transaction ID and attach the payment receipt. Your request will be reviewed before your balance is updated.
+  </div>
 
-        <div class="card" style="background:#f7f7fc">
-          <strong>Telebirr Account</strong>
-          <p style="font-size:20px;margin:10px 0">0964488470</p>
-          <button class="btn secondary"
-            onclick="copyAccount('0964488470')">
-            Copy Telebirr Number
-          </button>
-        </div>
+  <div class="account-box">
+    <strong>Telebirr Account</strong>
+    <p style="font-size:20px;margin:10px 0">0964488470</p>
+    <button class="btn secondary" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
+  </div>
 
-        <div class="card" style="background:#f7f7fc">
-          <strong>CBE Account</strong>
-          <p style="font-size:20px;margin:10px 0">10000298833585</p>
-          <button class="btn secondary"
-            onclick="copyAccount('10000298833585')">
-            Copy CBE Number
-          </button>
-        </div>
+  <div class="account-box">
+    <strong>CBE Account</strong>
+    <p style="font-size:20px;margin:10px 0">10000298833585</p>
+    <button class="btn secondary" onclick="copyAccount('10000298833585')">Copy CBE Number</button>
+  </div>
 
-        <label>Deposit Amount (ETB)</label>
-        <input id="depositAmount" type="number"
-               min="300" max="10000" placeholder="Enter amount">
+  <label>Deposit Amount (ETB)</label>
+  <input id="depositAmount" type="number" min="300" max="10000" placeholder="Enter amount">
 
-        <label>Payment Receipt Photo</label>
-        <input id="receiptFile" type="file" accept="image/*">
-        <img id="receiptPreview" class="preview hidden"
-             alt="Receipt preview">
-        <small>Image only. Maximum file size: 5 MB.</small>
+  <label>Transaction ID</label>
+  <input id="depositTransactionId" type="text" placeholder="Enter payment transaction ID">
 
-        <label>Note (optional)</label>
-        <textarea id="depositNote"
-          placeholder="Additional information"></textarea>
+  <label>Payment Receipt Photo</label>
+  <input id="receiptFile" type="file" accept="image/*">
+  <img id="receiptPreview" class="preview hidden" alt="Receipt preview">
+  <small>Image only. Maximum file size: 5 MB.</small>
 
-        <button class="btn" id="depositBtn">
-          Submit Deposit Request
-        </button>
+  <label>Note (optional)</label>
+  <textarea id="depositNote" placeholder="Additional information"></textarea>
 
-        <p class="muted" style="margin-top:12px">
-          Your request will be submitted for review. Submission does not mean payment has been verified.
-        </p>
-      </div>
-    </section>
+  <button class="btn" id="depositBtn">Submit Deposit Request</button>
 
-    <!-- WITHDRAWAL -->
-    <section id="withdrawPage" class="hidden">
-      <h2 class="page-title">Withdrawal</h2>
+  <p class="muted" style="margin-top:12px">
+    Submission does not mean payment has been verified. Your balance changes only after approval.
+  </p>
+</div>
 
-      <div class="card">
-        <h3>Withdrawal Request</h3>
-        <p class="muted">Enter your payment details carefully.</p>
+<div class="card">
+  <h3>My Deposit History</h3>
+  <div id="depositHistory"><div class="empty">Loading...</div></div>
+</div>
+</section>
 
-        <label>Payment Method</label>
-        <select id="withdrawMethod">
-          <option value="">Choose payment method</option>
-          <option value="Telebirr">Telebirr</option>
-          <option value="CBE">CBE</option>
-        </select>
+<!-- WITHDRAWAL -->
+<section id="withdrawPage" class="hidden">
+<h2 class="page-title">Withdrawal</h2>
+<div class="card">
+  <h3>Withdrawal Request</h3>
+  <p class="muted">Enter your payment details carefully.</p>
 
-        <label>Account Holder Name</label>
-        <input id="withdrawName" placeholder="Full name">
+  <label>Payment Method</label>
+  <select id="withdrawMethod">
+    <option value="">Choose payment method</option>
+    <option value="Telebirr">Telebirr</option>
+    <option value="CBE">CBE</option>
+  </select>
 
-        <label>Account Number / Phone Number</label>
-        <input id="withdrawAccount"
-               placeholder="Telebirr or CBE account">
+  <label>Account Holder Name</label>
+  <input id="withdrawName" placeholder="Full name">
 
-        <label>Withdrawal Amount (ETB)</label>
-        <input id="withdrawAmount" type="number"
-               min="100" max="5000" placeholder="Enter amount">
+  <label>Account Number / Phone Number</label>
+  <input id="withdrawAccount" placeholder="Telebirr or CBE account">
 
-        <label>Transaction Fee (ETB)</label>
-        <input id="withdrawFee" type="text"
-               value="0.00 ETB" readonly>
+  <label>Withdrawal Amount (ETB)</label>
+  <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
 
-        <label>Net Amount (ETB)</label>
-        <input id="withdrawNet" type="text"
-               value="0.00 ETB" readonly>
+  <label>Transaction Fee (ETB)</label>
+  <input id="withdrawFee" type="text" value="0.00 ETB" readonly>
 
-        <label>Additional Note (Optional)</label>
-        <textarea id="withdrawNote"
-          placeholder="Write additional information"></textarea>
+  <label>Net Amount (ETB)</label>
+  <input id="withdrawNet" type="text" value="0.00 ETB" readonly>
 
-        <div class="notice">
-          Minimum withdrawal: 100 ETB.
-          Maximum withdrawal: 5,000 ETB.
-          The fee is shown before submission.
-        </div>
+  <label>Additional Note (Optional)</label>
+  <textarea id="withdrawNote" placeholder="Write additional information"></textarea>
 
-        <button class="btn" id="withdrawBtn">
-          Submit Withdrawal Request
-        </button>
-      </div>
+  <div class="notice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is currently 0 ETB.</div>
+  <button class="btn" id="withdrawBtn">Submit Withdrawal Request</button>
+</div>
 
-      <div class="card">
-        <h3>My Withdrawal History</h3>
-        <div id="withdrawHistory">
-          <div class="empty">Loading...</div>
-        </div>
-      </div>
-    </section>
+<div class="card">
+  <h3>My Withdrawal History</h3>
+  <div id="withdrawHistory"><div class="empty">Loading...</div></div>
+</div>
+</section>
 
-    <!-- REFERRAL -->
-    <section id="referralPage" class="hidden">
-      <h2 class="page-title">Referral</h2>
-      <div class="card">
-        <h3>Your Referral Code</h3>
-        <p class="muted">Share your code with others.</p>
-        <br>
-        <h2 id="referralCode">Loading...</h2>
-        <br>
-        <button class="btn" id="copyReferralBtn">
-          Copy Referral Code
-        </button>
-      </div>
-    </section>
+<!-- REFERRAL -->
+<section id="referralPage" class="hidden">
+<h2 class="page-title">Referral</h2>
+<div class="card">
+  <h3>Your Referral Code</h3>
+  <p class="muted">Share your code with others.</p><br>
+  <h2 id="referralCode">Loading...</h2><br>
+  <button class="btn" id="copyReferralBtn">Copy Referral Code</button>
+</div>
+</section>
 
-    <!-- PACKAGES -->
-    <section id="packagesPage" class="hidden">
-      <h2 class="page-title">Packages</h2>
-      <div class="card">
-        <h3>Packages</h3>
-        <p class="muted">
-          Package information will appear here when officially configured.
-        </p>
-      </div>
-    </section>
+<!-- PACKAGES -->
+<section id="packagesPage" class="hidden">
+<h2 class="page-title">Packages</h2>
+<div class="card">
+  <h3>Packages</h3>
+  <p class="muted">Package information will appear here when officially configured.</p>
+</div>
+</section>
 
-    <!-- HISTORY -->
-    <section id="historyPage" class="hidden">
-      <h2 class="page-title">Transaction History</h2>
-      <div class="card">
-        <select id="historyFilter">
-          <option value="all">All Requests</option>
-          <option value="deposit">Deposits</option>
-          <option value="withdrawal">Withdrawals</option>
-        </select>
-        <div id="historyList">
-          <div class="empty">Loading history...</div>
-        </div>
-      </div>
-    </section>
+<!-- HISTORY -->
+<section id="historyPage" class="hidden">
+<h2 class="page-title">Transaction History</h2>
+<div class="card">
+  <select id="historyFilter">
+    <option value="all">All Requests</option>
+    <option value="deposit">Deposits</option>
+    <option value="withdrawal">Withdrawals</option>
+  </select>
+  <div id="historyList"><div class="empty">Loading history...</div></div>
+</div>
+</section>
 
-    <!-- PROFILE -->
-    <section id="profilePage" class="hidden">
-      <h2 class="page-title">My Profile</h2>
-      <div class="card">
-        <h3>Account Information</h3>
-        <p class="muted">Full Name</p>
-        <p id="profileName" style="margin:6px 0 15px">-</p>
+<!-- PROFILE -->
+<section id="profilePage" class="hidden">
+<h2 class="page-title">My Profile</h2>
 
-        <p class="muted">Email Address</p>
-        <p id="profileEmail" style="margin:6px 0 15px">-</p>
+<div class="balance">
+  <p>Current Balance</p>
+  <h1 id="profileBalance">0.00 ETB</h1>
+  <small style="color:#eee">Verified balance</small>
+</div>
 
-        <p class="muted">User ID</p>
-        <p id="profileUid"
-           style="margin:6px 0 15px;word-break:break-all">-</p>
+<div class="card">
+  <h3>Deposit Summary</h3>
+  <div class="stat-grid">
+    <div class="stat"><span class="muted">Total Deposits</span><strong id="totalDeposits">0.00 ETB</strong></div>
+    <div class="stat"><span class="muted">Approved</span><strong id="approvedDeposits">0.00 ETB</strong></div>
+    <div class="stat"><span class="muted">Pending</span><strong id="pendingDeposits">0.00 ETB</strong></div>
+    <div class="stat"><span class="muted">Rejected</span><strong id="rejectedDeposits">0.00 ETB</strong></div>
+  </div>
+</div>
 
-        <p class="muted">Account Status</p>
-        <p id="profileStatus" style="margin-top:6px">-</p>
-      </div>
-    </section>
+<div class="card">
+  <h3>Account Information</h3>
+  <p class="muted">Full Name</p>
+  <p id="profileName" style="margin:6px 0 15px">-</p>
 
-    <!-- SUPPORT -->
-    <section id="supportPage" class="hidden">
-      <h2 class="page-title">Support</h2>
-      <div class="card">
-        <h3>Contact Support</h3>
-        <textarea id="supportMessage"
-          placeholder="Write your message..."></textarea>
-        <button class="btn" id="supportBtn">Send Message</button>
-      </div>
+  <p class="muted">Email Address</p>
+  <p id="profileEmail" style="margin:6px 0 15px">-</p>
 
-      <div class="card">
-        <h3>My Support Requests</h3>
-        <div id="supportHistory">
-          <div class="empty">No support messages yet.</div>
-        </div>
-      </div>
-    </section>
+  <p class="muted">User ID</p>
+  <p id="profileUid" style="margin:6px 0 15px;word-break:break-all">-</p>
 
-  </main>
+  <p class="muted">Account Status</p>
+  <p id="profileStatus" style="margin-top:6px">-</p>
+</div>
+</section>
 
-  <!-- BOTTOM NAVIGATION -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-page="home"
-      onclick="openPage('home')">
-      <span>🏠</span>Home
-    </button>
-    <button class="nav-btn" data-page="deposit"
-      onclick="openPage('deposit')">
-      <span>💳</span>Deposit
-    </button>
-    <button class="nav-btn" data-page="withdraw"
-      onclick="openPage('withdraw')">
-      <span>💸</span>Withdraw
-    </button>
-    <button class="nav-btn" data-page="history"
-      onclick="openPage('history')">
-      <span>📋</span>History
-    </button>
-    <button class="nav-btn" data-page="profile"
-      onclick="openPage('profile')">
-      <span>👤</span>Profile
-    </button>
-  </nav>
+<!-- SUPPORT -->
+<section id="supportPage" class="hidden">
+<h2 class="page-title">Support</h2>
+<div class="card">
+  <h3>Contact Support</h3>
+  <textarea id="supportMessage" placeholder="Write your message..."></textarea>
+  <button class="btn" id="supportBtn">Send Message</button>
+</div>
+<div class="card">
+  <h3>My Support Requests</h3>
+  <div id="supportHistory"><div class="empty">No support messages yet.</div></div>
+</div>
+</section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="home" onclick="openPage('home')"><span>🏠</span>Home</button>
+  <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')"><span>💳</span>Deposit</button>
+  <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')"><span>💸</span>Withdraw</button>
+  <button class="nav-btn" data-page="history" onclick="openPage('history')"><span>📋</span>History</button>
+  <button class="nav-btn" data-page="profile" onclick="openPage('profile')"><span>👤</span>Profile</button>
+</nav>
 </section>
 
 <script>
 function showLogin(){
-  document.getElementById("loginBox").classList.remove("hidden");
-  document.getElementById("registerBox").classList.add("hidden");
-  document.getElementById("forgotBox").classList.add("hidden");
+  loginBox.classList.remove("hidden");
+  registerBox.classList.add("hidden");
+  forgotBox.classList.add("hidden");
 }
 function showRegister(){
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("registerBox").classList.remove("hidden");
-  document.getElementById("forgotBox").classList.add("hidden");
+  loginBox.classList.add("hidden");
+  registerBox.classList.remove("hidden");
+  forgotBox.classList.add("hidden");
 }
 function showForgot(){
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("registerBox").classList.add("hidden");
-  document.getElementById("forgotBox").classList.remove("hidden");
+  loginBox.classList.add("hidden");
+  registerBox.classList.add("hidden");
+  forgotBox.classList.remove("hidden");
 }
 
 function openPage(page){
-  const pages=[
-    "home","deposit","withdraw","referral",
-    "packages","history","profile","support"
-  ];
-
+  const pages=["home","deposit","withdraw","referral","packages","history","profile","support"];
   pages.forEach(p=>{
     const el=document.getElementById(p+"Page");
     if(el) el.classList.toggle("hidden",p!==page);
@@ -546,10 +375,10 @@ function openPage(page){
   });
 
   if(page==="history" && window.loadHistory) window.loadHistory();
-  if(page==="withdraw" && window.loadWithdrawalHistory)
-    window.loadWithdrawalHistory();
-  if(page==="support" && window.loadSupportHistory)
-    window.loadSupportHistory();
+  if(page==="withdraw" && window.loadWithdrawalHistory) window.loadWithdrawalHistory();
+  if(page==="deposit" && window.loadDepositHistory) window.loadDepositHistory();
+  if(page==="profile" && window.loadDepositSummary) window.loadDepositSummary();
+  if(page==="support" && window.loadSupportHistory) window.loadSupportHistory();
 }
 window.openPage=openPage;
 
@@ -570,46 +399,26 @@ window.copyAccount=async function(number){
 
 window.chooseMethod=function(method){
   document.getElementById("depositMethod").value=method;
-  document.getElementById("telebirrCard")
-    .classList.toggle("selected",method==="Telebirr");
-  document.getElementById("cbeCard")
-    .classList.toggle("selected",method==="CBE");
-  document.getElementById("receiptFile").click();
+  document.getElementById("telebirrCard").classList.toggle("selected",method==="Telebirr");
+  document.getElementById("cbeCard").classList.toggle("selected",method==="CBE");
 };
 </script>
 
 <script type="module">
-import {initializeApp}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged,
-  signOut
+  getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,
+  sendPasswordResetEmail,onAuthStateChanged,signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  updateDoc,
-  getDoc,
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp
+  getFirestore,doc,setDoc,getDoc,addDoc,collection,query,
+  where,getDocs,serverTimestamp,updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
+  getStorage,ref,uploadBytes,getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig={
@@ -632,7 +441,6 @@ let currentUserData={};
 let selectedReceipt=null;
 
 const $=id=>document.getElementById(id);
-
 function notify(message){alert(message);}
 
 function setLoading(button,loading,label){
@@ -646,21 +454,16 @@ function makeReferral(uid){
 
 function safeText(value){
   return String(value??"").replace(/[&<>"']/g,char=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   })[char]);
 }
 
 function statusClass(status){
   const s=String(status||"request-recorded").toLowerCase();
-
   if(["approved","completed","paid"].includes(s)) return "approved";
   if(["rejected","failed","cancelled"].includes(s)) return "rejected";
   if(s==="processing") return "processing";
-
+  if(s==="under-review"||s==="under review") return "under-review";
   return "pending";
 }
 
@@ -670,43 +473,48 @@ function readableStatus(status){
     .replace(/\b\w/g,c=>c.toUpperCase());
 }
 
+function formatMoney(value){
+  return Number(value||0).toFixed(2)+" ETB";
+}
+
+function getDate(record){
+  return record.createdAt?.toDate
+    ?record.createdAt.toDate().toLocaleString()
+    :"Date unavailable";
+}
+
 /* REGISTER */
 $("registerBtn").addEventListener("click",async()=>{
   const name=$("regName").value.trim();
   const email=$("regEmail").value.trim();
   const password=$("regPassword").value;
-  const confirm=$("regConfirm").value;
+  const confirmPassword=$("regConfirm").value;
 
-  if(!name||!email||!password||!confirm)
+  if(!name||!email||!password||!confirmPassword)
     return notify("Please complete all fields.");
-
   if(password.length<6)
     return notify("Password must be at least 6 characters.");
-
-  if(password!==confirm)
+  if(password!==confirmPassword)
     return notify("Passwords do not match.");
 
   const btn=$("registerBtn");
   setLoading(btn,true,"Register");
 
   try{
-    const result=await createUserWithEmailAndPassword(
-      auth,email,password
-    );
-
+    const result=await createUserWithEmailAndPassword(auth,email,password);
     const uid=result.user.uid;
 
     await setDoc(doc(db,"users",uid),{
       uid,
       fullName:name,
       email,
+      balance:0,
       referralCode:makeReferral(uid),
       status:"active",
       createdAt:serverTimestamp()
     });
 
     notify("Account created successfully.");
-
   }catch(error){
     notify(error.message);
   }finally{
@@ -718,13 +526,10 @@ $("registerBtn").addEventListener("click",async()=>{
 $("loginBtn").addEventListener("click",async()=>{
   const email=$("loginEmail").value.trim();
   const password=$("loginPassword").value;
-
-  if(!email||!password)
-    return notify("Enter email and password.");
+  if(!email||!password) return notify("Enter email and password.");
 
   const btn=$("loginBtn");
   setLoading(btn,true,"Login");
-
   try{
     await signInWithEmailAndPassword(auth,email,password);
   }catch(error){
@@ -737,12 +542,10 @@ $("loginBtn").addEventListener("click",async()=>{
 /* PASSWORD RESET */
 $("resetBtn").addEventListener("click",async()=>{
   const email=$("forgotEmail").value.trim();
-
   if(!email) return notify("Enter your email address.");
 
   const btn=$("resetBtn");
   setLoading(btn,true,"Send Reset Link");
-
   try{
     await sendPasswordResetEmail(auth,email);
     notify("Password reset link sent. Check your email.");
@@ -756,15 +559,12 @@ $("resetBtn").addEventListener("click",async()=>{
 
 /* LOGOUT */
 $("logoutBtn").addEventListener("click",async()=>{
-  if(confirm("Are you sure you want to logout?")){
-    await signOut(auth);
-  }
+  if(confirm("Are you sure you want to logout?")) await signOut(auth);
 });
 
 /* AUTH STATE */
 onAuthStateChanged(auth,async user=>{
   currentUser=user;
-
   if(!user){
     $("auth").classList.remove("hidden");
     $("application").classList.add("hidden");
@@ -776,11 +576,13 @@ onAuthStateChanged(auth,async user=>{
 
   await loadUserProfile();
   await loadHistory();
+  await loadDepositHistory();
+  await loadDepositSummary();
   await loadWithdrawalHistory();
   await loadSupportHistory();
 });
 
-/* USER PROFILE */
+/* USER PROFILE AND BALANCE */
 async function loadUserProfile(){
   if(!currentUser) return;
 
@@ -793,10 +595,10 @@ async function loadUserProfile(){
         uid:currentUser.uid,
         email:currentUser.email,
         fullName:"User",
+        balance:0,
         status:"active",
         referralCode:makeReferral(currentUser.uid)
       };
-
       await setDoc(userRef,{
         ...currentUserData,
         createdAt:serverTimestamp()
@@ -806,22 +608,37 @@ async function loadUserProfile(){
     }
 
     const name=currentUserData.fullName||"User";
+    const balance=Number(currentUserData.balance||0);
 
     $("headerName").textContent="Hello, "+name;
     $("profileName").textContent=name;
     $("profileEmail").textContent=currentUser.email||"-";
     $("profileUid").textContent=currentUser.uid;
     $("profileStatus").textContent=currentUserData.status||"Active";
+    $("referralCode").textContent=currentUserData.referralCode||makeReferral(currentUser.uid);
 
-    $("referralCode").textContent=
-      currentUserData.referralCode||makeReferral(currentUser.uid);
-
-    const balance=Number(currentUserData.balance||0);
-    $("balanceText").textContent=balance.toFixed(2)+" ETB";
+    $("balanceText").textContent=formatMoney(balance);
+    $("profileBalance").textContent=formatMoney(balance);
 
   }catch(error){
     console.error(error);
     notify("Could not load your profile.");
+  }
+}
+
+/* REFRESH BALANCE */
+async function refreshBalance(){
+  if(!currentUser) return;
+  try{
+    const snap=await getDoc(doc(db,"users",currentUser.uid));
+    if(snap.exists()){
+      currentUserData=snap.data();
+      const balance=Number(currentUserData.balance||0);
+      $("balanceText").textContent=formatMoney(balance);
+      $("profileBalance").textContent=formatMoney(balance);
+    }
+  }catch(error){
+    console.error("Balance refresh error:",error);
   }
 }
 
@@ -850,12 +667,10 @@ $("receiptFile").addEventListener("change",event=>{
   }
 
   const reader=new FileReader();
-
   reader.onload=()=>{
     $("receiptPreview").src=reader.result;
     $("receiptPreview").classList.remove("hidden");
   };
-
   reader.readAsDataURL(file);
 });
 
@@ -864,15 +679,10 @@ async function uploadReceipt(file){
   if(!currentUser) throw new Error("Please login first.");
 
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-  const filePath=
-    "depositReceipts/"+currentUser.uid+"/"+Date.now()+"_"+safeName;
-
+  const filePath="depositReceipts/"+currentUser.uid+"/"+Date.now()+"_"+safeName;
   const storageRef=ref(storage,filePath);
 
-  await uploadBytes(storageRef,file,{
-    contentType:file.type
-  });
-
+  await uploadBytes(storageRef,file,{contentType:file.type});
   return await getDownloadURL(storageRef);
 }
 
@@ -882,17 +692,16 @@ $("depositBtn").addEventListener("click",async()=>{
 
   const method=$("depositMethod").value;
   const amount=Number($("depositAmount").value);
+  const transactionId=$("depositTransactionId").value.trim();
   const note=$("depositNote").value.trim();
 
   if(!method) return notify("Choose a payment method.");
-
-  if(!Number.isFinite(amount)||amount<300||amount>10000){
+  if(!Number.isFinite(amount)||amount<300||amount>10000)
     return notify("Deposit amount must be between 300 and 10,000 ETB.");
-  }
-
-  if(!selectedReceipt){
+  if(!transactionId)
+    return notify("Enter your payment transaction ID.");
+  if(!selectedReceipt)
     return notify("Please attach your payment receipt photo.");
-  }
 
   const btn=$("depositBtn");
   setLoading(btn,true,"Submit Deposit Request");
@@ -900,51 +709,142 @@ $("depositBtn").addEventListener("click",async()=>{
   try{
     const receiptUrl=await uploadReceipt(selectedReceipt);
 
-    await addDoc(collection(db,"transactionRequests"),{
+    const transactionRef=await addDoc(collection(db,"transactionRequests"),{
       userId:currentUser.uid,
       email:currentUser.email,
       type:"deposit",
       amount,
       method,
+      transactionId,
       note,
       receiptUrl,
       receiptFileName:selectedReceipt.name,
-      status:"request-recorded",
+      status:"pending",
+      adminNote:"",
       createdAt:serverTimestamp()
     });
 
-    notify("Deposit request submitted for review.");
+    notify("Deposit request submitted successfully. It is waiting for review.");
 
     $("depositAmount").value="";
+    $("depositTransactionId").value="";
     $("depositNote").value="";
     $("receiptFile").value="";
     $("receiptPreview").src="";
     $("receiptPreview").classList.add("hidden");
     selectedReceipt=null;
 
+    await loadDepositHistory();
+    await loadDepositSummary();
     await loadHistory();
-    openPage("history");
+    openPage("deposit");
 
   }catch(error){
     console.error(error);
-    notify("Could not submit request: "+error.message);
+    notify("Could not submit deposit request: "+error.message);
   }finally{
     setLoading(btn,false,"Submit Deposit Request");
   }
 });
 
+/* DEPOSIT HISTORY */
+async function loadDepositHistory(){
+  if(!currentUser) return;
+
+  const container=$("depositHistory");
+  container.innerHTML='<div class="empty">Loading...</div>';
+
+  try{
+    const q=query(
+      collection(db,"transactionRequests"),
+      where("userId","==",currentUser.uid),
+      where("type","==","deposit")
+    );
+
+    const snapshot=await getDocs(q);
+    const records=[];
+    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
+
+    records.sort((a,b)=>
+      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
+    );
+
+    if(!records.length){
+      container.innerHTML='<div class="empty">No deposit requests yet.</div>';
+      return;
+    }
+
+    container.innerHTML=records.map(record=>`
+      <div class="item">
+        <div class="item-top">
+          <strong>${formatMoney(record.amount)}</strong>
+          <strong>${safeText(record.method||"")}</strong>
+        </div>
+        <p class="muted">Transaction ID: ${safeText(record.transactionId||"-")}</p>
+        <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
+        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
+        ${record.receiptUrl?`
+          <p style="margin-top:8px">
+            <a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">View submitted receipt</a>
+          </p>`:""}
+        ${record.note?`<p class="muted">Note: ${safeText(record.note)}</p>`:""}
+        ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
+      </div>
+    `).join("");
+
+  }catch(error){
+    console.error(error);
+    container.innerHTML='<div class="empty">Could not load deposit history.</div>';
+  }
+}
+window.loadDepositHistory=loadDepositHistory;
+
+/* DEPOSIT SUMMARY IN PROFILE */
+async function loadDepositSummary(){
+  if(!currentUser) return;
+
+  try{
+    const q=query(
+      collection(db,"transactionRequests"),
+      where("userId","==",currentUser.uid),
+      where("type","==","deposit")
+    );
+
+    const snapshot=await getDocs(q);
+    let total=0,approved=0,pending=0,rejected=0;
+
+    snapshot.forEach(item=>{
+      const record=item.data();
+      const amount=Number(record.amount||0);
+      const status=String(record.status||"pending").toLowerCase();
+
+      total+=amount;
+      if(["approved","completed","paid"].includes(status)) approved+=amount;
+      else if(["rejected","failed","cancelled"].includes(status)) rejected+=amount;
+      else pending+=amount;
+    });
+
+    $("totalDeposits").textContent=formatMoney(total);
+    $("approvedDeposits").textContent=formatMoney(approved);
+    $("pendingDeposits").textContent=formatMoney(pending);
+    $("rejectedDeposits").textContent=formatMoney(rejected);
+
+    await refreshBalance();
+
+  }catch(error){
+    console.error(error);
+  }
+}
+window.loadDepositSummary=loadDepositSummary;
+
 /* WITHDRAWAL CALCULATOR */
 function calculateWithdrawal(){
   const amount=Number($("withdrawAmount").value||0);
-
-  // Fee is currently zero until an official fee is configured.
   const fee=0;
   const net=Math.max(0,amount-fee);
-
-  $("withdrawFee").value=fee.toFixed(2)+" ETB";
-  $("withdrawNet").value=net.toFixed(2)+" ETB";
+  $("withdrawFee").value=formatMoney(fee);
+  $("withdrawNet").value=formatMoney(net);
 }
-
 $("withdrawAmount").addEventListener("input",calculateWithdrawal);
 
 /* WITHDRAWAL REQUEST */
@@ -961,14 +861,11 @@ $("withdrawBtn").addEventListener("click",async()=>{
   if(!method) return notify("Choose withdrawal method.");
   if(!name) return notify("Enter account holder name.");
   if(!account) return notify("Enter account number.");
-
-  if(!Number.isFinite(amount)||amount<100||amount>5000){
+  if(!Number.isFinite(amount)||amount<100||amount>5000)
     return notify("Withdrawal must be between 100 and 5,000 ETB.");
-  }
 
   const netAmount=amount-fee;
   const btn=$("withdrawBtn");
-
   setLoading(btn,true,"Submit Withdrawal Request");
 
   try{
@@ -998,7 +895,6 @@ $("withdrawBtn").addEventListener("click",async()=>{
     $("withdrawAccount").value="";
     $("withdrawAmount").value="";
     $("withdrawNote").value="";
-
     calculateWithdrawal();
 
     await loadWithdrawalHistory();
@@ -1027,119 +923,65 @@ async function loadWithdrawalHistory(){
     );
 
     const snapshot=await getDocs(q);
-    let records=[];
-
-    snapshot.forEach(item=>{
-      records.push({id:item.id,...item.data()});
-    });
+    const records=[];
+    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
 
     records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-
-      (a.createdAt?.toMillis?.()||0)
+      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
     );
 
     if(!records.length){
-      container.innerHTML=
-        '<div class="empty">No withdrawal requests yet.</div>';
+      container.innerHTML='<div class="empty">No withdrawal requests yet.</div>';
       return;
     }
 
     container.innerHTML=records.map(record=>{
-      const date=record.createdAt?.toDate
-        ?record.createdAt.toDate().toLocaleString()
-        :"Date unavailable";
-
       const status=String(record.status||"request-recorded");
       const canCancel=["request-recorded","pending"].includes(status);
 
       return `
-        <div class="item">
-          <div class="item-top">
-            <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
-            <strong>${safeText(record.method||"")}</strong>
-          </div>
-
-          <p class="muted">
-            Account holder: ${safeText(record.accountHolderName||"")}
-          </p>
-
-          <p class="muted">
-            Account: ${safeText(record.account||"")}
-          </p>
-
-          <p class="muted">
-            Fee: ${Number(record.fee||0).toFixed(2)} ETB
-          </p>
-
-          <p class="muted">
-            Net amount: ${Number(record.netAmount||0).toFixed(2)} ETB
-          </p>
-
-          <p class="muted">
-            ID: ${safeText(record.transactionId||record.id)}
-          </p>
-
-          <span class="status ${statusClass(status)}">
-            ${safeText(readableStatus(status))}
-          </span>
-
-          <p class="muted" style="margin-top:7px">
-            ${safeText(date)}
-          </p>
-
-          ${record.note?`
-            <p class="muted">Note: ${safeText(record.note)}</p>
-          `:""}
-
-          ${record.adminNote?`
-            <p class="notice">
-              Admin Note: ${safeText(record.adminNote)}
-            </p>
-          `:""}
-
-          ${canCancel?`
-            <button class="btn danger"
-              style="margin-top:10px"
-              onclick="cancelWithdrawal('${record.id}')">
-              Cancel Request
-            </button>
-          `:""}
+      <div class="item">
+        <div class="item-top">
+          <strong>${formatMoney(record.amount)}</strong>
+          <strong>${safeText(record.method||"")}</strong>
         </div>
-      `;
+        <p class="muted">Account holder: ${safeText(record.accountHolderName||"")}</p>
+        <p class="muted">Account: ${safeText(record.account||"")}</p>
+        <p class="muted">Fee: ${formatMoney(record.fee)}</p>
+        <p class="muted">Net amount: ${formatMoney(record.netAmount)}</p>
+        <p class="muted">ID: ${safeText(record.transactionId||record.id)}</p>
+        <span class="status ${statusClass(status)}">${safeText(readableStatus(status))}</span>
+        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
+        ${record.note?`<p class="muted">Note: ${safeText(record.note)}</p>`:""}
+        ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
+        ${canCancel?`
+          <button class="btn danger" style="margin-top:10px" onclick="cancelWithdrawal('${record.id}')">Cancel Request</button>
+        `:""}
+      </div>`;
     }).join("");
 
   }catch(error){
     console.error(error);
-    container.innerHTML=
-      '<div class="empty">Could not load withdrawal history.</div>';
+    container.innerHTML='<div class="empty">Could not load withdrawal history.</div>';
   }
 }
-
 window.loadWithdrawalHistory=loadWithdrawalHistory;
 
 /* CANCEL WITHDRAWAL */
 window.cancelWithdrawal=async function(id){
   if(!currentUser) return;
-
   if(!confirm("Cancel this withdrawal request?")) return;
 
   try{
     const requestRef=doc(db,"transactionRequests",id);
     const snapshot=await getDoc(requestRef);
 
-    if(!snapshot.exists()){
-      return notify("Request not found.");
-    }
+    if(!snapshot.exists()) return notify("Request not found.");
 
     const data=snapshot.data();
-
-    if(data.userId!==currentUser.uid){
-      return notify("You cannot cancel this request.");
-    }
-
-    if(!["request-recorded","pending"].includes(data.status)){
+    if(data.userId!==currentUser.uid) return notify("You cannot cancel this request.");
+    if(!["request-recorded","pending"].includes(data.status))
       return notify("This request can no longer be cancelled.");
-    }
 
     await updateDoc(requestRef,{
       status:"cancelled",
@@ -1147,7 +989,6 @@ window.cancelWithdrawal=async function(id){
     });
 
     notify("Withdrawal request cancelled.");
-
     await loadWithdrawalHistory();
     await loadHistory();
 
@@ -1160,7 +1001,6 @@ window.cancelWithdrawal=async function(id){
 /* REFERRAL COPY */
 $("copyReferralBtn").addEventListener("click",async()=>{
   const code=$("referralCode").textContent;
-
   try{
     await navigator.clipboard.writeText(code);
     notify("Referral code copied.");
@@ -1175,7 +1015,6 @@ async function loadHistory(){
 
   const list=$("historyList");
   const recent=$("recentActivity");
-
   list.innerHTML='<div class="empty">Loading...</div>';
 
   try{
@@ -1185,31 +1024,24 @@ async function loadHistory(){
     );
 
     const snapshot=await getDocs(q);
-    let records=[];
-
-    snapshot.forEach(item=>{
-      records.push({id:item.id,...item.data()});
-    });
+    const records=[];
+    snapshot.forEach(item=>records.push({id:item.id,...item.data()}));
 
     records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-
-      (a.createdAt?.toMillis?.()||0)
+      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
     );
 
     renderHistory(records);
 
     const recentRecords=records.slice(0,3);
-
     if(recentRecords.length){
       recent.innerHTML=recentRecords.map(record=>`
         <div class="item">
           <div class="item-top">
             <strong>${safeText(record.type||"Request")}</strong>
-            <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
+            <strong>${formatMoney(record.amount)}</strong>
           </div>
-          <span class="status ${statusClass(record.status)}">
-            ${safeText(readableStatus(record.status))}
-          </span>
+          <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
         </div>
       `).join("");
     }else{
@@ -1224,51 +1056,32 @@ async function loadHistory(){
 
 function renderHistory(records){
   const filter=$("historyFilter").value;
-
   const filtered=records.filter(record=>{
     if(filter==="all") return true;
     return String(record.type||"").toLowerCase()===filter;
   });
 
   if(!filtered.length){
-    $("historyList").innerHTML=
-      '<div class="empty">No requests found.</div>';
+    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
     return;
   }
 
-  $("historyList").innerHTML=filtered.map(record=>{
-    const date=record.createdAt?.toDate
-      ?record.createdAt.toDate().toLocaleString()
-      :"Date unavailable";
-
-    return `
-      <div class="item">
-        <div class="item-top">
-          <strong>${safeText(record.type||"Request")}</strong>
-          <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
-        </div>
-
-        <p class="muted">${safeText(record.method||"")}</p>
-
-        <span class="status ${statusClass(record.status)}">
-          ${safeText(readableStatus(record.status))}
-        </span>
-
-        <p class="muted" style="margin-top:7px">
-          ${safeText(date)}
-        </p>
-
-        ${record.receiptUrl?`
-          <p style="margin-top:7px">
-            <a href="${safeText(record.receiptUrl)}"
-               target="_blank" rel="noopener">
-              View submitted receipt
-            </a>
-          </p>
-        `:""}
+  $("historyList").innerHTML=filtered.map(record=>`
+    <div class="item">
+      <div class="item-top">
+        <strong>${safeText(record.type||"Request")}</strong>
+        <strong>${formatMoney(record.amount)}</strong>
       </div>
-    `;
-  }).join("");
+      <p class="muted">${safeText(record.method||"")}</p>
+      ${record.transactionId?`<p class="muted">Transaction ID: ${safeText(record.transactionId)}</p>`:""}
+      <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
+      <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
+      ${record.receiptUrl?`
+        <p style="margin-top:7px"><a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">View submitted receipt</a></p>
+      `:""}
+      ${record.adminNote?`<div class="notice">Admin Note: ${safeText(record.adminNote)}</div>`:""}
+    </div>
+  `).join("");
 }
 
 $("historyFilter").addEventListener("change",loadHistory);
@@ -1279,7 +1092,6 @@ $("supportBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
 
   const message=$("supportMessage").value.trim();
-
   if(!message) return notify("Write your message first.");
 
   const btn=$("supportBtn");
@@ -1296,7 +1108,6 @@ $("supportBtn").addEventListener("click",async()=>{
 
     $("supportMessage").value="";
     notify("Your support message has been sent.");
-
     await loadSupportHistory();
 
   }catch(error){
@@ -1320,48 +1131,31 @@ async function loadSupportHistory(){
     );
 
     const snapshot=await getDocs(q);
-    let records=[];
-
-    snapshot.forEach(item=>{
-      records.push(item.data());
-    });
+    const records=[];
+    snapshot.forEach(item=>records.push(item.data()));
 
     records.sort((a,b)=>
-      (b.createdAt?.toMillis?.()||0)-
-      (a.createdAt?.toMillis?.()||0)
+      (b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)
     );
 
     if(!records.length){
-      container.innerHTML=
-        '<div class="empty">No support messages yet.</div>';
+      container.innerHTML='<div class="empty">No support messages yet.</div>';
       return;
     }
 
-    container.innerHTML=records.map(record=>{
-      const date=record.createdAt?.toDate
-        ?record.createdAt.toDate().toLocaleString()
-        :"Date unavailable";
-
-      return `
-        <div class="item">
-          <p>${safeText(record.message||"")}</p>
-          <span class="status ${statusClass(record.status)}">
-            ${safeText(readableStatus(record.status))}
-          </span>
-          <p class="muted" style="margin-top:7px">
-            ${safeText(date)}
-          </p>
-        </div>
-      `;
-    }).join("");
+    container.innerHTML=records.map(record=>`
+      <div class="item">
+        <p>${safeText(record.message||"")}</p>
+        <span class="status ${statusClass(record.status)}">${safeText(readableStatus(record.status))}</span>
+        <p class="muted" style="margin-top:7px">${safeText(getDate(record))}</p>
+      </div>
+    `).join("");
 
   }catch(error){
     console.error(error);
-    container.innerHTML=
-      '<div class="empty">Could not load support history.</div>';
+    container.innerHTML='<div class="empty">Could not load support history.</div>';
   }
 }
-
 window.loadSupportHistory=loadSupportHistory;
 
 </script>
