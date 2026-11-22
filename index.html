@@ -71,7 +71,6 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 <div class="auth-card">
 <div class="auth-logo">BaweReal</div>
 <div class="auth-subtitle">Secure Account Access</div>
-
 <div class="auth-tabs">
 <button type="button" id="show-login" class="auth-tab active">Login</button>
 <button type="button" id="show-register" class="auth-tab">Register</button>
@@ -94,7 +93,6 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 <input type="password" id="register-confirm" placeholder="Confirm password" autocomplete="new-password">
 <button class="btn-primary" id="register-btn">Create Account</button>
 </div>
-
 <div id="auth-message" class="auth-message"></div>
 </div>
 </section>
@@ -115,12 +113,11 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 
 <div id="app-content" class="hidden">
 <main class="container">
-
 <section id="page-home" class="page">
-<div class="welcome-bar"><span class="welcome-text">Welcome to BaweReal! Start earning daily rewards and manage your investments easily.</span></div>
+<div class="welcome-bar"><span class="welcome-text">Welcome to BaweReal! Start earning daily rewards and manage your account easily.</span></div>
 <div class="wallet-card">
 <div class="wallet-top">
-<div><div class="wallet-label">Total Wallet Balance</div><div class="wallet-amount" id="balance-text">150.00 ETB</div></div>
+<div><div class="wallet-label">Demo Wallet Balance</div><div class="wallet-amount" id="balance-text">150.00 ETB</div></div>
 <button class="eye-btn" id="toggle-balance-btn">👁</button>
 </div>
 <div class="rate-row">
@@ -128,50 +125,38 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 <div style="text-align:right">1 USD = 161.81 ETB</div>
 </div>
 <div class="wallet-bottom">
-<div><div class="sub-label">Invested</div><div class="sub-val" id="invested-text">0.00 ETB</div></div>
-<div><div class="sub-label">Total Profit</div><div class="sub-val profit-val" id="profit-text">+0.00 ETB</div></div>
+<div><div class="sub-label">Demo Total</div><div class="sub-val" id="invested-text">0.00 ETB</div></div>
+<div><div class="sub-label">Demo Change</div><div class="sub-val profit-val" id="profit-text">+0.00 ETB</div></div>
 </div>
 </div>
 
 <div class="actions-grid">
-<div class="action-item" onclick="go('packages')"><div class="action-icon bg-green">↙</div><div class="action-title">Deposit</div></div>
-<div class="action-item" onclick="go('profile')"><div class="action-icon bg-red">↗</div><div class="action-title">Withdrawal</div></div>
+<div class="action-item" onclick="go('packages')"><div class="action-icon bg-green">↙</div><div class="action-title">Packages</div></div>
+<div class="action-item" onclick="go('profile')"><div class="action-icon bg-red">👤</div><div class="action-title">Profile</div></div>
 <div class="action-item" onclick="go('referrals')"><div class="action-icon bg-purple">👥</div><div class="action-title">Invitation</div></div>
-<div class="action-item" onclick="go('packages')"><div class="action-icon bg-blue">📈</div><div class="action-title">Investment</div></div>
-<div class="action-item" onclick="alert('Daily Reward feature is not connected yet.')"><div class="action-icon bg-yellow">📅</div><div class="action-title">Daily Reward</div></div>
+<div class="action-item" onclick="go('packages')"><div class="action-icon bg-blue">▣</div><div class="action-title">Packages</div></div>
+<div class="action-item" onclick="alert('This demo feature is not connected.')"><div class="action-icon bg-yellow">📅</div><div class="action-title">Daily Activity</div></div>
 <div class="action-item" onclick="go('profile')"><div class="action-icon bg-gray">🕒</div><div class="action-title">History</div></div>
 </div>
 
 <div class="tx-card">
-<div class="tx-header"><h3>Live Platform Transactions</h3><span class="live-badge">LIVE</span></div>
+<div class="tx-header"><h3>Activity Examples</h3><span class="live-badge">DEMO</span></div>
 <div id="live-tx-list">
-<div class="tx-row"><span class="tx-phone">099****540</span><span class="tx-plus">+150 ETB</span></div>
-<div class="tx-row"><span class="tx-phone">091****812</span><span class="tx-plus">+500 ETB</span></div>
+<div class="tx-row"><span class="tx-phone">Example User 1</span><span>Demo activity</span></div>
+<div class="tx-row"><span class="tx-phone">Example User 2</span><span>Demo activity</span></div>
 </div>
 </div>
 </section>
 
 <section id="page-packages" class="page hidden">
-<div class="page-card">
-<h3>Investment Packages</h3>
-<p style="color:#64748b;font-size:14px;margin-top:6px">VIP 1 Starter - Daily return active.</p>
-</div>
+<div class="page-card"><h3>Packages</h3><p style="color:#64748b;font-size:14px;margin-top:6px">Demo information only.</p></div>
 </section>
-
 <section id="page-referrals" class="page hidden">
-<div class="page-card">
-<h3>Referrals &amp; Invitation</h3>
-<p style="color:#64748b;font-size:14px;margin-top:6px">Share your referral link to earn bonuses.</p>
-</div>
+<div class="page-card"><h3>Referrals &amp; Invitation</h3><p style="color:#64748b;font-size:14px;margin-top:6px">Referral information.</p></div>
 </section>
-
 <section id="page-profile" class="page hidden">
-<div class="page-card">
-<h3>Profile</h3>
-<p id="profile-auth-info" style="color:#64748b;font-size:14px;margin-top:6px">Loading...</p>
-</div>
+<div class="page-card"><h3>Profile</h3><p id="profile-auth-info" style="color:#64748b;font-size:14px;margin-top:6px">Loading...</p></div>
 </section>
-
 <section id="page-chat" class="page hidden">
 <div class="page-card">
 <h3>Support Chat</h3>
@@ -222,7 +207,9 @@ import {
 getFirestore,
 collection,
 addDoc,
-serverTimestamp
+serverTimestamp,
+doc,
+setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -268,12 +255,10 @@ if(!email||!password||!confirm){
 message("Please fill in all fields.",true);
 return;
 }
-
 if(password.length<6){
 message("Password must be at least 6 characters.",true);
 return;
 }
-
 if(password!==confirm){
 message("Passwords do not match.",true);
 return;
@@ -283,20 +268,30 @@ try{
 btn.disabled=true;
 btn.textContent="Creating Account...";
 
-await createUserWithEmailAndPassword(auth,email,password);
+const result=await createUserWithEmailAndPassword(auth,email,password);
+const user=result.user;
 
-message("Account created successfully!");
+/* Save the new user's profile in Firestore */
+await setDoc(doc(db,"users",user.uid),{
+uid:user.uid,
+email:user.email,
+createdAt:serverTimestamp(),
+status:"active"
+});
+
+message("Account created and profile saved successfully!");
 }catch(error){
-console.error(error);
-
+console.error("Registration error:",error);
 if(error.code==="auth/email-already-in-use"){
 message("This email is already registered. Please login.",true);
 }else if(error.code==="auth/invalid-email"){
 message("Please enter a valid email address.",true);
 }else if(error.code==="auth/weak-password"){
 message("Password is too weak. Use at least 6 characters.",true);
+}else if(error.code==="permission-denied"){
+message("Account created, but Firestore permission denied. Check Firestore Rules.",true);
 }else{
-message("Registration failed: "+error.message,true);
+message("Registration error: "+error.message,true);
 }
 }finally{
 btn.disabled=false;
@@ -313,17 +308,13 @@ if(!email||!password){
 message("Enter your email and password.",true);
 return;
 }
-
 try{
 btn.disabled=true;
 btn.textContent="Logging in...";
-
 await signInWithEmailAndPassword(auth,email,password);
-
 message("Login successful!");
 }catch(error){
 console.error(error);
-
 if(error.code==="auth/invalid-credential"||error.code==="auth/wrong-password"||error.code==="auth/user-not-found"){
 message("Incorrect email or password.",true);
 }else if(error.code==="auth/invalid-email"){
@@ -339,12 +330,10 @@ btn.textContent="Login";
 
 $("forgot-password").addEventListener("click",async()=>{
 const email=$("login-email").value.trim().toLowerCase();
-
 if(!email){
 message("Enter your email address first.",true);
 return;
 }
-
 try{
 await sendPasswordResetEmail(auth,email);
 message("Password reset email sent. Check your inbox.");
@@ -364,7 +353,6 @@ const displayName=user.email||"BaweReal User";
 $("user-display-name").textContent=displayName;
 $("user-avatar").textContent=displayName.substring(0,2).toUpperCase();
 $("profile-auth-info").textContent="Signed in: "+displayName;
-
 go("home");
 }else{
 $("auth-section").classList.remove("hidden");
@@ -392,12 +380,10 @@ if(!user){
 alert("Please sign in first.");
 return;
 }
-
 if(!msg){
 alert("Enter a message.");
 return;
 }
-
 try{
 await addDoc(collection(db,"supportRequests"),{
 userId:user.uid,
@@ -406,7 +392,6 @@ message:msg,
 status:"pending",
 createdAt:serverTimestamp()
 });
-
 alert("Message sent successfully!");
 $("support-msg").value="";
 }catch(error){
