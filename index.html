@@ -69,7 +69,82 @@ small{color:var(--muted)}
 .feature-row .btn{flex:1}
 .faq-item{padding:13px 0;border-bottom:1px solid #eee}
 .faq-item:last-child{border:0}
-.faq-item strong{display:block;margin-bottom:7px}
+
+/* TASK AND VIP */
+.task-card,.vip-card{
+  background:white;
+  border:1px solid #eee;
+  border-radius:15px;
+  padding:17px;
+  margin-bottom:12px;
+}
+.vip-card{
+  border-left:4px solid #635bff;
+}
+.vip-level{
+  font-size:24px;
+  margin-bottom:8px;
+}
+.task-icon{
+  font-size:25px;
+  margin-bottom:8px;
+}
+
+/* ACTIVITY DISPLAY */
+.live-activity{
+  background:#17172b;
+  color:white;
+  padding:18px;
+  border-radius:17px;
+  margin-top:17px;
+  overflow:hidden;
+}
+.live-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+.live-dot{
+  width:9px;
+  height:9px;
+  background:#22c985;
+  border-radius:50%;
+  display:inline-block;
+  margin-right:6px;
+  animation:pulse 1.2s infinite;
+}
+@keyframes pulse{
+  50%{opacity:.3}
+}
+.activity-window{
+  height:180px;
+  overflow:hidden;
+}
+.activity-track{
+  animation:activityScroll 18s linear infinite;
+}
+.activity-window:hover .activity-track{
+  animation-play-state:paused;
+}
+.activity-entry{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 10px;
+  margin-bottom:8px;
+  background:#25253e;
+  border-radius:10px;
+  font-size:13px;
+}
+.activity-entry strong{
+  color:#67e5ae;
+}
+@keyframes activityScroll{
+  from{transform:translateY(0)}
+  to{transform:translateY(-50%)}
+}
+
 @media(min-width:650px){
 .bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
 }
@@ -144,11 +219,28 @@ small{color:var(--muted)}
     <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong>Support</strong></div>
     <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong>Notifications</strong></div>
     <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong>Help / FAQ</strong></div>
+    <div class="action" onclick="openPage('task')"><span class="emoji">🎯</span><strong>Task</strong></div>
+    <div class="action" onclick="openPage('vip')"><span class="emoji">👑</span><strong>VIP</strong></div>
   </div>
 
   <div class="card" style="margin-top:17px">
     <h3>Recent Activity</h3>
     <div id="recentActivity" class="empty">No recent activity.</div>
+  </div>
+
+  <div class="live-activity">
+    <div class="live-title">
+      <strong>Deposit Activity</strong>
+      <span style="font-size:12px;color:#67e5ae">
+        <span class="live-dot"></span>Activity Display
+      </span>
+    </div>
+    <p style="font-size:11px;color:#b9b9ca;margin-bottom:12px">
+      Sample Activity — Not Verified Deposits
+    </p>
+    <div class="activity-window">
+      <div class="activity-track" id="activityTrack"></div>
+    </div>
   </div>
 </section>
 
@@ -275,6 +367,62 @@ small{color:var(--muted)}
   <p class="muted">Package information will appear here when officially configured.</p>
   <div class="notice">No package purchase or earning feature is currently active.</div>
 </div>
+</section>
+
+<!-- TASK PAGE -->
+<section id="taskPage" class="hidden">
+  <h2 class="page-title">Daily Tasks</h2>
+  <div class="card">
+    <h3>Available Tasks</h3>
+
+    <div class="task-card">
+      <div class="task-icon">📌</div>
+      <strong>Daily Check-in</strong>
+      <p class="muted">Daily task information will appear here.</p>
+      <span class="status pending">Coming Soon</span>
+    </div>
+
+    <div class="task-card">
+      <div class="task-icon">👥</div>
+      <strong>Referral Task</strong>
+      <p class="muted">Referral task information will appear here.</p>
+      <span class="status pending">Coming Soon</span>
+    </div>
+
+    <div class="notice">
+      Tasks and rewards are not active until officially configured.
+    </div>
+  </div>
+</section>
+
+<!-- VIP PAGE -->
+<section id="vipPage" class="hidden">
+  <h2 class="page-title">VIP Membership</h2>
+
+  <div class="vip-card">
+    <div class="vip-level">🥉</div>
+    <h3>VIP 1</h3>
+    <p class="muted">Membership information not configured.</p>
+    <span class="status pending">Coming Soon</span>
+  </div>
+
+  <div class="vip-card">
+    <div class="vip-level">🥈</div>
+    <h3>VIP 2</h3>
+    <p class="muted">Membership information not configured.</p>
+    <span class="status pending">Coming Soon</span>
+  </div>
+
+  <div class="vip-card">
+    <div class="vip-level">🥇</div>
+    <h3>VIP 3</h3>
+    <p class="muted">Membership information not configured.</p>
+    <span class="status pending">Coming Soon</span>
+  </div>
+
+  <div class="notice">
+    VIP purchases and benefits are not active.
+  </div>
 </section>
 
 <!-- HISTORY -->
@@ -438,7 +586,12 @@ function showForgot(){
 }
 
 function openPage(page){
-  const pages=["home","deposit","withdraw","referral","packages","history","profile","support","notifications","faq"];
+  const pages=[
+    "home","deposit","withdraw","referral","packages",
+    "history","profile","support","notifications","faq",
+    "task","vip"
+  ];
+
   pages.forEach(p=>{
     const el=document.getElementById(p+"Page");
     if(el) el.classList.toggle("hidden",p!==page);
@@ -477,6 +630,32 @@ window.chooseMethod=function(method){
   document.getElementById("telebirrCard").classList.toggle("selected",method==="Telebirr");
   document.getElementById("cbeCard").classList.toggle("selected",method==="CBE");
 };
+
+/* ACTIVITY DISPLAY */
+const activityNumbers=[
+  "0912*******25",
+  "0916*******75",
+  "0948*******62",
+  "0932*******12",
+  "0944*******55",
+  "0925*******07",
+  "0906*******24",
+  "0987*******20",
+  "0909*******14"
+];
+
+const activityTrack=document.getElementById("activityTrack");
+
+if(activityTrack){
+  const entries=[...activityNumbers,...activityNumbers];
+
+  activityTrack.innerHTML=entries.map((number,index)=>`
+    <div class="activity-entry">
+      <span>📱 ${number}</span>
+      <strong>Sample #${(index%9)+1}</strong>
+    </div>
+  `).join("");
+}
 </script>
 
 <script type="module">
