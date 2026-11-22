@@ -3,354 +3,1113 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BaweReal</title>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
-body{background:#f3f6fb;color:#172033;padding-bottom:80px}
-.hidden{display:none!important}
-header{background:white;padding:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;border-bottom:1px solid #ddd;z-index:5}
-.container{max-width:520px;margin:auto;padding:15px}
-.card{background:white;padding:17px;border-radius:15px;margin-bottom:14px;border:1px solid #e5eaf1}
-h2{font-size:19px;margin-bottom:12px}
-h3{font-size:16px;margin-bottom:10px}
-p{font-size:14px;color:#64748b;margin:7px 0}
-input,select,textarea{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:9px;margin:7px 0;font-size:14px}
+:root{
+  --primary:#635bff;
+  --dark:#17172b;
+  --bg:#f4f5fb;
+  --card:#ffffff;
+  --muted:#77788a;
+  --green:#159b69;
+  --red:#d94c59;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+  padding-bottom:85px;
+}
+button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-.btn{width:100%;padding:13px;border:0;border-radius:9px;background:#2563eb;color:white;font-weight:bold;margin-top:9px}
-.secondary{background:#eef2ff;color:#1d4ed8}
-.wallet{background:linear-gradient(135deg,#2563eb,#172554);color:white;padding:22px;border-radius:17px;margin-bottom:15px}
-.wallet p{color:#dbeafe}
-.amount{font-size:29px;font-weight:bold;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.action{background:white;padding:17px 10px;text-align:center;border:1px solid #e5eaf1;border-radius:13px;font-weight:bold;color:#1e40af}
-.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.method-card{border:1px solid #dbe3ee;background:white;border-radius:13px;padding:14px 8px;text-align:center}
-.method-logo{height:55px;width:70px;object-fit:contain;margin:0 auto 8px;display:block}
-.method-name{font-size:13px;font-weight:bold}
-.account-box{background:#f8fafc;border:1px solid #dbe3ee;border-radius:10px;padding:12px;margin-top:10px}
-.account-title{font-size:13px;color:#64748b;margin-bottom:7px}
-.account-number{font-size:19px;font-weight:bold;color:#172554;letter-spacing:1px;word-break:break-all}
-.copy-btn{background:#2563eb;color:white;border:0;border-radius:7px;padding:9px 14px;font-weight:bold;margin-top:8px;width:100%}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 3px;z-index:10}
-.bottom button{background:none;border:0;color:#64748b;font-size:11px}
-.bottom button span{display:block;font-size:19px;margin-bottom:3px}
-.bottom button.active{color:#2563eb;font-weight:bold}
-.notice{background:#eff6ff;color:#1d4ed8;padding:11px;border-radius:9px;font-size:13px;margin-bottom:12px}
-.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #eee;font-size:14px}
+.hidden{display:none!important}
+header{
+  background:var(--dark);
+  color:white;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h2{font-size:21px}
+.container{padding:17px;max-width:650px;margin:auto}
+.card{
+  background:white;
+  padding:18px;
+  border-radius:17px;
+  margin-bottom:15px;
+  box-shadow:0 3px 14px rgba(0,0,0,.045);
+}
+.card h3{margin-bottom:13px}
+.muted{color:var(--muted);font-size:13px}
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  margin:7px 0 13px;
+  background:white;
+  outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+textarea{resize:vertical;min-height:85px}
+.btn{
+  border:0;
+  padding:13px;
+  border-radius:10px;
+  background:var(--primary);
+  color:white;
+  width:100%;
+  font-weight:bold;
+}
+.btn.secondary{background:#ecebff;color:var(--primary)}
+.btn.danger{background:#ffe9eb;color:var(--red)}
+.btn.small{width:auto;padding:8px 12px;font-size:12px}
+.link{color:var(--primary);cursor:pointer;font-size:14px}
+.auth-wrap{
+  max-width:420px;
+  margin:45px auto;
+  padding:20px;
+}
+.auth-wrap .card{padding:25px}
+.logo{
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+  color:var(--primary);
+  margin-bottom:20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.action{
+  background:white;
+  padding:18px 10px;
+  border-radius:15px;
+  text-align:center;
+  cursor:pointer;
+  border:1px solid #eee;
+}
+.action .emoji{font-size:27px;display:block;margin-bottom:8px}
+.balance{
+  background:linear-gradient(130deg,#635bff,#302b9d);
+  color:white;
+  padding:23px;
+  border-radius:18px;
+  margin-bottom:17px;
+}
+.balance h1{font-size:30px;margin-top:12px}
+.method{
+  border:2px solid #eee;
+  border-radius:13px;
+  padding:14px;
+  margin:8px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.method.selected{border-color:var(--primary);background:#f5f4ff}
+.method strong{font-size:16px}
+.method .brand{font-size:25px;margin-right:10px}
+.method-left{display:flex;align-items:center}
+.status{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#eee;
+  font-size:11px;
+  margin-top:7px;
+}
+.status.pending,.status.request-recorded{background:#fff0ce;color:#946000}
+.status.approved,.status.completed{background:#d9f7e9;color:#087b4c}
+.status.rejected,.status.failed{background:#ffe1e4;color:#bd2636}
+.item{
+  border-bottom:1px solid #eee;
+  padding:13px 0;
+}
+.item:last-child{border:0}
+.item-top{display:flex;justify-content:space-between;gap:10px}
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  border-top:1px solid #eee;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 2px;
+  z-index:10;
+}
+.nav-btn{
+  background:none;
+  border:0;
+  color:#777;
+  font-size:11px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.nav-btn span{font-size:20px}
+.nav-btn.active{color:var(--primary);font-weight:bold}
+.preview{
+  max-width:100%;
+  max-height:220px;
+  border-radius:12px;
+  display:block;
+  margin:10px 0;
+}
+.notice{
+  padding:12px;
+  border-radius:10px;
+  background:#f1f0ff;
+  color:#4841a8;
+  font-size:13px;
+  margin:10px 0;
+}
+.empty{text-align:center;color:var(--muted);padding:20px}
+.page-title{margin:5px 0 17px}
+small{color:var(--muted)}
+@media(min-width:650px){
+  .bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
+}
 </style>
 </head>
+
 <body>
 
-<section id="auth" class="container" style="max-width:420px;margin-top:40px">
-<div class="card">
-<h2 style="text-align:center;color:#2563eb">BaweReal</h2>
-<p style="text-align:center">Secure Account Access</p>
-<div id="login">
-<h3>Login</h3>
-<input id="email" type="email" placeholder="Email address">
-<input id="password" type="password" placeholder="Password">
-<button class="btn" id="loginBtn">Login</button>
-<p onclick="resetPassword()" style="text-align:center;color:#2563eb;cursor:pointer">Forgot Password?</p>
-<p onclick="showRegister()" style="text-align:center;color:#2563eb;cursor:pointer">Create Account</p>
-</div>
-<div id="register" class="hidden">
-<h3>Create Account</h3>
-<input id="fullName" placeholder="Full Name">
-<input id="newEmail" type="email" placeholder="Email">
-<input id="newPassword" type="password" placeholder="Password">
-<button class="btn" id="registerBtn">Register</button>
-<p onclick="showLogin()" style="text-align:center;color:#2563eb">Back to Login</p>
-</div>
-<div id="authMessage"></div>
-</div>
+<!-- AUTH -->
+<section id="auth" class="auth-wrap">
+  <div class="logo">BaweReal</div>
+
+  <div class="card" id="loginBox">
+    <h2>Welcome Back</h2>
+    <p class="muted">Login to your account</p>
+    <br>
+    <input id="loginEmail" type="email" placeholder="Email address">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button class="btn" id="loginBtn">Login</button>
+    <br><br>
+    <p class="link" onclick="showForgot()">Forgot Password?</p>
+    <br>
+    <p class="muted">Don't have an account?
+      <span class="link" onclick="showRegister()">Create Account</span>
+    </p>
+  </div>
+
+  <div class="card hidden" id="registerBox">
+    <h2>Create Account</h2>
+    <br>
+    <input id="regName" placeholder="Full name">
+    <input id="regEmail" type="email" placeholder="Email address">
+    <input id="regPassword" type="password" placeholder="Password">
+    <input id="regConfirm" type="password" placeholder="Confirm password">
+    <button class="btn" id="registerBtn">Register</button>
+    <br><br>
+    <p class="muted">Already have an account?
+      <span class="link" onclick="showLogin()">Login</span>
+    </p>
+  </div>
+
+  <div class="card hidden" id="forgotBox">
+    <h2>Reset Password</h2>
+    <p class="muted">Enter your registered email address.</p>
+    <br>
+    <input id="forgotEmail" type="email" placeholder="Email address">
+    <button class="btn" id="resetBtn">Send Reset Link</button>
+    <br><br>
+    <p class="link" onclick="showLogin()">Back to Login</p>
+  </div>
 </section>
 
-<div id="application" class="hidden">
-<header>
-<div><strong id="displayName">BaweReal</strong><p id="tier">Account</p></div>
-<button class="btn secondary" style="width:auto;margin:0" id="logoutBtn">Logout</button>
-</header>
+<!-- APPLICATION -->
+<section id="application" class="hidden">
+  <header>
+    <div>
+      <h2>BaweReal</h2>
+      <small style="color:#ddd" id="headerName">Welcome</small>
+    </div>
+    <button class="btn small danger" id="logoutBtn">Logout</button>
+  </header>
 
-<main class="container">
-<section id="home" class="page">
-<div class="wallet">
-<p>Account Balance</p>
-<div class="amount" id="balance">0.00 ETB</div>
-<p>Account overview</p>
-</div>
-<div class="grid">
-<button class="action" onclick="openPage('deposit')">Deposit</button>
-<button class="action" onclick="openPage('withdrawal')">Withdrawal</button>
-<button class="action" onclick="openPage('referral')">Referral</button>
-<button class="action" onclick="openPage('packages')">Packages</button>
-<button class="action" onclick="openPage('history')">History</button>
-<button class="action" onclick="openPage('profile')">Profile</button>
-</div>
+  <main class="container">
+
+    <!-- HOME -->
+    <section id="homePage">
+      <div class="balance">
+        <p>Account Balance</p>
+        <h1 id="balanceText">0.00 ETB</h1>
+        <small style="color:#eee">Only verified account balance is displayed.</small>
+      </div>
+
+      <div class="grid">
+        <div class="action" onclick="openPage('deposit')">
+          <span class="emoji">💳</span>
+          <strong>Deposit</strong>
+        </div>
+        <div class="action" onclick="openPage('withdraw')">
+          <span class="emoji">💸</span>
+          <strong>Withdrawal</strong>
+        </div>
+        <div class="action" onclick="openPage('history')">
+          <span class="emoji">📋</span>
+          <strong>History</strong>
+        </div>
+        <div class="action" onclick="openPage('referral')">
+          <span class="emoji">👥</span>
+          <strong>Referral</strong>
+        </div>
+        <div class="action" onclick="openPage('packages')">
+          <span class="emoji">📦</span>
+          <strong>Packages</strong>
+        </div>
+        <div class="action" onclick="openPage('support')">
+          <span class="emoji">💬</span>
+          <strong>Support</strong>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:17px">
+        <h3>Recent Activity</h3>
+        <div id="recentActivity" class="empty">No recent activity.</div>
+      </div>
+    </section>
+
+    <!-- DEPOSIT -->
+    <section id="depositPage" class="hidden">
+      <h2 class="page-title">Deposit</h2>
+
+      <div class="card">
+        <h3>Select Payment Method</h3>
+
+        <div class="method" id="telebirrCard" onclick="chooseMethod('Telebirr')">
+          <div class="method-left">
+            <span class="brand">📱</span>
+            <div>
+              <strong>Telebirr</strong>
+              <p class="muted">Mobile payment</p>
+            </div>
+          </div>
+          <strong>›</strong>
+        </div>
+
+        <div class="method" id="cbeCard" onclick="chooseMethod('CBE')">
+          <div class="method-left">
+            <span class="brand">🏦</span>
+            <div>
+              <strong>CBE</strong>
+              <p class="muted">Commercial Bank of Ethiopia</p>
+            </div>
+          </div>
+          <strong>›</strong>
+        </div>
+
+        <select id="depositMethod">
+          <option value="">Choose method</option>
+          <option value="Telebirr">Telebirr</option>
+          <option value="CBE">CBE</option>
+        </select>
+
+        <div class="notice">
+          Select your payment method. Use the account details below and attach your payment receipt for review.
+        </div>
+
+        <div class="card" style="background:#f7f7fc">
+          <strong>Telebirr Account</strong>
+          <p style="font-size:20px;margin:10px 0">0964488470</p>
+          <button class="btn secondary" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
+        </div>
+
+        <div class="card" style="background:#f7f7fc">
+          <strong>CBE Account</strong>
+          <p style="font-size:20px;margin:10px 0">10000298833585</p>
+          <button class="btn secondary" onclick="copyAccount('10000298833585')">Copy CBE Number</button>
+        </div>
+
+        <label>Deposit Amount (ETB)</label>
+        <input id="depositAmount" type="number" min="300" max="10000" placeholder="Enter amount">
+
+        <label>Payment Receipt Photo</label>
+        <input id="receiptFile" type="file" accept="image/*">
+        <img id="receiptPreview" class="preview hidden" alt="Receipt preview">
+        <small>Image only. Maximum file size: 5 MB.</small>
+
+        <label>Note (optional)</label>
+        <textarea id="depositNote" placeholder="Additional information"></textarea>
+
+        <button class="btn" id="depositBtn">Submit Deposit Request</button>
+
+        <p class="muted" style="margin-top:12px">
+          Your request will be submitted for review. Submission does not mean payment has been verified.
+        </p>
+      </div>
+    </section>
+
+    <!-- WITHDRAW -->
+    <section id="withdrawPage" class="hidden">
+      <h2 class="page-title">Withdrawal</h2>
+
+      <div class="card">
+        <h3>Withdrawal Request</h3>
+
+        <label>Payment Method</label>
+        <select id="withdrawMethod">
+          <option value="">Choose method</option>
+          <option value="Telebirr">Telebirr</option>
+          <option value="CBE">CBE</option>
+        </select>
+
+        <label>Account Number</label>
+        <input id="withdrawAccount" placeholder="Enter your account number">
+
+        <label>Amount (ETB)</label>
+        <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
+
+        <button class="btn" id="withdrawBtn">Submit Withdrawal Request</button>
+
+        <div class="notice">
+          Withdrawal requests are submitted for review. No money is transferred automatically by this form.
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERRAL -->
+    <section id="referralPage" class="hidden">
+      <h2 class="page-title">Referral</h2>
+      <div class="card">
+        <h3>Your Referral Code</h3>
+        <p class="muted">Share your code with others.</p>
+        <br>
+        <h2 id="referralCode">Loading...</h2>
+        <br>
+        <button class="btn" id="copyReferralBtn">Copy Referral Code</button>
+      </div>
+    </section>
+
+    <!-- PACKAGES -->
+    <section id="packagesPage" class="hidden">
+      <h2 class="page-title">Packages</h2>
+      <div class="card">
+        <h3>Packages</h3>
+        <p class="muted">
+          Package information will appear here when it is officially configured.
+        </p>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="historyPage" class="hidden">
+      <h2 class="page-title">Transaction History</h2>
+      <div class="card">
+        <select id="historyFilter">
+          <option value="all">All Requests</option>
+          <option value="deposit">Deposits</option>
+          <option value="withdrawal">Withdrawals</option>
+        </select>
+        <div id="historyList">
+          <div class="empty">Loading history...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profilePage" class="hidden">
+      <h2 class="page-title">My Profile</h2>
+      <div class="card">
+        <h3>Account Information</h3>
+        <p class="muted">Full Name</p>
+        <p id="profileName" style="margin:6px 0 15px">-</p>
+
+        <p class="muted">Email Address</p>
+        <p id="profileEmail" style="margin:6px 0 15px">-</p>
+
+        <p class="muted">User ID</p>
+        <p id="profileUid" style="margin:6px 0 15px;word-break:break-all">-</p>
+
+        <p class="muted">Account Status</p>
+        <p id="profileStatus" style="margin-top:6px">-</p>
+      </div>
+    </section>
+
+    <!-- SUPPORT -->
+    <section id="supportPage" class="hidden">
+      <h2 class="page-title">Support</h2>
+      <div class="card">
+        <h3>Contact Support</h3>
+        <textarea id="supportMessage" placeholder="Write your message..."></textarea>
+        <button class="btn" id="supportBtn">Send Message</button>
+      </div>
+
+      <div class="card">
+        <h3>My Support Requests</h3>
+        <div id="supportHistory">
+          <div class="empty">No support messages yet.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="home" onclick="openPage('home')">
+      <span>🏠</span>Home
+    </button>
+    <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')">
+      <span>💳</span>Deposit
+    </button>
+    <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')">
+      <span>💸</span>Withdraw
+    </button>
+    <button class="nav-btn" data-page="history" onclick="openPage('history')">
+      <span>📋</span>History
+    </button>
+    <button class="nav-btn" data-page="profile" onclick="openPage('profile')">
+      <span>👤</span>Profile
+    </button>
+  </nav>
 </section>
-
-<section id="deposit" class="page hidden">
-<div class="card">
-<h2>Deposit Request</h2>
-<div class="notice">Submit a request for review. This does not transfer money.</div>
-
-<h3>Select Payment Method</h3>
-
-<div class="method-grid">
-<div class="method-card">
-<img class="method-logo" src="https://www.ethiotelecom.et/wp-content/uploads/2022/06/telebirr-logo.png" alt="Telebirr logo">
-<div class="method-name">Telebirr</div>
-</div>
-<div class="method-card">
-<img class="method-logo" src="https://www.combanketh.et/images/logo.png" alt="CBE logo">
-<div class="method-name">Commercial Bank of Ethiopia</div>
-</div>
-</div>
-
-<div class="account-box">
-<div class="account-title">Telebirr Account Number</div>
-<div class="account-number">0964488470</div>
-<button class="copy-btn" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
-</div>
-
-<div class="account-box">
-<div class="account-title">CBE Account Number</div>
-<div class="account-number">10000298833585</div>
-<button class="copy-btn" onclick="copyAccount('10000298833585')">Copy CBE Account Number</button>
-</div>
-
-<select id="depositMethod">
-<option value="Telebirr">Telebirr</option>
-<option value="CBE">Commercial Bank of Ethiopia</option>
-</select>
-
-<input id="depositAmount" type="number" placeholder="Amount in ETB">
-<textarea id="depositNote" placeholder="Reference note (optional)"></textarea>
-<button class="btn" onclick="submitRequest('deposit')">Submit Deposit Request</button>
-</div>
-</section>
-
-<section id="withdrawal" class="page hidden">
-<div class="card">
-<h2>Withdrawal Request</h2>
-<div class="notice">Submit a withdrawal request for review. No money is transferred by this form.</div>
-<select id="withdrawMethod">
-<option>Telebirr</option>
-<option>Commercial Bank of Ethiopia</option>
-</select>
-<input id="withdrawAccount" placeholder="Your account number or phone">
-<input id="withdrawAmount" type="number" placeholder="Amount in ETB">
-<button class="btn" onclick="submitRequest('withdrawal')">Submit Withdrawal Request</button>
-</div>
-</section>
-
-<section id="referral" class="page hidden">
-<div class="card">
-<h2>Referral</h2>
-<p>Your referral code</p>
-<strong id="referralCode">Loading...</strong>
-<button class="btn secondary" onclick="copyReferral()">Copy Referral Code</button>
-</div>
-</section>
-
-<section id="packages" class="page hidden">
-<div class="card"><h2>Packages</h2><p>Package information</p></div>
-</section>
-
-<section id="history" class="page hidden">
-<div class="card"><h2>Transaction History</h2><div id="historyList">No requests yet.</div></div>
-</section>
-
-<section id="profile" class="page hidden">
-<div class="card"><h2>Profile</h2><p id="profileInfo"></p></div>
-</section>
-
-<section id="support" class="page hidden">
-<div class="card">
-<h2>Support</h2>
-<textarea id="supportMessage" placeholder="Write your message"></textarea>
-<button class="btn" onclick="sendSupport()">Send Message</button>
-</div>
-</section>
-</main>
-
-<nav class="bottom">
-<button class="active" onclick="openPage('home',this)"><span>⌂</span>Home</button>
-<button onclick="openPage('deposit',this)"><span>＋</span>Deposit</button>
-<button onclick="openPage('withdrawal',this)"><span>↗</span>Withdraw</button>
-<button onclick="openPage('referral',this)"><span>♧</span>Referral</button>
-<button onclick="openPage('profile',this)"><span>👤</span>Profile</button>
-</nav>
-</div>
 
 <script>
-function showRegister(){
-document.getElementById("login").classList.add("hidden");
-document.getElementById("register").classList.remove("hidden");
-}
 function showLogin(){
-document.getElementById("register").classList.add("hidden");
-document.getElementById("login").classList.remove("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("forgotBox").classList.add("hidden");
 }
-function openPage(id,button){
-document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
-document.getElementById(id).classList.remove("hidden");
-document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
-if(button)button.classList.add("active");
+function showRegister(){
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.remove("hidden");
+  document.getElementById("forgotBox").classList.add("hidden");
 }
+function showForgot(){
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("forgotBox").classList.remove("hidden");
+}
+function openPage(page){
+  const pages=["home","deposit","withdraw","referral","packages","history","profile","support"];
+  pages.forEach(p=>{
+    const el=document.getElementById(p+"Page");
+    if(el) el.classList.toggle("hidden",p!==page);
+  });
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.page===page);
+  });
+  if(page==="history" && window.loadHistory) window.loadHistory();
+  if(page==="support" && window.loadSupportHistory) window.loadSupportHistory();
+}
+window.openPage=openPage;
 
-async function copyAccount(number){
-try{
-if(navigator.clipboard && window.isSecureContext){
-await navigator.clipboard.writeText(number);
-}else{
-const input=document.createElement("textarea");
-input.value=number;
-input.style.position="fixed";
-input.style.opacity="0";
-document.body.appendChild(input);
-input.select();
-document.execCommand("copy");
-input.remove();
-}
-alert("Account number copied: "+number);
-}catch(e){
-alert("Copy failed. Please copy manually: "+number);
-}
-}
+window.copyAccount=async function(number){
+  try{
+    await navigator.clipboard.writeText(number);
+    alert("Account number copied: "+number);
+  }catch(e){
+    const temp=document.createElement("textarea");
+    temp.value=number;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    temp.remove();
+    alert("Account number copied.");
+  }
+};
+
+window.chooseMethod=function(method){
+  document.getElementById("depositMethod").value=method;
+  document.getElementById("telebirrCard").classList.toggle("selected",method==="Telebirr");
+  document.getElementById("cbeCard").classList.toggle("selected",method==="CBE");
+  document.getElementById("receiptFile").click();
+};
 </script>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getAuth,onAuthStateChanged,signOut,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,doc,setDoc,getDoc,addDoc,collection,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig={
-apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
-authDomain:"bawereal.firebaseapp.com",
-projectId:"bawereal",
-storageBucket:"bawereal.firebasestorage.app",
-messagingSenderId:"756822160410",
-appId:"1:756822160410:web:e2a09b254d851c229a4da3",
-measurementId:"G-VN3D9QM7P8"
+  apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain:"bawereal.firebaseapp.com",
+  projectId:"bawereal",
+  storageBucket:"bawereal.firebasestorage.app",
+  messagingSenderId:"756822160410",
+  appId:"1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId:"G-VN3D9QM7P8"
 };
 
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
+const storage=getStorage(app);
+
+let currentUser=null;
+let currentUserData={};
+let selectedReceipt=null;
+
 const $=id=>document.getElementById(id);
 
-$("loginBtn").onclick=async()=>{
-try{
-await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
-}catch(e){$("authMessage").textContent=e.message;}
-};
+function notify(message){
+  alert(message);
+}
 
-$("registerBtn").onclick=async()=>{
-try{
-const name=$("fullName").value.trim();
-const email=$("newEmail").value.trim();
-const password=$("newPassword").value;
-if(!name||!email||password.length<6)throw Error("Enter valid details. Password must be at least 6 characters.");
-const result=await createUserWithEmailAndPassword(auth,email,password);
-await setDoc(doc(db,"users",result.user.uid),{
-uid:result.user.uid,fullName:name,email:email,
-createdAt:serverTimestamp(),status:"active"
+function setLoading(button,loading,label){
+  button.disabled=loading;
+  button.textContent=loading?"Please wait...":label;
+}
+
+function makeReferral(uid){
+  return "BW"+uid.substring(0,8).toUpperCase();
+}
+
+function safeText(value){
+  return String(value??"").replace(/[&<>"']/g,char=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  })[char]);
+}
+
+function statusClass(status){
+  const s=String(status||"request-recorded").toLowerCase();
+  if(["approved","completed","paid"].includes(s)) return "approved";
+  if(["rejected","failed"].includes(s)) return "rejected";
+  return "pending";
+}
+
+function readableStatus(status){
+  return String(status||"Request recorded")
+    .replace(/-/g," ")
+    .replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+/* REGISTER */
+$("registerBtn").addEventListener("click",async()=>{
+  const name=$("regName").value.trim();
+  const email=$("regEmail").value.trim();
+  const password=$("regPassword").value;
+  const confirm=$("regConfirm").value;
+
+  if(!name||!email||!password||!confirm){
+    return notify("Please complete all fields.");
+  }
+  if(password.length<6){
+    return notify("Password must be at least 6 characters.");
+  }
+  if(password!==confirm){
+    return notify("Passwords do not match.");
+  }
+
+  const btn=$("registerBtn");
+  setLoading(btn,true,"Register");
+
+  try{
+    const result=await createUserWithEmailAndPassword(auth,email,password);
+    const uid=result.user.uid;
+
+    await setDoc(doc(db,"users",uid),{
+      uid,
+      fullName:name,
+      email,
+      referralCode:makeReferral(uid),
+      status:"active",
+      createdAt:serverTimestamp()
+    });
+
+    notify("Account created successfully.");
+  }catch(error){
+    notify(error.message);
+  }finally{
+    setLoading(btn,false,"Register");
+  }
 });
-}catch(e){$("authMessage").textContent=e.message;}
-};
 
-window.resetPassword=async()=>{
-const email=$("email").value.trim();
-if(!email)return alert("Enter your email first.");
-try{await sendPasswordResetEmail(auth,email);alert("Reset email sent.");}
-catch(e){alert(e.message);}
-};
+/* LOGIN */
+$("loginBtn").addEventListener("click",async()=>{
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
 
-$("logoutBtn").onclick=()=>signOut(auth);
+  if(!email||!password) return notify("Enter email and password.");
 
+  const btn=$("loginBtn");
+  setLoading(btn,true,"Login");
+
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+  }catch(error){
+    notify(error.message);
+  }finally{
+    setLoading(btn,false,"Login");
+  }
+});
+
+/* PASSWORD RESET */
+$("resetBtn").addEventListener("click",async()=>{
+  const email=$("forgotEmail").value.trim();
+  if(!email) return notify("Enter your email address.");
+
+  const btn=$("resetBtn");
+  setLoading(btn,true,"Send Reset Link");
+
+  try{
+    await sendPasswordResetEmail(auth,email);
+    notify("Password reset link sent. Check your email.");
+    showLogin();
+  }catch(error){
+    notify(error.message);
+  }finally{
+    setLoading(btn,false,"Send Reset Link");
+  }
+});
+
+/* LOGOUT */
+$("logoutBtn").addEventListener("click",async()=>{
+  if(confirm("Are you sure you want to logout?")){
+    await signOut(auth);
+  }
+});
+
+/* AUTH STATE */
 onAuthStateChanged(auth,async user=>{
-if(!user){
-$("auth").classList.remove("hidden");
-$("application").classList.add("hidden");
-return;
+  currentUser=user;
+
+  if(!user){
+    $("auth").classList.remove("hidden");
+    $("application").classList.add("hidden");
+    return;
+  }
+
+  $("auth").classList.add("hidden");
+  $("application").classList.remove("hidden");
+
+  await loadUserProfile();
+  await loadHistory();
+  await loadSupportHistory();
+});
+
+/* USER PROFILE */
+async function loadUserProfile(){
+  if(!currentUser) return;
+
+  try{
+    const userRef=doc(db,"users",currentUser.uid);
+    const snap=await getDoc(userRef);
+
+    if(!snap.exists()){
+      currentUserData={
+        uid:currentUser.uid,
+        email:currentUser.email,
+        fullName:"User",
+        status:"active",
+        referralCode:makeReferral(currentUser.uid)
+      };
+
+      await setDoc(userRef,{
+        ...currentUserData,
+        createdAt:serverTimestamp()
+      });
+    }else{
+      currentUserData=snap.data();
+    }
+
+    const name=currentUserData.fullName||"User";
+
+    $("headerName").textContent="Hello, "+name;
+    $("profileName").textContent=name;
+    $("profileEmail").textContent=currentUser.email||"-";
+    $("profileUid").textContent=currentUser.uid;
+    $("profileStatus").textContent=currentUserData.status||"Active";
+
+    $("referralCode").textContent=
+      currentUserData.referralCode||makeReferral(currentUser.uid);
+
+    const balance=Number(currentUserData.balance||0);
+    $("balanceText").textContent=balance.toFixed(2)+" ETB";
+
+  }catch(error){
+    console.error(error);
+    notify("Could not load your profile.");
+  }
 }
-$("auth").classList.add("hidden");
-$("application").classList.remove("hidden");
-let name=user.email||"User";
-try{
-const snap=await getDoc(doc(db,"users",user.uid));
-if(snap.exists())name=snap.data().fullName||name;
-}catch(e){console.error(e);}
-$("displayName").textContent=name;
-$("profileInfo").textContent="Name: "+name+" | Email: "+(user.email||"");
-$("referralCode").textContent=user.uid.substring(0,8).toUpperCase();
+
+/* DEPOSIT RECEIPT PREVIEW */
+$("receiptFile").addEventListener("change",event=>{
+  const file=event.target.files[0];
+  selectedReceipt=file;
+
+  if(!file){
+    $("receiptPreview").classList.add("hidden");
+    return;
+  }
+
+  if(!file.type.startsWith("image/")){
+    selectedReceipt=null;
+    event.target.value="";
+    $("receiptPreview").classList.add("hidden");
+    return notify("Please select an image file.");
+  }
+
+  if(file.size>5*1024*1024){
+    selectedReceipt=null;
+    event.target.value="";
+    $("receiptPreview").classList.add("hidden");
+    return notify("Image must be smaller than 5 MB.");
+  }
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    $("receiptPreview").src=reader.result;
+    $("receiptPreview").classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
 });
 
-window.submitRequest=async type=>{
-const user=auth.currentUser;
-if(!user)return alert("Please login first.");
-const amount=Number($(type==="deposit"?"depositAmount":"withdrawAmount").value);
-if(!Number.isFinite(amount)||amount<=0)return alert("Enter a valid amount.");
-if(type==="deposit"&&(amount<300||amount>10000))return alert("Deposit range: 300–10,000 ETB.");
-if(type==="withdrawal"&&(amount<100||amount>5000))return alert("Withdrawal range: 100–5,000 ETB.");
+/* UPLOAD RECEIPT TO FIREBASE STORAGE */
+async function uploadReceipt(file){
+  if(!currentUser) throw new Error("Please login first.");
 
-const data={
-userId:user.uid,email:user.email||"",type,
-amount,
-method:type==="deposit"?$("depositMethod").value:$("withdrawMethod").value,
-status:"request-recorded",
-createdAt:serverTimestamp()
-};
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  const filePath=
+    "depositReceipts/"+currentUser.uid+"/"+Date.now()+"_"+safeName;
 
-if(type==="withdrawal")data.account=$("withdrawAccount").value.trim();
-if(type==="deposit")data.note=$("depositNote").value.trim();
+  const storageRef=ref(storage,filePath);
 
-try{
-await addDoc(collection(db,"transactionRequests"),data);
-alert("Your request has been recorded for review. No payment has been processed.");
-openPage("history");
-loadHistory(user.uid);
-}catch(e){alert("Could not save request: "+e.message);}
-};
+  await uploadBytes(storageRef,file,{
+    contentType:file.type
+  });
 
-async function loadHistory(uid){
-const {getDocs,query,where,orderBy}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-try{
-const q=query(collection(db,"transactionRequests"),where("userId","==",uid),orderBy("createdAt","desc"));
-const snap=await getDocs(q);
-$("historyList").innerHTML="";
-if(snap.empty){$("historyList").textContent="No requests yet.";return;}
-snap.forEach(d=>{
-const x=d.data();
-const div=document.createElement("div");
-div.className="row";
-div.textContent=x.type+" — "+x.amount+" ETB — "+x.status;
-$("historyList").appendChild(div);
-});
-}catch(e){$("historyList").textContent="Could not load history.";}
+  return await getDownloadURL(storageRef);
 }
 
-window.copyReferral=async()=>{
-const code=$("referralCode").textContent;
-try{await navigator.clipboard.writeText(code);alert("Referral code copied.");}
-catch(e){alert("Your referral code: "+code);}
-};
+/* DEPOSIT REQUEST */
+$("depositBtn").addEventListener("click",async()=>{
+  if(!currentUser) return notify("Please login first.");
 
-window.sendSupport=async()=>{
-const user=auth.currentUser;
-if(!user)return alert("Please login first.");
-const message=$("supportMessage").value.trim();
-if(!message)return alert("Write a message first.");
-try{
-await addDoc(collection(db,"supportRequests"),{
-userId:user.uid,email:user.email||"",message,
-status:"pending",createdAt:serverTimestamp()
+  const method=$("depositMethod").value;
+  const amount=Number($("depositAmount").value);
+  const note=$("depositNote").value.trim();
+
+  if(!method) return notify("Choose a payment method.");
+  if(!Number.isFinite(amount)||amount<300||amount>10000){
+    return notify("Deposit amount must be between 300 and 10,000 ETB.");
+  }
+  if(!selectedReceipt){
+    return notify("Please attach your payment receipt photo.");
+  }
+
+  const btn=$("depositBtn");
+  setLoading(btn,true,"Submit Deposit Request");
+
+  try{
+    const receiptUrl=await uploadReceipt(selectedReceipt);
+
+    await addDoc(collection(db,"transactionRequests"),{
+      userId:currentUser.uid,
+      email:currentUser.email,
+      type:"deposit",
+      amount,
+      method,
+      note,
+      receiptUrl,
+      receiptFileName:selectedReceipt.name,
+      status:"request-recorded",
+      createdAt:serverTimestamp()
+    });
+
+    notify("Deposit request submitted for review.");
+
+    $("depositAmount").value="";
+    $("depositNote").value="";
+    $("receiptFile").value="";
+    $("receiptPreview").src="";
+    $("receiptPreview").classList.add("hidden");
+    selectedReceipt=null;
+
+    await loadHistory();
+    openPage("history");
+
+  }catch(error){
+    console.error(error);
+    notify("Could not submit request: "+error.message);
+  }finally{
+    setLoading(btn,false,"Submit Deposit Request");
+  }
 });
-$("supportMessage").value="";
-alert("Support message submitted.");
-}catch(e){alert(e.message);}
-};
+
+/* WITHDRAWAL REQUEST */
+$("withdrawBtn").addEventListener("click",async()=>{
+  if(!currentUser) return notify("Please login first.");
+
+  const method=$("withdrawMethod").value;
+  const account=$("withdrawAccount").value.trim();
+  const amount=Number($("withdrawAmount").value);
+
+  if(!method) return notify("Choose withdrawal method.");
+  if(!account) return notify("Enter account number.");
+  if(!Number.isFinite(amount)||amount<100||amount>5000){
+    return notify("Withdrawal amount must be between 100 and 5,000 ETB.");
+  }
+
+  const btn=$("withdrawBtn");
+  setLoading(btn,true,"Submit Withdrawal Request");
+
+  try{
+    await addDoc(collection(db,"transactionRequests"),{
+      userId:currentUser.uid,
+      email:currentUser.email,
+      type:"withdrawal",
+      amount,
+      method,
+      account,
+      status:"request-recorded",
+      createdAt:serverTimestamp()
+    });
+
+    notify("Withdrawal request submitted for review.");
+
+    $("withdrawMethod").value="";
+    $("withdrawAccount").value="";
+    $("withdrawAmount").value="";
+
+    await loadHistory();
+    openPage("history");
+
+  }catch(error){
+    notify("Could not submit request: "+error.message);
+  }finally{
+    setLoading(btn,false,"Submit Withdrawal Request");
+  }
+});
+
+/* REFERRAL COPY */
+$("copyReferralBtn").addEventListener("click",async()=>{
+  const code=$("referralCode").textContent;
+
+  try{
+    await navigator.clipboard.writeText(code);
+    notify("Referral code copied.");
+  }catch(error){
+    notify("Could not copy referral code.");
+  }
+});
+
+/* HISTORY */
+async function loadHistory(){
+  if(!currentUser) return;
+
+  const list=$("historyList");
+  const recent=$("recentActivity");
+
+  list.innerHTML='<div class="empty">Loading...</div>';
+
+  try{
+    const q=query(
+      collection(db,"transactionRequests"),
+      where("userId","==",currentUser.uid)
+    );
+
+    const snapshot=await getDocs(q);
+    let records=[];
+
+    snapshot.forEach(item=>{
+      records.push({id:item.id,...item.data()});
+    });
+
+    records.sort((a,b)=>{
+      const ta=a.createdAt?.toMillis?.()||0;
+      const tb=b.createdAt?.toMillis?.()||0;
+      return tb-ta;
+    });
+
+    renderHistory(records);
+
+    const recentRecords=records.slice(0,3);
+    if(recentRecords.length){
+      recent.innerHTML=recentRecords.map(record=>`
+        <div class="item">
+          <div class="item-top">
+            <strong>${safeText(record.type||"Request")}</strong>
+            <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
+          </div>
+          <span class="status ${statusClass(record.status)}">
+            ${safeText(readableStatus(record.status))}
+          </span>
+        </div>
+      `).join("");
+    }else{
+      recent.innerHTML='<div class="empty">No recent activity.</div>';
+    }
+
+  }catch(error){
+    console.error(error);
+    list.innerHTML='<div class="empty">Could not load history.</div>';
+  }
+}
+
+function renderHistory(records){
+  const filter=$("historyFilter").value;
+
+  const filtered=records.filter(record=>{
+    if(filter==="all") return true;
+    return String(record.type||"").toLowerCase()===filter;
+  });
+
+  if(!filtered.length){
+    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
+    return;
+  }
+
+  $("historyList").innerHTML=filtered.map(record=>{
+    const date=record.createdAt?.toDate
+      ?record.createdAt.toDate().toLocaleString()
+      :"Date unavailable";
+
+    return `
+      <div class="item">
+        <div class="item-top">
+          <strong>${safeText(record.type||"Request")}</strong>
+          <strong>${Number(record.amount||0).toFixed(2)} ETB</strong>
+        </div>
+        <p class="muted">${safeText(record.method||"")}</p>
+        <span class="status ${statusClass(record.status)}">
+          ${safeText(readableStatus(record.status))}
+        </span>
+        <p class="muted" style="margin-top:7px">${safeText(date)}</p>
+        ${record.receiptUrl?`
+          <p style="margin-top:7px">
+            <a href="${safeText(record.receiptUrl)}" target="_blank" rel="noopener">
+              View submitted receipt
+            </a>
+          </p>`:""}
+      </div>
+    `;
+  }).join("");
+}
+
+$("historyFilter").addEventListener("change",loadHistory);
+window.loadHistory=loadHistory;
+
+/* SUPPORT REQUEST */
+$("supportBtn").addEventListener("click",async()=>{
+  if(!currentUser) return notify("Please login first.");
+
+  const message=$("supportMessage").value.trim();
+  if(!message) return notify("Write your message first.");
+
+  const btn=$("supportBtn");
+  setLoading(btn,true,"Send Message");
+
+  try{
+    await addDoc(collection(db,"supportRequests"),{
+      userId:currentUser.uid,
+      email:currentUser.email,
+      message,
+      status:"request-recorded",
+      createdAt:serverTimestamp()
+    });
+
+    $("supportMessage").value="";
+    notify("Your support message has been sent.");
+    await loadSupportHistory();
+
+  }catch(error){
+    notify("Could not send message: "+error.message);
+  }finally{
+    setLoading(btn,false,"Send Message");
+  }
+});
+
+/* SUPPORT HISTORY */
+async function loadSupportHistory(){
+  if(!currentUser) return;
+
+  const container=$("supportHistory");
+  container.innerHTML='<div class="empty">Loading...</div>';
+
+  try{
+    const q=query(
+      collection(db,"supportRequests"),
+      where("userId","==",currentUser.uid)
+    );
+
+    const snapshot=await getDocs(q);
+    let records=[];
+
+    snapshot.forEach(item=>{
+      records.push(item.data());
+    });
+
+    records.sort((a,b)=>{
+      return (b.createdAt?.toMillis?.()||0)-
+             (a.createdAt?.toMillis?.()||0);
+    });
+
+    if(!records.length){
+      container.innerHTML='<div class="empty">No support messages yet.</div>';
+      return;
+    }
+
+    container.innerHTML=records.map(record=>{
+      const date=record.createdAt?.toDate
+        ?record.createdAt.toDate().toLocaleString()
+        :"Date unavailable";
+
+      return `
+        <div class="item">
+          <p>${safeText(record.message||"")}</p>
+          <span class="status ${statusClass(record.status)}">
+            ${safeText(readableStatus(record.status))}
+          </span>
+          <p class="muted" style="margin-top:7px">${safeText(date)}</p>
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    console.error(error);
+    container.innerHTML='<div class="empty">Could not load support history.</div>';
+  }
+}
+
+window.loadSupportHistory=loadSupportHistory;
+
 </script>
 </body>
 </html>
