@@ -30,7 +30,9 @@ body{background:#f4f7fb;color:#111827;padding-bottom:85px}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed}
 .auth-message{margin-top:15px;font-size:13px;color:#2563eb;text-align:center;overflow-wrap:anywhere}
 .auth-link{display:block;text-align:center;color:#2563eb;margin-top:15px;font-size:14px;cursor:pointer}
-#recaptcha-container{display:flex;justify-content:center;margin-top:15px;overflow:hidden}
+.auth-tabs{display:flex;gap:10px;margin-bottom:22px}
+.auth-tab{flex:1;padding:12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;color:#475569;font-weight:700;font-size:14px;cursor:pointer}
+.auth-tab.active{background:#2563eb;color:white;border-color:#2563eb}
 .welcome-bar{background:#eef4ff;border:1px solid #bfd7ff;border-radius:12px;padding:10px 14px;margin-bottom:14px;overflow:hidden;white-space:nowrap;color:#1d4ed8;font-weight:600;font-size:14px}
 .welcome-text{display:inline-block;padding-left:100%;animation:scrollText 12s linear infinite}
 @keyframes scrollText{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
@@ -70,41 +72,29 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e
 <div class="auth-logo">BaweReal</div>
 <div class="auth-subtitle">Secure Account Access</div>
 
-<div id="phone-step">
-<h3>Phone Registration</h3>
-<p>Enter your Ethiopian phone number to verify your account.</p>
-<input type="tel" id="phone-input" placeholder="09XXXXXXXX or +2519XXXXXXXX" autocomplete="tel">
-<button class="btn-primary" id="send-otp-btn">Send Verification Code</button>
+<div class="auth-tabs">
+<button type="button" id="show-login" class="auth-tab active">Login</button>
+<button type="button" id="show-register" class="auth-tab">Register</button>
 </div>
 
-<div id="otp-step" class="hidden">
-<h3>Verify Your Phone</h3>
-<p>Enter the verification code sent to your phone.</p>
-<input type="text" id="otp-input" placeholder="6-digit verification code" inputmode="numeric" maxlength="6">
-<button class="btn-primary" id="verify-otp-btn">Verify Phone</button>
-<button class="btn-primary" id="change-phone-btn" style="background:#64748b">Change Phone</button>
-</div>
-
-<div id="setup-step" class="hidden">
-<h3>Create Your Account</h3>
-<p>Enter an email address and create a password for future login.</p>
-<input type="email" id="setup-email" placeholder="Email address" autocomplete="email">
-<input type="password" id="setup-password" placeholder="Create password (at least 6 characters)" autocomplete="new-password">
-<input type="password" id="setup-confirm" placeholder="Confirm password" autocomplete="new-password">
-<button class="btn-primary" id="create-account-btn">Create Account</button>
-</div>
-
-<div id="login-step" class="hidden">
+<div id="login-form">
 <h3>Welcome Back</h3>
-<p>Login using your registered email and password.</p>
+<p>Login using your email and password.</p>
 <input type="email" id="login-email" placeholder="Email address" autocomplete="email">
 <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
 <button class="btn-primary" id="login-btn">Login</button>
 <span class="auth-link" id="forgot-password">Forgot Password?</span>
-<span class="auth-link" id="show-register">Register with Phone OTP</span>
 </div>
 
-<div id="recaptcha-container"></div>
+<div id="register-form" class="hidden">
+<h3>Create Account</h3>
+<p>Register with your email and create a password.</p>
+<input type="email" id="register-email" placeholder="Email address" autocomplete="email">
+<input type="password" id="register-password" placeholder="Create password (at least 6 characters)" autocomplete="new-password">
+<input type="password" id="register-confirm" placeholder="Confirm password" autocomplete="new-password">
+<button class="btn-primary" id="register-btn">Create Account</button>
+</div>
+
 <div id="auth-message" class="auth-message"></div>
 </div>
 </section>
@@ -207,6 +197,7 @@ document.querySelectorAll(".page").forEach(sec=>sec.classList.toggle("hidden",se
 document.querySelectorAll("#nav .nav-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.page===target));
 }
 document.querySelectorAll("#nav .nav-btn").forEach(btn=>btn.addEventListener("click",()=>go(btn.dataset.page)));
+
 let balanceHidden=false;
 document.getElementById("toggle-balance-btn").addEventListener("click",()=>{
 balanceHidden=!balanceHidden;
@@ -217,13 +208,22 @@ document.getElementById("usd-text").textContent=balanceHidden?"****":"$0.93";
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
-getAuth,onAuthStateChanged,RecaptchaVerifier,signInWithPhoneNumber,
-signOut,EmailAuthProvider,linkWithCredential,signInWithEmailAndPassword,
-createUserWithEmailAndPassword,sendPasswordResetEmail
+getAuth,
+onAuthStateChanged,
+signOut,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword,
+sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,collection,addDoc,serverTimestamp}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
@@ -238,122 +238,120 @@ measurementId:"G-VN3D9QM7P8"
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
-let confirmationResult=null;
-let recaptchaVerifier=null;
-let verifiedPhone="";
 
 const $=id=>document.getElementById(id);
+
 function message(msg,error=false){
 $("auth-message").textContent=msg;
 $("auth-message").style.color=error?"#dc2626":"#2563eb";
 }
-function showStep(step){
-["phone-step","otp-step","setup-step","login-step"].forEach(id=>$(id).classList.toggle("hidden",id!==step));
-}
-function normalizePhone(value){
-let p=value.replace(/[\s()-]/g,"");
-if(p.startsWith("0"))p="+251"+p.slice(1);
-else if(p.startsWith("251"))p="+"+p;
-else if(/^[79]\d{8}$/.test(p))p="+251"+p;
-if(!/^\+251[79]\d{8}$/.test(p))throw new Error("Enter a valid Ethiopian mobile number.");
-return p;
-}
-function resetRecaptcha(){
-if(recaptchaVerifier){try{recaptchaVerifier.clear()}catch(e){}}
-recaptchaVerifier=null;
-$("recaptcha-container").innerHTML="";
-}
-function createRecaptcha(){
-if(!recaptchaVerifier){
-recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"normal"});
-}
-return recaptchaVerifier;
+
+function showAuthTab(tab){
+const login=tab==="login";
+$("login-form").classList.toggle("hidden",!login);
+$("register-form").classList.toggle("hidden",login);
+$("show-login").classList.toggle("active",login);
+$("show-register").classList.toggle("active",!login);
+message("");
 }
 
-$("send-otp-btn").addEventListener("click",async()=>{
-const btn=$("send-otp-btn");
+$("show-login").addEventListener("click",()=>showAuthTab("login"));
+$("show-register").addEventListener("click",()=>showAuthTab("register"));
+
+$("register-btn").addEventListener("click",async()=>{
+const btn=$("register-btn");
+const email=$("register-email").value.trim().toLowerCase();
+const password=$("register-password").value;
+const confirm=$("register-confirm").value;
+
+if(!email||!password||!confirm){
+message("Please fill in all fields.",true);
+return;
+}
+
+if(password.length<6){
+message("Password must be at least 6 characters.",true);
+return;
+}
+
+if(password!==confirm){
+message("Passwords do not match.",true);
+return;
+}
+
 try{
-const phone=normalizePhone($("phone-input").value);
-btn.disabled=true;btn.textContent="Sending...";
-const verifier=createRecaptcha();
-confirmationResult=await signInWithPhoneNumber(auth,phone,verifier);
-verifiedPhone=phone;
-showStep("otp-step");
-message("Verification code sent to "+phone);
-}catch(e){console.error(e);message(e.message,true);resetRecaptcha();}
-finally{btn.disabled=false;btn.textContent="Send Verification Code";}
-});
+btn.disabled=true;
+btn.textContent="Creating Account...";
 
-$("verify-otp-btn").addEventListener("click",async()=>{
-const btn=$("verify-otp-btn");
-const code=$("otp-input").value.trim();
-if(!confirmationResult){message("Request a verification code first.",true);return;}
-if(!/^\d{6}$/.test(code)){message("Enter the 6-digit code.",true);return;}
-try{
-btn.disabled=true;btn.textContent="Verifying...";
-await confirmationResult.confirm(code);
-message("Phone verified.");
-showStep("setup-step");
-}catch(e){console.error(e);message(e.message,true);}
-finally{btn.disabled=false;btn.textContent="Verify Phone";}
-});
+await createUserWithEmailAndPassword(auth,email,password);
 
-$("change-phone-btn").addEventListener("click",()=>{
-confirmationResult=null;$("otp-input").value="";
-resetRecaptcha();showStep("phone-step");message("Enter your phone number.");
-});
+message("Account created successfully!");
+}catch(error){
+console.error(error);
 
-$("create-account-btn").addEventListener("click",async()=>{
-const btn=$("create-account-btn");
-const email=$("setup-email").value.trim().toLowerCase();
-const password=$("setup-password").value;
-const confirm=$("setup-confirm").value;
-const user=auth.currentUser;
-if(!user||!user.phoneNumber){message("Verify your phone first.",true);return;}
-if(!email||!email.includes("@")){message("Enter a valid email address.",true);return;}
-if(password.length<6){message("Password must be at least 6 characters.",true);return;}
-if(password!==confirm){message("Passwords do not match.",true);return;}
-try{
-btn.disabled=true;btn.textContent="Creating...";
-const credential=EmailAuthProvider.credential(email,password);
-await linkWithCredential(user,credential);
-message("Account created successfully.");
-}catch(e){
-console.error(e);
-if(e.code==="auth/provider-already-linked"){
-message("An email login is already linked to this account. Please use Login.",true);
-}else if(e.code==="auth/email-already-in-use"){
-message("This email is already used by another account. Choose another email.",true);
+if(error.code==="auth/email-already-in-use"){
+message("This email is already registered. Please login.",true);
+}else if(error.code==="auth/invalid-email"){
+message("Please enter a valid email address.",true);
+}else if(error.code==="auth/weak-password"){
+message("Password is too weak. Use at least 6 characters.",true);
 }else{
-message(e.message,true);
+message("Registration failed: "+error.message,true);
 }
-}finally{btn.disabled=false;btn.textContent="Create Account";}
+}finally{
+btn.disabled=false;
+btn.textContent="Create Account";
+}
 });
 
 $("login-btn").addEventListener("click",async()=>{
 const btn=$("login-btn");
 const email=$("login-email").value.trim().toLowerCase();
 const password=$("login-password").value;
-if(!email||!password){message("Enter your email and password.",true);return;}
+
+if(!email||!password){
+message("Enter your email and password.",true);
+return;
+}
+
 try{
-btn.disabled=true;btn.textContent="Logging in...";
+btn.disabled=true;
+btn.textContent="Logging in...";
+
 await signInWithEmailAndPassword(auth,email,password);
-message("Login successful.");
-}catch(e){console.error(e);message("Login failed: "+e.message,true);}
-finally{btn.disabled=false;btn.textContent="Login";}
+
+message("Login successful!");
+}catch(error){
+console.error(error);
+
+if(error.code==="auth/invalid-credential"||error.code==="auth/wrong-password"||error.code==="auth/user-not-found"){
+message("Incorrect email or password.",true);
+}else if(error.code==="auth/invalid-email"){
+message("Enter a valid email address.",true);
+}else{
+message("Login failed: "+error.message,true);
+}
+}finally{
+btn.disabled=false;
+btn.textContent="Login";
+}
 });
 
 $("forgot-password").addEventListener("click",async()=>{
 const email=$("login-email").value.trim().toLowerCase();
-if(!email){message("Enter your email address first.",true);return;}
+
+if(!email){
+message("Enter your email address first.",true);
+return;
+}
+
 try{
 await sendPasswordResetEmail(auth,email);
 message("Password reset email sent. Check your inbox.");
-}catch(e){message(e.message,true);}
-});
-
-$("show-register").addEventListener("click",()=>{
-resetRecaptcha();showStep("phone-step");message("Register with phone verification.");
+}catch(error){
+console.error(error);
+message("Could not send reset email: "+error.message,true);
+}
 });
 
 onAuthStateChanged(auth,user=>{
@@ -361,37 +359,59 @@ if(user){
 $("auth-section").classList.add("hidden");
 $("app-header").classList.remove("hidden");
 $("app-content").classList.remove("hidden");
-const phone=user.phoneNumber||"Verified user";
-$("user-display-name").textContent=phone;
-$("profile-auth-info").textContent="Signed in: "+phone+" | "+(user.email||"No email linked");
+
+const displayName=user.email||"BaweReal User";
+$("user-display-name").textContent=displayName;
+$("user-avatar").textContent=displayName.substring(0,2).toUpperCase();
+$("profile-auth-info").textContent="Signed in: "+displayName;
+
 go("home");
 }else{
 $("auth-section").classList.remove("hidden");
 $("app-header").classList.add("hidden");
 $("app-content").classList.add("hidden");
 $("profile-auth-info").textContent="Not signed in";
-if(!confirmationResult)showStep("login-step");
 }
 });
 
 $("logout-btn").addEventListener("click",async()=>{
-try{await signOut(auth);message("Signed out successfully.");}
-catch(e){alert(e.message);}
+try{
+await signOut(auth);
+showAuthTab("login");
+message("Signed out successfully.");
+}catch(error){
+alert(error.message);
+}
 });
 
 $("send-support-btn").addEventListener("click",async()=>{
 const user=auth.currentUser;
 const msg=$("support-msg").value.trim();
-if(!user){alert("Please sign in first.");return;}
-if(!msg){alert("Enter a message.");return;}
+
+if(!user){
+alert("Please sign in first.");
+return;
+}
+
+if(!msg){
+alert("Enter a message.");
+return;
+}
+
 try{
 await addDoc(collection(db,"supportRequests"),{
-userId:user.uid,phoneNumber:user.phoneNumber||"",
-message:msg,status:"pending",createdAt:serverTimestamp()
+userId:user.uid,
+email:user.email||"",
+message:msg,
+status:"pending",
+createdAt:serverTimestamp()
 });
+
 alert("Message sent successfully!");
 $("support-msg").value="";
-}catch(e){alert("Error: "+e.message);}
+}catch(error){
+alert("Error: "+error.message);
+}
 });
 </script>
 </body>
