@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +57,6 @@ textarea{resize:vertical;min-height:85px}
 .nav-btn{background:none;border:0;color:#777;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .nav-btn span{font-size:20px}
 .nav-btn.active{color:var(--primary);font-weight:bold}
-.preview{max-width:100%;max-height:220px;border-radius:12px;display:block;margin:10px 0}
 .notice{padding:12px;border-radius:10px;background:#f1f0ff;color:#4841a8;font-size:13px;margin:10px 0}
 .empty{text-align:center;color:var(--muted);padding:20px}
 .page-title{margin:5px 0 17px}
@@ -168,7 +166,7 @@ small{color:var(--muted)}
   </select>
 
   <div class="notice">
-    Transfer the payment to the selected account. Enter your transaction ID and attach the payment receipt. Your request will be reviewed before your balance is updated.
+    Transfer the payment to the selected account and enter your transaction ID. Your request will be reviewed before your balance is updated.
   </div>
 
   <div class="account-box">
@@ -188,11 +186,6 @@ small{color:var(--muted)}
 
   <label>Transaction ID</label>
   <input id="depositTransactionId" type="text" placeholder="Enter payment transaction ID">
-
-  <label>Payment Receipt Photo</label>
-  <input id="receiptFile" type="file" accept="image/*">
-  <img id="receiptPreview" class="preview hidden" alt="Receipt preview">
-  <small>Image only. Maximum file size: 5 MB.</small>
 
   <label>Note (optional)</label>
   <textarea id="depositNote" placeholder="Additional information"></textarea>
@@ -417,10 +410,6 @@ import {
   where,getDocs,serverTimestamp,updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-  getStorage,ref,uploadBytes,getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
 const firebaseConfig={
   apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
   authDomain:"bawereal.firebaseapp.com",
@@ -434,11 +423,9 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
-const storage=getStorage(app);
 
 let currentUser=null;
 let currentUserData={};
-let selectedReceipt=null;
 
 const $=id=>document.getElementById(id);
 function notify(message){alert(message);}
@@ -508,8 +495,6 @@ $("registerBtn").addEventListener("click",async()=>{
       uid,
       fullName:name,
       email,
-      balance:0,
-      referralCode:makeReferral(uid),
       status:"active",
       createdAt:serverTimestamp()
     });
@@ -595,12 +580,13 @@ async function loadUserProfile(){
         uid:currentUser.uid,
         email:currentUser.email,
         fullName:"User",
-        balance:0,
-        status:"active",
-        referralCode:makeReferral(currentUser.uid)
+        status:"active"
       };
       await setDoc(userRef,{
-        ...currentUserData,
+        uid:currentUser.uid,
+        fullName:"User",
+        email:currentUser.email,
+        status:"active",
         createdAt:serverTimestamp()
       });
     }else{
@@ -642,50 +628,6 @@ async function refreshBalance(){
   }
 }
 
-/* RECEIPT PREVIEW */
-$("receiptFile").addEventListener("change",event=>{
-  const file=event.target.files[0];
-  selectedReceipt=file;
-
-  if(!file){
-    $("receiptPreview").classList.add("hidden");
-    return;
-  }
-
-  if(!file.type.startsWith("image/")){
-    selectedReceipt=null;
-    event.target.value="";
-    $("receiptPreview").classList.add("hidden");
-    return notify("Please select an image file.");
-  }
-
-  if(file.size>5*1024*1024){
-    selectedReceipt=null;
-    event.target.value="";
-    $("receiptPreview").classList.add("hidden");
-    return notify("Image must be smaller than 5 MB.");
-  }
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    $("receiptPreview").src=reader.result;
-    $("receiptPreview").classList.remove("hidden");
-  };
-  reader.readAsDataURL(file);
-});
-
-/* RECEIPT UPLOAD */
-async function uploadReceipt(file){
-  if(!currentUser) throw new Error("Please login first.");
-
-  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-  const filePath="depositReceipts/"+currentUser.uid+"/"+Date.now()+"_"+safeName;
-  const storageRef=ref(storage,filePath);
-
-  await uploadBytes(storageRef,file,{contentType:file.type});
-  return await getDownloadURL(storageRef);
-}
-
 /* DEPOSIT REQUEST */
 $("depositBtn").addEventListener("click",async()=>{
   if(!currentUser) return notify("Please login first.");
@@ -700,16 +642,12 @@ $("depositBtn").addEventListener("click",async()=>{
     return notify("Deposit amount must be between 300 and 10,000 ETB.");
   if(!transactionId)
     return notify("Enter your payment transaction ID.");
-  if(!selectedReceipt)
-    return notify("Please attach your payment receipt photo.");
 
   const btn=$("depositBtn");
   setLoading(btn,true,"Submit Deposit Request");
 
   try{
-    const receiptUrl=await uploadReceipt(selectedReceipt);
-
-    const transactionRef=await addDoc(collection(db,"transactionRequests"),{
+    await addDoc(collection(db,"transactionRequests"),{
       userId:currentUser.uid,
       email:currentUser.email,
       type:"deposit",
@@ -717,8 +655,6 @@ $("depositBtn").addEventListener("click",async()=>{
       method,
       transactionId,
       note,
-      receiptUrl,
-      receiptFileName:selectedReceipt.name,
       status:"pending",
       adminNote:"",
       createdAt:serverTimestamp()
@@ -729,10 +665,6 @@ $("depositBtn").addEventListener("click",async()=>{
     $("depositAmount").value="";
     $("depositTransactionId").value="";
     $("depositNote").value="";
-    $("receiptFile").value="";
-    $("receiptPreview").src="";
-    $("receiptPreview").classList.add("hidden");
-    selectedReceipt=null;
 
     await loadDepositHistory();
     await loadDepositSummary();
@@ -1102,7 +1034,7 @@ $("supportBtn").addEventListener("click",async()=>{
       userId:currentUser.uid,
       email:currentUser.email,
       message,
-      status:"request-recorded",
+      status:"pending",
       createdAt:serverTimestamp()
     });
 
