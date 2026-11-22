@@ -2,739 +2,648 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BaweReal Admin Dashboard</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BaweReal Admin</title>
 <style>
-*{box-sizing:border-box}
+:root{
+  --primary:#2563eb;
+  --primary-soft:#dbeafe;
+  --danger-soft:#fee2e2;
+  --danger:#dc2626;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --nav-bg:#0f172a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
 body{
- margin:0;
- font-family:Arial,sans-serif;
- background:#f1f5f9;
- color:#172033;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:13px;
+  line-height:1.4;
 }
-button,input,textarea{font:inherit}
-button{cursor:pointer}
 .hidden{display:none!important}
+header{
+  background:var(--nav-bg);
+  color:#fff;
+  padding:10px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h1{
+  font-size:16px;
+  font-weight:700;
+}
+header h1 span{
+  color:#60a5fa;
+}
+.wrap{
+  max-width:720px;
+  margin:auto;
+  padding:12px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:12px;
+}
+.card h2{
+  font-size:15px;
+  margin-bottom:8px;
+}
+.card h3{
+  font-size:13.5px;
+  margin-bottom:8px;
+}
+.btn-row{
+  display:flex;
+  gap:8px;
+  margin:8px 0 10px;
+  flex-wrap:wrap;
+}
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.btn.blue{
+  background:var(--primary-soft);
+  color:var(--primary);
+}
+.btn.red{
+  background:var(--danger-soft);
+  color:var(--danger);
+}
+.btn.primary{
+  background:var(--primary);
+  color:#fff;
+}
+.btn.small{
+  padding:5px 8px;
+  font-size:11px;
+}
+.error-msg{
+  color:var(--primary);
+  font-size:12.5px;
+  font-weight:700;
+  margin:8px 0 12px;
+}
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+input{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:12.5px;
+  margin:5px 0 10px;
+}
 
-/* PROGRESS LOADER (25% -> 50% -> 75% -> 100%) */
-#bootLoader{
- position:fixed;
- inset:0;
- z-index:9999;
- background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
- color:#fff;
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- padding:24px;
- transition:opacity .25s ease;
+/* VERTICAL STACKED NAVIGATION TABLE */
+.nav-table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:12px;
 }
-.loader-box{
- width:100%;
- max-width:340px;
- background:rgba(15,23,42,.75);
- border:1px solid rgba(255,255,255,.15);
- border-radius:16px;
- padding:24px;
- text-align:center;
- box-shadow:0 20px 50px rgba(0,0,0,.35);
+.nav-table th{
+  background:#f1f5f9;
+  color:var(--text);
+  text-align:left;
+  padding:8px 10px;
+  font-size:12px;
+  border-bottom:1px solid var(--border);
 }
-.loader-percent{
- font-size:32px;
- font-weight:bold;
- margin-bottom:12px;
- color:#93c5fd;
+.nav-table td{
+  padding:0;
+  border-bottom:1px solid var(--border);
 }
-.loader-track{
- width:100%;
- height:12px;
- background:rgba(255,255,255,.15);
- border-radius:999px;
- overflow:hidden;
+.nav-table tr:last-child td{
+  border-bottom:0;
 }
-.loader-fill{
- width:25%;
- height:100%;
- background:#3b82f6;
- border-radius:999px;
- transition:width .25s ease;
+.nav-link-btn{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  padding:9px 12px;
+  text-align:left;
+  font-size:12.5px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+.nav-link-btn.active{
+  background:var(--primary);
+  color:#fff;
+  font-weight:700;
 }
 
-/* LOGIN */
-#loginScreen{
- min-height:100vh;
- display:flex;
- align-items:center;
- justify-content:center;
- padding:20px;
- background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+/* DATA & OVERVIEW TABLES */
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
 }
-.login-box{
- width:100%;
- max-width:390px;
- background:white;
- padding:32px;
- border-radius:20px;
- box-shadow:0 20px 60px #0005;
+.data-table th,
+.data-table td{
+  border:1px solid var(--border);
+  padding:8px 9px;
+  text-align:left;
+  vertical-align:top;
 }
-.login-box h2{text-align:center;margin:0 0 8px}
-.login-box p{text-align:center;color:#64748b;margin-bottom:25px}
-.login-box input{
- width:100%;padding:14px;margin:8px 0;
- border:1px solid #cbd5e1;border-radius:10px;
+.data-table th{
+  background:#f1f5f9;
+  color:var(--text);
+  font-weight:700;
+  font-size:11.5px;
 }
-.primary{
- background:#2563eb;color:white;border:0;
- padding:13px 18px;border-radius:10px;font-weight:bold;
+.stat-val{
+  color:var(--primary);
+  font-size:14px;
+  font-weight:700;
 }
-.login-box .primary{width:100%;margin-top:12px}
-#error{color:#dc2626;text-align:center;overflow-wrap:anywhere}
-
-/* DASHBOARD */
-#dashboard{display:flex;min-height:100vh}
-.sidebar{
- width:245px;background:#0f172a;color:white;
- padding:24px 16px;flex-shrink:0;
+.badge{
+  display:inline-block;
+  padding:2px 7px;
+  border-radius:999px;
+  font-size:10.5px;
+  font-weight:700;
+  background:#e2e8f0;
+  color:#1e293b;
 }
-.brand{font-size:22px;font-weight:bold;padding:8px 12px 28px}
-.brand span{color:#60a5fa}
-.nav button{
- width:100%;display:block;text-align:left;
- padding:13px 14px;margin:5px 0;border:0;
- border-radius:9px;background:transparent;color:#cbd5e1;
- font-weight:600;
-}
-.nav button:hover,.nav button.active{
- background:#1d4ed8;color:white;
-}
-.main{flex:1;min-width:0;padding:25px}
-.topbar{
- display:flex;justify-content:space-between;align-items:center;
- gap:12px;margin-bottom:25px;flex-wrap:wrap;
-}
-.topbar h1{font-size:25px;margin:0}
-.topbar-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.refresh-btn{
- background:#dbeafe;color:#1e40af;border:0;
- padding:11px 15px;border-radius:9px;font-weight:bold;
-}
-.logout{background:#fee2e2;color:#b91c1c;border:0;padding:11px 16px;border-radius:9px;font-weight:bold}
-.cards{
- display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));
- gap:15px;margin-bottom:25px;
-}
-.stat{
- background:white;border-radius:14px;padding:20px;
- box-shadow:0 3px 12px #0f172a0a;
- border:1px solid #e2e8f0;
-}
-.stat small{color:#64748b;font-weight:600}
-.stat h2{font-size:27px;margin:12px 0 0;color:#1d4ed8}
-.panel{
- background:white;border:1px solid #e2e8f0;
- border-radius:14px;padding:20px;margin-bottom:20px;
- overflow:hidden;
-}
-.panel h2{font-size:18px;margin:0 0 17px}
-.section{display:none}
-.section.active{display:block}
-.table-wrap{width:100%;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-th,td{
- padding:13px 12px;text-align:left;
- border-bottom:1px solid #e2e8f0;font-size:13px;
- vertical-align:middle;
-}
-th{background:#f8fafc;color:#475569;font-size:12px}
-td{color:#334155}
-.status{
- display:inline-block;padding:5px 9px;border-radius:20px;
- font-size:11px;font-weight:bold;background:#fef3c7;color:#92400e;
-}
-.status.approved{background:#dcfce7;color:#166534}
-.status.rejected{background:#fee2e2;color:#991b1b}
-.status.under-review{background:#dbeafe;color:#1e40af}
-.action{
- border:0;border-radius:7px;padding:7px 10px;
- margin:2px;font-size:12px;font-weight:bold;
-}
-.action:disabled{opacity:.5;cursor:not-allowed}
-.approve{background:#dcfce7;color:#166534}
-.reject{background:#fee2e2;color:#991b1b}
-.review{background:#dbeafe;color:#1e40af}
-.note-input,.fee-input{
- width:135px;padding:7px 8px;border:1px solid #cbd5e1;
- border-radius:7px;margin:2px 0;
-}
-.fee-input{width:95px}
-.net-text{display:block;font-size:11px;color:#475569;margin-top:3px}
-.empty{text-align:center;color:#94a3b8;padding:25px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;align-items:center}
-.toolbar input{
- padding:10px;border:1px solid #cbd5e1;border-radius:8px;
- width:100%;max-width:280px;
-}
-.receipt{color:#2563eb;text-decoration:none;font-weight:bold}
-#message{margin-bottom:15px;color:#2563eb;font-weight:bold}
-@media(max-width:900px){
- .cards{grid-template-columns:repeat(2,minmax(130px,1fr))}
- .sidebar{width:190px}
-}
-@media(max-width:600px){
- #dashboard{display:block}
- .sidebar{width:100%;padding:12px}
- .brand{padding:8px 10px 12px}
- .nav{display:flex;overflow-x:auto;gap:5px}
- .nav button{white-space:nowrap;width:auto;margin:0}
- .main{padding:15px}
- .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- .stat{padding:14px}
- .stat h2{font-size:21px}
- .panel{padding:13px}
+.badge.pending{background:#fef3c7;color:#92400e}
+.badge.approved{background:#dcfce7;color:#166534}
+.badge.rejected{background:#fee2e2;color:#991b1b}
+.table-responsive{
+  width:100%;
+  overflow-x:auto;
 }
 </style>
 </head>
-
 <body>
 
-<!-- 25% -> 50% -> 75% -> 100% LOADER -->
-<div id="bootLoader" class="hidden">
- <div class="loader-box">
-  <div class="loader-percent" id="loaderPercent">25%</div>
-  <div class="loader-track">
-   <div class="loader-fill" id="loaderFill"></div>
+<header>
+  <h1>Bawe<span>Real</span></h1>
+  <small id="adminEmailLabel" style="color:#cbd5e1;font-size:11px">Admin Panel</small>
+</header>
+
+<!-- ADMIN LOGIN -->
+<section id="adminLoginSection" class="wrap" style="max-width:400px;margin-top:24px">
+  <div class="card">
+    <h2>Admin Login</h2>
+    <p class="muted" style="margin-bottom:8px">Sign in with your administrator credentials.</p>
+    <input id="adminEmail" type="email" placeholder="Admin email">
+    <input id="adminPassword" type="password" placeholder="Password">
+    <button class="btn primary" id="adminLoginBtn" style="width:100%">Login</button>
   </div>
- </div>
-</div>
+</section>
 
-<!-- LOGIN -->
-<div id="loginScreen">
- <div class="login-box">
-  <h2>BaweReal Admin</h2>
-  <p>Authorized administration portal</p>
-  <form id="loginForm">
-   <input type="email" id="email" placeholder="Admin Email" required>
-   <input type="password" id="password" placeholder="Password" required>
-   <button class="primary" id="loginButton">Login</button>
-   <div id="error"></div>
-  </form>
- </div>
-</div>
+<!-- ADMIN DASHBOARD -->
+<section id="adminAppSection" class="wrap hidden">
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
+  <!-- VERTICAL MENU TABLE (TOP TO BOTTOM) -->
+  <table class="nav-table" aria-label="Admin Navigation Menu">
+    <thead>
+      <tr>
+        <th colspan="2">Admin Sections</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <button type="button" class="nav-link-btn active" data-tab="overview" onclick="switchAdminTab('overview')">
+            <span>#</span><span>Overview</span>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" class="nav-link-btn" data-tab="users" onclick="switchAdminTab('users')">
+            <span>👤</span><span>Users</span>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" class="nav-link-btn" data-tab="deposits" onclick="switchAdminTab('deposits')">
+            <span>+</span><span>Deposits</span>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" class="nav-link-btn" data-tab="withdrawals" onclick="switchAdminTab('withdrawals')">
+            <span>-</span><span>Withdrawals</span>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button type="button" class="nav-link-btn" data-tab="support" onclick="switchAdminTab('support')">
+            <span>💬</span><span>Support</span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
- <aside class="sidebar">
-  <div class="brand">Bawe<span>Real</span></div>
-  <div class="nav">
-   <button class="active" data-page="overview">▦ Overview</button>
-   <button data-page="users">♙ Users</button>
-   <button data-page="deposits">＋ Deposits</button>
-   <button data-page="withdrawals">－ Withdrawals</button>
-   <button data-page="support">✉ Support</button>
-  </div>
- </aside>
+  <!-- OVERVIEW TAB -->
+  <section id="overviewTab">
+    <div class="card">
+      <h2>Dashboard Overview</h2>
+      <div class="btn-row">
+        <button type="button" class="btn blue" id="refreshBalanceBtn">Refresh Balance</button>
+        <button type="button" class="btn red" id="logoutAdminBtn">Logout</button>
+      </div>
 
- <main class="main">
-  <div class="topbar">
-   <h1 id="pageTitle">Dashboard Overview</h1>
-   <div class="topbar-actions">
-    <button class="refresh-btn" id="refreshBalanceBtn" type="button">Refresh Balance</button>
-    <button class="logout" id="logoutButton" type="button">Logout</button>
-   </div>
-  </div>
+      <p class="error-msg hidden" id="adminErrorMsg">Could not load data: Missing or insufficient permissions.</p>
 
-  <div id="message"></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Count / Value</th>
+              <th>Metric</th>
+              <th>Count / Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Users</td>
+              <td><span class="stat-val" id="statTotalUsers">0</span></td>
+              <td>Deposit Requests</td>
+              <td><span class="stat-val" id="statDepositReqs">0</span></td>
+            </tr>
+            <tr>
+              <td>Withdrawal Requests</td>
+              <td><span class="stat-val" id="statWithdrawReqs">0</span></td>
+              <td>Support Requests</td>
+              <td><span class="stat-val" id="statSupportReqs">0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-  <section id="overview" class="section active">
-   <div class="cards">
-    <div class="stat"><small>Total Users</small><h2 id="totalUsers">0</h2></div>
-    <div class="stat"><small>Deposit Requests</small><h2 id="totalDeposits">0</h2></div>
-    <div class="stat"><small>Withdrawal Requests</small><h2 id="totalWithdrawals">0</h2></div>
-    <div class="stat"><small>Support Requests</small><h2 id="totalSupport">0</h2></div>
-   </div>
-   <div class="panel">
-    <h2>Recent Activity</h2>
-    <p id="recentInfo">Click "Refresh Balance" to load or refresh data.</p>
-   </div>
+    <div class="card">
+      <h3>Recent Activity</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="recentActivityTableBody">
+            <tr>
+              <td>Status</td>
+              <td>Click "Refresh Balance" to load or refresh data.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
-  <section id="users" class="section">
-   <div class="panel">
-    <h2>Registered Users</h2>
-    <div class="toolbar">
-     <input id="userSearch" placeholder="Search name, email or UID">
-     <button class="refresh-btn" id="usersRefreshBtn" type="button">Refresh Balance</button>
+  <!-- USERS TAB -->
+  <section id="usersTab" class="hidden">
+    <div class="card">
+      <h2>Users</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Balance</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td colspan="4" class="muted">No users loaded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-wrap">
-     <table>
-      <thead><tr><th>Name</th><th>Email</th><th>User ID</th><th>Balance</th><th>Status</th></tr></thead>
-      <tbody id="usersTable"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
-     </table>
-    </div>
-   </div>
   </section>
 
-  <section id="deposits" class="section">
-   <div class="panel">
-    <h2>Deposit Requests</h2>
-    <div class="table-wrap">
-     <table>
-      <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Transaction ID</th><th>Receipt</th><th>Status</th><th>Admin Note</th><th>Actions</th></tr></thead>
-      <tbody id="depositsTable"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
-     </table>
+  <!-- DEPOSITS TAB -->
+  <section id="depositsTab" class="hidden">
+    <div class="card">
+      <h2>Deposits</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Amount</th>
+              <th>Method / TxID</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="depositsTableBody">
+            <tr>
+              <td colspan="5" class="muted">No deposit requests loaded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-   </div>
   </section>
 
-  <section id="withdrawals" class="section">
-   <div class="panel">
-    <h2>Withdrawal Requests</h2>
-    <div class="table-wrap">
-     <table>
-      <thead><tr><th>User</th><th>Amount</th><th>Withdrawal Fee</th><th>Method</th><th>Account</th><th>Status</th><th>Admin Note</th><th>Date</th><th>Actions</th></tr></thead>
-      <tbody id="withdrawalsTable"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
-     </table>
+  <!-- WITHDRAWALS TAB -->
+  <section id="withdrawalsTab" class="hidden">
+    <div class="card">
+      <h2>Withdrawals</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Amount / Net</th>
+              <th>Account</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawalsTableBody">
+            <tr>
+              <td colspan="5" class="muted">No withdrawal requests loaded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-   </div>
   </section>
 
-  <section id="support" class="section">
-   <div class="panel">
-    <h2>Support Requests</h2>
-    <div class="table-wrap">
-     <table>
-      <thead><tr><th>User</th><th>Subject</th><th>Message</th><th>Status</th><th>Date</th></tr></thead>
-      <tbody id="supportTable"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
-     </table>
+  <!-- SUPPORT TAB -->
+  <section id="supportTab" class="hidden">
+    <div class="card">
+      <h2>Support</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Message</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="supportTableBody">
+            <tr>
+              <td colspan="3" class="muted">No support requests loaded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-   </div>
   </section>
 
- </main>
-</div>
+</section>
 
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
- getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
- getFirestore,collection,getDocs,doc,updateDoc,runTransaction,
- query,where,serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig={
- apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
- authDomain:"bawereal.firebaseapp.com",
- projectId:"bawereal",
- storageBucket:"bawereal.firebasestorage.app",
- messagingSenderId:"756822160410",
- appId:"1:756822160410:web:e2a09b254d851c229a4da3",
- measurementId:"G-VN3D9QM7P8"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const ADMIN_UID="hpjWfkOX1ETA1TVsN94OkAGLWuy1";
-
-const $=id=>document.getElementById(id);
-let usersData=[],depositData=[],withdrawalData=[],supportData=[];
-
-function safe(value){
- return String(value??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
- }[c]));
-}
-function dateText(v){
- if(!v)return "—";
- try{
-  const d=v.toDate?v.toDate():new Date(v);
-  return isNaN(d)?"—":d.toLocaleString();
- }catch{return "—"}
-}
-function statusClass(s){
- const x=String(s||"pending").toLowerCase().replace(/\s+/g,"-");
- return ["approved","rejected","under-review"].includes(x)?x:"";
-}
-function statusLabel(s){return safe(s||"Pending")}
-function userName(uid,email){
- const u=usersData.find(x=>x.id===uid);
- return safe(u?.name||u?.fullName||email||uid||"Unknown");
-}
-
-function playSteppedProgress(){
- return new Promise(resolve=>{
-  const loader=$("bootLoader");
-  const pctEl=$("loaderPercent");
-  const fillEl=$("loaderFill");
-  loader.classList.remove("hidden");
-  const steps=[25,50,75,100];
-  let idx=0;
-  function next(){
-   const val=steps[idx];
-   pctEl.textContent=val+"%";
-   fillEl.style.width=val+"%";
-   idx++;
-   if(idx<steps.length){
-    setTimeout(next,140);
-   }else{
-    setTimeout(()=>{
-     loader.classList.add("hidden");
-     resolve();
-    },160);
-   }
-  }
-  next();
- });
-}
-
-$("loginForm").addEventListener("submit",async e=>{
- e.preventDefault();
- $("error").textContent="";
- $("loginButton").disabled=true;
- $("loginButton").textContent="Checking...";
- try{
-  const result=await signInWithEmailAndPassword(
-   auth,$("email").value.trim(),$("password").value
-  );
-  if(result.user.uid!==ADMIN_UID){
-   await signOut(auth);
-   throw new Error("This account is not authorized as admin.");
-  }
- }catch(err){
-  $("error").textContent=
-   err.code==="auth/invalid-credential"?"Incorrect email or password.":err.message;
-  $("loginButton").disabled=false;
-  $("loginButton").textContent="Login";
- }
-});
-
-onAuthStateChanged(auth,async user=>{
- if(user&&user.uid===ADMIN_UID){
-  $("loginScreen").classList.add("hidden");
-  $("dashboard").classList.remove("hidden");
-  await playSteppedProgress();
-  await loadAll();
- }else{
-  $("dashboard").classList.add("hidden");
-  $("loginScreen").classList.remove("hidden");
- }
-});
-
-$("logoutButton").onclick=()=>signOut(auth);
-
-// Refresh balance ONLY when button is clicked
-async function manualRefreshBalance(){
- $("message").textContent="Refreshing balances and records...";
- await loadAll();
- $("message").textContent="Balance and records refreshed.";
-}
-$("refreshBalanceBtn").addEventListener("click",manualRefreshBalance);
-$("usersRefreshBtn").addEventListener("click",manualRefreshBalance);
-
-document.querySelectorAll(".nav button").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  btn.classList.add("active");
-  $(btn.dataset.page).classList.add("active");
-  $("pageTitle").textContent=btn.textContent.trim();
- });
-});
-
-async function loadAll(){
- try{
-  const [u,d,w,s]=await Promise.all([
-   getDocs(collection(db,"users")),
-   getDocs(query(collection(db,"transactionRequests"),where("type","==","deposit"))),
-   getDocs(query(collection(db,"transactionRequests"),where("type","==","withdrawal"))),
-   getDocs(collection(db,"supportRequests"))
-  ]);
-
-  usersData=u.docs.map(x=>({id:x.id,...x.data()}));
-  depositData=d.docs.map(x=>({id:x.id,...x.data()}));
-  withdrawalData=w.docs.map(x=>({id:x.id,...x.data()}));
-  supportData=s.docs.map(x=>({id:x.id,...x.data()}));
-
-  renderAll();
- }catch(err){
-  $("message").textContent="Could not load data: "+err.message;
- }
-}
-
-function renderAll(){
- $("totalUsers").textContent=usersData.length;
- $("totalDeposits").textContent=depositData.length;
- $("totalWithdrawals").textContent=withdrawalData.length;
- $("totalSupport").textContent=supportData.length;
- $("recentInfo").textContent=
-  `${usersData.length} users · ${depositData.length} deposits · ${withdrawalData.length} withdrawals · ${supportData.length} support requests`;
-
- $("usersTable").innerHTML=usersData.map(u=>`
-  <tr>
-   <td>${safe(u.name||u.fullName||"—")}</td>
-   <td>${safe(u.email||"—")}</td>
-   <td>${safe(u.id)}</td>
-   <td>${safe(u.balance??0)} ETB</td>
-   <td><span class="status approved">Registered</span></td>
-  </tr>`).join("")||'<tr><td colspan="5" class="empty">No users found</td></tr>';
-
- $("depositsTable").innerHTML=depositData.map(d=>{
-  const isApproved=String(d.status||"").toLowerCase()==="approved";
-  return `
-  <tr>
-   <td>${userName(d.userId,d.email)}</td>
-   <td>${safe(d.amount)} ETB</td>
-   <td>${safe(d.method)}</td>
-   <td>${safe(d.transactionId||"—")}</td>
-   <td>${d.receiptUrl?`<a class="receipt" href="${safe(d.receiptUrl)}" target="_blank" rel="noopener">View receipt</a>`:"—"}</td>
-   <td><span class="status ${statusClass(d.status)}">${statusLabel(d.status)}</span></td>
-   <td><input class="note-input" id="note-${safe(d.id)}" value="${safe(d.adminNote||"")}" placeholder="Admin note"></td>
-   <td>
-    <button class="action review" data-id="${safe(d.id)}" data-action="review" ${isApproved?"disabled":""}>Review</button>
-    <button class="action approve" data-id="${safe(d.id)}" data-action="approve" ${isApproved?"disabled":""}>Approve</button>
-    <button class="action reject" data-id="${safe(d.id)}" data-action="reject" ${isApproved?"disabled":""}>Reject</button>
-   </td>
-  </tr>`;
- }).join("")||'<tr><td colspan="8" class="empty">No deposit requests</td></tr>';
-
- $("withdrawalsTable").innerHTML=withdrawalData.map(w=>{
-  const st=String(w.status||"").toLowerCase();
-  const isDone=st==="approved"||st==="rejected";
-  const amt=Number(w.amount)||0;
-  const feeVal=Number(w.withdrawalFee??0)||0;
-  const netVal=Math.max(0,amt-feeVal);
-  return `
-  <tr>
-   <td>${userName(w.userId,w.email)}</td>
-   <td>${safe(amt)} ETB</td>
-   <td>
-    <input type="number" min="0" step="any" class="fee-input" id="wfee-${safe(w.id)}" value="${safe(feeVal)}" placeholder="Fee">
-    <span class="net-text" id="wnet-${safe(w.id)}">Net: ${safe(netVal)} ETB</span>
-   </td>
-   <td>${safe(w.method||"—")}</td>
-   <td>${safe(w.accountNumber||w.phone||"—")}</td>
-   <td><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></td>
-   <td><input class="note-input" id="wnote-${safe(w.id)}" value="${safe(w.adminNote||"")}" placeholder="Admin note"></td>
-   <td>${dateText(w.createdAt)}</td>
-   <td>
-    <button class="action review" data-id="${safe(w.id)}" data-action="review" ${isDone?"disabled":""}>Review</button>
-    <button class="action approve" data-id="${safe(w.id)}" data-action="approve" ${isDone?"disabled":""}>Approve</button>
-    <button class="action reject" data-id="${safe(w.id)}" data-action="reject" ${isDone?"disabled":""}>Reject</button>
-   </td>
-  </tr>`;
- }).join("")||'<tr><td colspan="9" class="empty">No withdrawal requests</td></tr>';
-
- $("supportTable").innerHTML=supportData.map(s=>`
-  <tr>
-   <td>${userName(s.userId,s.email)}</td>
-   <td>${safe(s.subject||"—")}</td>
-   <td>${safe(s.message||s.description||"—")}</td>
-   <td><span class="status">${statusLabel(s.status)}</span></td>
-   <td>${dateText(s.createdAt)}</td>
-  </tr>`).join("")||'<tr><td colspan="5" class="empty">No support requests</td></tr>';
-}
-
-// Live Net preview when withdrawal fee changes
-$("withdrawalsTable").addEventListener("input",e=>{
- if(!e.target.classList.contains("fee-input"))return;
- const id=e.target.id.replace("wfee-","");
- const w=withdrawalData.find(x=>x.id===id);
- if(!w)return;
- const amt=Number(w.amount)||0;
- const fee=Math.max(0,Number(e.target.value)||0);
- const netEl=$("wnet-"+id);
- if(netEl)netEl.textContent=`Net: ${Math.max(0,amt-fee)} ETB`;
-});
-
-$("withdrawalsTable").addEventListener("click",async e=>{
- const btn=e.target.closest("button[data-action]");
- if(!btn)return;
- const id=btn.dataset.id;
- const action=btn.dataset.action;
- const w=withdrawalData.find(x=>x.id===id);
- if(!w)return;
-
- const note=$("wnote-"+id)?.value.trim()||"";
- const fee=Math.max(0,Number($("wfee-"+id)?.value)||0);
-
- if(action==="review"){
-  await saveWithdrawalStatus(id,"under-review",note,fee);
-  return;
- }
- if(action==="reject"){
-  if(!confirm("Reject this withdrawal request?"))return;
-  await saveWithdrawalStatus(id,"rejected",note,fee);
-  return;
- }
- if(action==="approve"){
-  await approveWithdrawal(id,w,note,fee,btn);
- }
-});
-
-async function approveWithdrawal(id,w,note,fee,btn){
- const st=String(w.status||"").toLowerCase();
- if(st==="approved"||st==="rejected"){
-  $("message").textContent="This withdrawal is already finalized.";
-  return;
- }
- const amount=Number(w.amount);
- if(!w.userId||!Number.isFinite(amount)||amount<=0){
-  $("message").textContent="Approval failed: invalid userId or amount.";
-  return;
- }
- if(fee>amount){
-  $("message").textContent="Approval failed: withdrawal fee cannot exceed amount.";
-  return;
- }
- const netAmount=amount-fee;
- if(!confirm(`Approve withdrawal of ${amount} ETB (Fee: ${fee} ETB, Net: ${netAmount} ETB)?`))return;
-
- btn.disabled=true;
- $("message").textContent="Approving withdrawal...";
-
- try{
-  await updateDoc(doc(db,"transactionRequests",id),{
-   status:"approved",
-   withdrawalFee:fee,
-   netAmount,
-   adminNote:note,
-   approvedBy:auth.currentUser?.uid||ADMIN_UID,
-   approvedAt:serverTimestamp(),
-   reviewedAt:serverTimestamp()
+<script>
+function switchAdminTab(tabName){
+  const tabs = ["overview", "users", "deposits", "withdrawals", "support"];
+  tabs.forEach(t => {
+    const sec = document.getElementById(t + "Tab");
+    if(sec) sec.classList.toggle("hidden", t !== tabName);
   });
-  $("message").textContent=`Withdrawal approved (Fee: ${fee} ETB, Net: ${netAmount} ETB).`;
-  await loadAll();
- }catch(err){
-  btn.disabled=false;
-  $("message").textContent="Withdrawal approval failed: "+err.message;
- }
-}
-
-async function saveWithdrawalStatus(id,status,note,fee){
- try{
-  const amt=Number(withdrawalData.find(x=>x.id===id)?.amount)||0;
-  await updateDoc(doc(db,"transactionRequests",id),{
-   status,
-   withdrawalFee:fee,
-   netAmount:Math.max(0,amt-fee),
-   adminNote:note,
-   reviewedAt:serverTimestamp()
+  document.querySelectorAll(".nav-link-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tabName);
   });
-  $("message").textContent="Withdrawal status updated.";
-  await loadAll();
- }catch(err){
-  $("message").textContent="Withdrawal update failed: "+err.message;
- }
 }
-
-$("depositsTable").addEventListener("click",async e=>{
- const btn=e.target.closest("button[data-action]");
- if(!btn)return;
- const id=btn.dataset.id;
- const action=btn.dataset.action;
- const d=depositData.find(x=>x.id===id);
- if(!d)return;
-
- const note=$("note-"+id)?.value.trim()||"";
- if(action==="review"){
-  await saveDepositStatus(id,"under-review",note);
-  return;
- }
- if(action==="reject"){
-  if(!confirm("Reject this deposit request?"))return;
-  await saveDepositStatus(id,"rejected",note);
-  return;
- }
- if(action==="approve"){
-  await approveDeposit(id,d,note,btn);
- }
-});
-
-async function approveDeposit(id,d,note,btn){
- if(String(d.status||"").toLowerCase()==="approved"){
-  $("message").textContent="This deposit is already approved.";
-  return;
- }
- const amount=Number(d.amount);
- if(!d.userId||!Number.isFinite(amount)||amount<=0){
-  $("message").textContent="Approval failed: invalid userId or amount.";
-  return;
- }
- if(!confirm(`Approve deposit of ${amount} ETB and credit user balance?`))return;
-
- btn.disabled=true;
- $("message").textContent="Approving deposit and updating balance...";
-
- try{
-  const depositRef=doc(db,"transactionRequests",id);
-  const userRef=doc(db,"users",d.userId);
-
-  await runTransaction(db,async tx=>{
-   const depositSnap=await tx.get(depositRef);
-   if(!depositSnap.exists())throw new Error("Deposit request not found.");
-   const currentDeposit=depositSnap.data();
-   if(String(currentDeposit.status||"").toLowerCase()==="approved"){
-    throw new Error("Deposit already approved.");
-   }
-
-   const userSnap=await tx.get(userRef);
-   if(!userSnap.exists())throw new Error("User document not found.");
-
-   const currentBalance=Number(userSnap.data().balance??0);
-   const safeBalance=Number.isFinite(currentBalance)?currentBalance:0;
-   const txAmount=Number(currentDeposit.amount);
-   if(!Number.isFinite(txAmount)||txAmount<=0){
-    throw new Error("Invalid deposit amount in database.");
-   }
-
-   tx.update(userRef,{
-    balance:safeBalance+txAmount,
-    updatedAt:serverTimestamp()
-   });
-   tx.update(depositRef,{
-    status:"approved",
-    adminNote:note,
-    approvedBy:auth.currentUser?.uid||ADMIN_UID,
-    approvedAt:serverTimestamp(),
-    reviewedAt:serverTimestamp()
-   });
-  });
-
-  $("message").textContent=`Approved ${amount} ETB and updated user balance.`;
-  await loadAll();
- }catch(err){
-  btn.disabled=false;
-  $("message").textContent="Approval failed: "+err.message;
- }
-}
-
-async function saveDepositStatus(id,status,note){
- try{
-  await updateDoc(doc(db,"transactionRequests",id),{
-   status,
-   adminNote:note,
-   reviewedAt:serverTimestamp()
-  });
-  $("message").textContent="Deposit status updated.";
-  await loadAll();
- }catch(err){
-  $("message").textContent="Update failed: "+err.message;
- }
-}
-
-$("userSearch").addEventListener("input",()=>{
- const term=$("userSearch").value.toLowerCase();
- const rows=[...$("usersTable").rows];
- rows.forEach(row=>{
-  row.style.display=row.textContent.toLowerCase().includes(term)?"":"none";
- });
-});
+window.switchAdminTab = switchAdminTab;
 </script>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, doc, updateDoc, runTransaction, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain: "bawereal.firebaseapp.com",
+  projectId: "bawereal",
+  storageBucket: "bawereal.firebasestorage.app",
+  messagingSenderId: "756822160410",
+  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId: "G-VN3D9QM7P8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[c]);
+}
+
+function money(v){
+  return Number(v || 0).toFixed(2) + " ETB";
+}
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    $("adminLoginSection").classList.add("hidden");
+    $("adminAppSection").classList.remove("hidden");
+    $("adminEmailLabel").textContent = user.email || "Admin";
+  }else{
+    $("adminLoginSection").classList.remove("hidden");
+    $("adminAppSection").classList.add("hidden");
+    $("adminEmailLabel").textContent = "Admin Panel";
+  }
+});
+
+$("adminLoginBtn").addEventListener("click", async () => {
+  const email = $("adminEmail").value.trim();
+  const password = $("adminPassword").value;
+  if(!email || !password) return alert("Enter email and password.");
+  try{
+    await signInWithEmailAndPassword(auth, email, password);
+  }catch(err){
+    alert(err.message);
+  }
+});
+
+$("logoutAdminBtn").addEventListener("click", async () => {
+  if(confirm("Logout from admin?")){
+    await signOut(auth);
+  }
+});
+
+async function loadAllAdminData(){
+  const errEl = $("adminErrorMsg");
+  errEl.classList.add("hidden");
+  try{
+    const [usersSnap, txSnap, supSnap] = await Promise.all([
+      getDocs(collection(db, "users")),
+      getDocs(collection(db, "transactionRequests")),
+      getDocs(collection(db, "supportRequests"))
+    ]);
+
+    const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const txs = txSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const sups = supSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const deposits = txs.filter(t => t.type === "deposit");
+    const withdrawals = txs.filter(t => t.type === "withdrawal");
+
+    $("statTotalUsers").textContent = String(users.length);
+    $("statDepositReqs").textContent = String(deposits.length);
+    $("statWithdrawReqs").textContent = String(withdrawals.length);
+    $("statSupportReqs").textContent = String(sups.length);
+
+    $("recentActivityTableBody").innerHTML = txs.length
+      ? txs.slice(0, 8).map(t => `
+          <tr>
+            <td>${esc(String(t.type || "activity").toUpperCase())}</td>
+            <td>${esc(t.email || t.userId || "-")} · ${esc(money(t.amount))} · <span class="badge ${esc(t.status || "pending")}">${esc(t.status || "pending")}</span></td>
+          </tr>
+        `).join("")
+      : `<tr><td>Recent Activity</td><td>No recent activity found.</td></tr>`;
+
+    $("usersTableBody").innerHTML = users.length
+      ? users.map(u => `
+          <tr>
+            <td>${esc(u.fullName || "-")}</td>
+            <td>${esc(u.email || "-")}</td>
+            <td>${esc(money(u.balance))}</td>
+            <td><span class="badge">${esc(u.status || "active")}</span></td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="4" class="muted">No users found.</td></tr>`;
+
+    $("depositsTableBody").innerHTML = deposits.length
+      ? deposits.map(d => `
+          <tr>
+            <td>${esc(d.email || d.userId || "-")}</td>
+            <td>${esc(money(d.amount))}</td>
+            <td>${esc(d.method || "-")} / ${esc(d.transactionId || "-")}</td>
+            <td><span class="badge ${esc(d.status || "pending")}">${esc(d.status || "pending")}</span></td>
+            <td>
+              <button type="button" class="btn blue small" onclick="window.approveDeposit('${esc(d.id)}','${esc(d.userId)}',${Number(d.amount || 0)})">Approve</button>
+              <button type="button" class="btn red small" onclick="window.rejectRequest('${esc(d.id)}')">Reject</button>
+            </td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="5" class="muted">No deposit requests found.</td></tr>`;
+
+    $("withdrawalsTableBody").innerHTML = withdrawals.length
+      ? withdrawals.map(w => `
+          <tr>
+            <td>${esc(w.email || w.userId || "-")}</td>
+            <td>${esc(money(w.amount))} / Net ${esc(money(w.netAmount ?? w.amount))}</td>
+            <td>${esc(w.method || "-")}: ${esc(w.accountNumber || "-")} (${esc(w.accountName || "-")})</td>
+            <td><span class="badge ${esc(w.status || "pending")}">${esc(w.status || "pending")}</span></td>
+            <td>
+              <button type="button" class="btn blue small" onclick="window.approveWithdrawal('${esc(w.id)}','${esc(w.userId)}',${Number(w.amount || 0)})">Approve</button>
+              <button type="button" class="btn red small" onclick="window.rejectRequest('${esc(w.id)}')">Reject</button>
+            </td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="5" class="muted">No withdrawal requests found.</td></tr>`;
+
+    $("supportTableBody").innerHTML = sups.length
+      ? sups.map(s => `
+          <tr>
+            <td>${esc(s.email || s.userId || "-")}</td>
+            <td>${esc(s.message || "-")}</td>
+            <td><span class="badge ${esc(s.status || "pending")}">${esc(s.status || "pending")}</span></td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="3" class="muted">No support requests found.</td></tr>`;
+
+  }catch(err){
+    console.error(err);
+    errEl.textContent = "Could not load data: " + (err.message || "Missing or insufficient permissions.");
+    errEl.classList.remove("hidden");
+  }
+}
+
+$("refreshBalanceBtn").addEventListener("click", loadAllAdminData);
+
+window.approveDeposit = async function(reqId, userId, amount){
+  try{
+    await runTransaction(db, async tx => {
+      const reqRef = doc(db, "transactionRequests", reqId);
+      const userRef = doc(db, "users", userId);
+      const reqSnap = await tx.get(reqRef);
+      const userSnap = await tx.get(userRef);
+      if(!reqSnap.exists()) throw new Error("Request not found.");
+      if(reqSnap.data().status === "approved") throw new Error("Already approved.");
+      const curBal = userSnap.exists() ? Number(userSnap.data().balance || 0) : 0;
+      tx.set(userRef, { balance: curBal + Number(amount || 0), updatedAt: serverTimestamp() }, { merge: true });
+      tx.update(reqRef, { status: "approved", updatedAt: serverTimestamp() });
+    });
+    alert("Deposit approved and balance updated.");
+    await loadAllAdminData();
+  }catch(err){
+    alert(err.message);
+  }
+};
+
+window.approveWithdrawal = async function(reqId, userId, amount){
+  try{
+    await runTransaction(db, async tx => {
+      const reqRef = doc(db, "transactionRequests", reqId);
+      const userRef = doc(db, "users", userId);
+      const reqSnap = await tx.get(reqRef);
+      const userSnap = await tx.get(userRef);
+      if(!reqSnap.exists()) throw new Error("Request not found.");
+      if(reqSnap.data().status === "approved") throw new Error("Already approved.");
+      const curBal = userSnap.exists() ? Number(userSnap.data().balance || 0) : 0;
+      if(curBal < Number(amount || 0)) throw new Error("Insufficient user balance.");
+      tx.set(userRef, { balance: curBal - Number(amount || 0), updatedAt: serverTimestamp() }, { merge: true });
+      tx.update(reqRef, { status: "approved", updatedAt: serverTimestamp() });
+    });
+    alert("Withdrawal approved and balance updated.");
+    await loadAllAdminData();
+  }catch(err){
+    alert(err.message);
+  }
+};
+
+window.rejectRequest = async function(reqId){
+  try{
+    await updateDoc(doc(db, "transactionRequests", reqId), {
+      status: "rejected",
+      updatedAt: serverTimestamp()
+    });
+    alert("Request rejected.");
+    await loadAllAdminData();
+  }catch(err){
+    alert(err.message);
+  }
+};
+</script>
 </body>
 </html>
