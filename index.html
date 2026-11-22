@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +12,6 @@
       color: #111827;
       padding-bottom: 85px;
     }
-
-    /* Top Profile Header */
     .header {
       background: #ffffff;
       padding: 14px 16px;
@@ -24,180 +23,68 @@
       top: 0;
       z-index: 20;
     }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
     .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #2563eb;
-      color: #fff;
-      font-weight: 700;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #2563eb; color: #fff; font-weight: 700;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
     }
     .user-name {
-      font-size: 17px;
-      font-weight: 700;
-      color: #111827;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 17px; font-weight: 700; color: #111827;
+      display: flex; align-items: center; gap: 6px;
     }
     .status-dot {
-      width: 10px;
-      height: 10px;
-      border: 2px solid #111827;
-      border-radius: 50%;
-      display: inline-block;
+      width: 10px; height: 10px; border: 2px solid #111827;
+      border-radius: 50%; display: inline-block;
     }
-    .user-tier {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 2px;
-    }
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
+    .user-tier { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .header-actions { display: flex; gap: 8px; }
     .icon-pill {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 8px 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #1e293b;
-      cursor: pointer;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 12px; padding: 8px 12px; font-size: 14px;
+      font-weight: 600; color: #1e293b; cursor: pointer;
     }
-
-    .container {
-      padding: 14px 16px;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    /* Welcome Marquee Banner */
+    .container { padding: 14px 16px; max-width: 520px; margin: 0 auto; }
     .welcome-bar {
-      background: #eef4ff;
-      border: 1px solid #bfd7ff;
-      border-radius: 12px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      overflow: hidden;
-      white-space: nowrap;
-      color: #1d4ed8;
-      font-weight: 600;
-      font-size: 14px;
+      background: #eef4ff; border: 1px solid #bfd7ff;
+      border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+      overflow: hidden; white-space: nowrap; color: #1d4ed8;
+      font-weight: 600; font-size: 14px;
     }
-    .welcome-text {
-      display: inline-block;
-      padding-left: 100%;
-      animation: scrollText 12s linear infinite;
-    }
-    @keyframes scrollText {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Blue Wallet Card */
+    .welcome-text { display: inline-block; padding-left: 100%; animation: scrollText 12s linear infinite; }
+    @keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     .wallet-card {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
-      color: #ffffff;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
-      margin-bottom: 18px;
+      color: #ffffff; border-radius: 20px; padding: 20px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); margin-bottom: 18px;
     }
-    .wallet-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-    .wallet-label {
-      font-size: 13px;
-      color: #dbeafe;
-    }
-    .wallet-amount {
-      font-size: 30px;
-      font-weight: 800;
-      margin: 6px 0 12px 0;
-      letter-spacing: 0.3px;
-    }
+    .wallet-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .wallet-label { font-size: 13px; color: #dbeafe; }
+    .wallet-amount { font-size: 30px; font-weight: 800; margin: 6px 0 12px 0; letter-spacing: 0.3px; }
     .eye-btn {
-      background: rgba(255, 255, 255, 0.16);
-      border: none;
-      color: #fff;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
+      background: rgba(255, 255, 255, 0.16); border: none; color: #fff;
+      width: 42px; height: 42px; border-radius: 50%; font-size: 18px; cursor: pointer;
     }
     .rate-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: #dbeafe;
-      padding-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: #dbeafe; padding-bottom: 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     }
-    .rate-row strong {
-      display: block;
-      font-size: 14px;
-      color: #fff;
-      margin-top: 2px;
-    }
-    .wallet-bottom {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      padding-top: 14px;
-    }
-    .sub-label {
-      font-size: 12px;
-      color: #bfdbfe;
-    }
-    .sub-val {
-      font-size: 16px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .profit-val {
-      color: #4ade80;
-    }
-
-    /* 6 Action Grid */
-    .actions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 18px;
-    }
+    .rate-row strong { display: block; font-size: 14px; color: #fff; margin-top: 2px; }
+    .wallet-bottom { display: grid; grid-template-columns: 1fr 1fr; padding-top: 14px; }
+    .sub-label { font-size: 12px; color: #bfdbfe; }
+    .sub-val { font-size: 16px; font-weight: 700; margin-top: 4px; }
+    .profit-val { color: #4ade80; }
+    .actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
     .action-item {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 14px 8px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-      border: 1px solid #f1f5f9;
-      cursor: pointer;
+      background: #ffffff; border-radius: 16px; padding: 14px 8px;
+      text-align: center; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+      border: 1px solid #f1f5f9; cursor: pointer;
     }
     .action-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      margin: 0 auto 8px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
+      width: 42px; height: 42px; border-radius: 12px;
+      margin: 0 auto 8px auto; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; font-weight: 700;
     }
     .bg-green { background: #ecfdf5; color: #10b981; }
     .bg-red { background: #fef2f2; color: #ef4444; }
@@ -205,117 +92,40 @@
     .bg-blue { background: #eff6ff; color: #3b82f6; }
     .bg-yellow { background: #fefce8; color: #eab308; }
     .bg-gray { background: #f8fafc; color: #64748b; }
-    .action-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1e293b;
-    }
-
-    /* Live Transactions Box */
+    .action-title { font-size: 13px; font-weight: 600; color: #1e293b; }
     .tx-card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-      border: 1px solid #f1f5f9;
+      background: #ffffff; border-radius: 18px; padding: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04); border: 1px solid #f1f5f9;
     }
-    .tx-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .tx-header h3 {
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .live-badge {
-      background: #dcfce7;
-      color: #16a34a;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 8px;
-    }
-    .tx-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-top: 1px solid #f1f5f9;
-      font-size: 14px;
-    }
-    .tx-phone {
-      font-family: monospace;
-      font-weight: 600;
-      color: #334155;
-    }
-    .tx-plus {
-      color: #16a34a;
-      font-weight: 700;
-    }
-
-    /* Generic Subpages */
-    .page-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      border: 1px solid #e2e8f0;
-    }
+    .tx-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .tx-header h3 { font-size: 16px; font-weight: 700; }
+    .live-badge { background: #dcfce7; color: #16a34a; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+    .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid #f1f5f9; font-size: 14px; }
+    .tx-phone { font-family: monospace; font-weight: 600; color: #334155; }
+    .tx-plus { color: #16a34a; font-weight: 700; }
+    .page-card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
     textarea, input, button.btn-primary {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      margin-top: 8px;
-      font-size: 14px;
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid #cbd5e1; margin-top: 8px; font-size: 14px;
     }
-    button.btn-primary {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    button.btn-primary { background: #2563eb; color: #fff; border: none; font-weight: 600; cursor: pointer; }
     .hidden { display: none !important; }
-
-    /* Bottom Navigation */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #ffffff;
-      border-top: 1px solid #e2e8f0;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      padding: 8px 4px;
-      z-index: 30;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #ffffff; border-top: 1px solid #e2e8f0;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      padding: 8px 4px; z-index: 30;
     }
     .nav-btn {
-      background: transparent;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: #64748b;
-      cursor: pointer;
+      background: transparent; border: none; display: flex;
+      flex-direction: column; align-items: center; gap: 4px;
+      font-size: 11px; color: #64748b; cursor: pointer;
     }
-    .nav-btn.active {
-      color: #2563eb;
-      font-weight: 700;
-    }
-    .nav-icon {
-      font-size: 18px;
-    }
+    .nav-btn.active { color: #2563eb; font-weight: 700; }
+    .nav-icon { font-size: 18px; }
   </style>
 </head>
 <body>
-
-  <!-- Top Header -->
   <header class="header">
     <div class="user-info">
       <div class="avatar" id="user-avatar">BA</div>
@@ -331,13 +141,10 @@
   </header>
 
   <main class="container">
-    <!-- HOME PAGE -->
     <section id="page-home" class="page">
       <div class="welcome-bar">
         <span class="welcome-text">Welcome to BaweReal! Start earning daily rewards and manage your investments easily.</span>
       </div>
-
-      <!-- Blue Wallet Card -->
       <div class="wallet-card">
         <div class="wallet-top">
           <div>
@@ -346,77 +153,32 @@
           </div>
           <button class="eye-btn" id="toggle-balance-btn" type="button">&#128065;</button>
         </div>
-
         <div class="rate-row">
-          <div>
-            Daily USD Value:
-            <strong id="usd-text">$0.93</strong>
-          </div>
-          <div style="text-align:right;">
-            1 USD = 161.81 ETB
-          </div>
+          <div>Daily USD Value:<strong id="usd-text">$0.93</strong></div>
+          <div style="text-align:right;">1 USD = 161.81 ETB</div>
         </div>
-
         <div class="wallet-bottom">
-          <div>
-            <div class="sub-label">Invested</div>
-            <div class="sub-val" id="invested-text">0.00 ETB</div>
-          </div>
-          <div>
-            <div class="sub-label">Total Profit</div>
-            <div class="sub-val profit-val" id="profit-text">+0.00 ETB</div>
-          </div>
+          <div><div class="sub-label">Invested</div><div class="sub-val" id="invested-text">0.00 ETB</div></div>
+          <div><div class="sub-label">Total Profit</div><div class="sub-val profit-val" id="profit-text">+0.00 ETB</div></div>
         </div>
       </div>
-
-      <!-- 6 Action Buttons -->
       <div class="actions-grid">
-        <div class="action-item" onclick="go('packages')">
-          <div class="action-icon bg-green">&#8601;</div>
-          <div class="action-title">Deposit</div>
-        </div>
-        <div class="action-item" onclick="go('profile')">
-          <div class="action-icon bg-red">&#8599;</div>
-          <div class="action-title">Withdrawal</div>
-        </div>
-        <div class="action-item" onclick="go('referrals')">
-          <div class="action-icon bg-purple">&#128101;</div>
-          <div class="action-title">Invitation</div>
-        </div>
-        <div class="action-item" onclick="go('packages')">
-          <div class="action-icon bg-blue">&#128200;</div>
-          <div class="action-title">Investment</div>
-        </div>
-        <div class="action-item" onclick="alert('Daily Reward claimed!')">
-          <div class="action-icon bg-yellow">&#128197;</div>
-          <div class="action-title">Daily Reward</div>
-        </div>
-        <div class="action-item" onclick="go('profile')">
-          <div class="action-icon bg-gray">&#128337;</div>
-          <div class="action-title">History</div>
-        </div>
+        <div class="action-item" onclick="go('packages')"><div class="action-icon bg-green">&#8601;</div><div class="action-title">Deposit</div></div>
+        <div class="action-item" onclick="go('profile')"><div class="action-icon bg-red">&#8599;</div><div class="action-title">Withdrawal</div></div>
+        <div class="action-item" onclick="go('referrals')"><div class="action-icon bg-purple">&#128101;</div><div class="action-title">Invitation</div></div>
+        <div class="action-item" onclick="go('packages')"><div class="action-icon bg-blue">&#128200;</div><div class="action-title">Investment</div></div>
+        <div class="action-item" onclick="alert('Daily Reward claimed!')"><div class="action-icon bg-yellow">&#128197;</div><div class="action-title">Daily Reward</div></div>
+        <div class="action-item" onclick="go('profile')"><div class="action-icon bg-gray">&#128337;</div><div class="action-title">History</div></div>
       </div>
-
-      <!-- Live Platform Transactions -->
       <div class="tx-card">
-        <div class="tx-header">
-          <h3>Live Platform Transactions</h3>
-          <span class="live-badge">LIVE</span>
-        </div>
+        <div class="tx-header"><h3>Live Platform Transactions</h3><span class="live-badge">LIVE</span></div>
         <div id="live-tx-list">
-          <div class="tx-row">
-            <span class="tx-phone">099****540</span>
-            <span class="tx-plus">+150 ETB</span>
-          </div>
-          <div class="tx-row">
-            <span class="tx-phone">091****812</span>
-            <span class="tx-plus">+500 ETB</span>
-          </div>
+          <div class="tx-row"><span class="tx-phone">099****540</span><span class="tx-plus">+150 ETB</span></div>
+          <div class="tx-row"><span class="tx-phone">091****812</span><span class="tx-plus">+500 ETB</span></div>
         </div>
       </div>
     </section>
 
-    <!-- PACKAGES PAGE -->
     <section id="page-packages" class="page hidden">
       <div class="page-card">
         <h3>Investment Packages</h3>
@@ -424,7 +186,6 @@
       </div>
     </section>
 
-    <!-- REFERRALS PAGE -->
     <section id="page-referrals" class="page hidden">
       <div class="page-card">
         <h3>Referrals &amp; Invitation</h3>
@@ -432,7 +193,6 @@
       </div>
     </section>
 
-    <!-- PROFILE PAGE -->
     <section id="page-profile" class="page hidden">
       <div class="page-card">
         <h3>Profile</h3>
@@ -440,7 +200,6 @@
       </div>
     </section>
 
-    <!-- CHAT / SUPPORT PAGE -->
     <section id="page-chat" class="page hidden">
       <div class="page-card">
         <h3>Support Chat</h3>
@@ -450,28 +209,12 @@
     </section>
   </main>
 
-  <!-- Bottom Navigation -->
   <nav id="nav" class="bottom-nav">
-    <button class="nav-btn active" data-page="home" type="button">
-      <span class="nav-icon">&#8962;</span>
-      <span>Home</span>
-    </button>
-    <button class="nav-btn" data-page="packages" type="button">
-      <span class="nav-icon">&#9783;</span>
-      <span>Packages</span>
-    </button>
-    <button class="nav-btn" data-page="referrals" type="button">
-      <span class="nav-icon">&#128101;</span>
-      <span>Referrals</span>
-    </button>
-    <button class="nav-btn" data-page="profile" type="button">
-      <span class="nav-icon">&#128100;</span>
-      <span>Profile</span>
-    </button>
-    <button class="nav-btn" data-page="chat" type="button">
-      <span class="nav-icon">&#128172;</span>
-      <span>Chat</span>
-    </button>
+    <button class="nav-btn active" data-page="home" type="button"><span class="nav-icon">&#8962;</span><span>Home</span></button>
+    <button class="nav-btn" data-page="packages" type="button"><span class="nav-icon">&#9783;</span><span>Packages</span></button>
+    <button class="nav-btn" data-page="referrals" type="button"><span class="nav-icon">&#128101;</span><span>Referrals</span></button>
+    <button class="nav-btn" data-page="profile" type="button"><span class="nav-icon">&#128100;</span><span>Profile</span></button>
+    <button class="nav-btn" data-page="chat" type="button"><span class="nav-icon">&#128172;</span><span>Chat</span></button>
   </nav>
 
   <script>
@@ -489,7 +232,6 @@
       btn.addEventListener("click", () => go(btn.dataset.page));
     });
 
-    // Show / Hide Balance
     let balanceHidden = false;
     document.getElementById("toggle-balance-btn").addEventListener("click", () => {
       balanceHidden = !balanceHidden;
@@ -500,14 +242,13 @@
     go("home");
   </script>
 
-  <!-- Firebase Connection -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
+      apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
       authDomain: "bawereal.firebaseapp.com",
       projectId: "bawereal",
       storageBucket: "bawereal.firebasestorage.app",
