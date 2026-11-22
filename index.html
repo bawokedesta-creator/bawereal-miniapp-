@@ -28,6 +28,10 @@ button{cursor:pointer}
 .method-card{border:1px solid #dbe3ee;background:white;border-radius:13px;padding:14px 8px;text-align:center}
 .method-logo{height:55px;width:70px;object-fit:contain;margin:0 auto 8px;display:block}
 .method-name{font-size:13px;font-weight:bold}
+.account-box{background:#f8fafc;border:1px solid #dbe3ee;border-radius:10px;padding:12px;margin-top:10px}
+.account-title{font-size:13px;color:#64748b;margin-bottom:7px}
+.account-number{font-size:19px;font-weight:bold;color:#172554;letter-spacing:1px;word-break:break-all}
+.copy-btn{background:#2563eb;color:white;border:0;border-radius:7px;padding:9px 14px;font-weight:bold;margin-top:8px;width:100%}
 .bottom{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 3px;z-index:10}
 .bottom button{background:none;border:0;color:#64748b;font-size:11px}
 .bottom button span{display:block;font-size:19px;margin-bottom:3px}
@@ -89,7 +93,9 @@ button{cursor:pointer}
 <div class="card">
 <h2>Deposit Request</h2>
 <div class="notice">Submit a request for review. This does not transfer money.</div>
+
 <h3>Select Payment Method</h3>
+
 <div class="method-grid">
 <div class="method-card">
 <img class="method-logo" src="https://www.ethiotelecom.et/wp-content/uploads/2022/06/telebirr-logo.png" alt="Telebirr logo">
@@ -100,10 +106,24 @@ button{cursor:pointer}
 <div class="method-name">Commercial Bank of Ethiopia</div>
 </div>
 </div>
+
+<div class="account-box">
+<div class="account-title">Telebirr Account Number</div>
+<div class="account-number">0964488470</div>
+<button class="copy-btn" onclick="copyAccount('0964488470')">Copy Telebirr Number</button>
+</div>
+
+<div class="account-box">
+<div class="account-title">CBE Account Number</div>
+<div class="account-number">10000298833585</div>
+<button class="copy-btn" onclick="copyAccount('10000298833585')">Copy CBE Account Number</button>
+</div>
+
 <select id="depositMethod">
 <option value="Telebirr">Telebirr</option>
 <option value="CBE">Commercial Bank of Ethiopia</option>
 </select>
+
 <input id="depositAmount" type="number" placeholder="Amount in ETB">
 <textarea id="depositNote" placeholder="Reference note (optional)"></textarea>
 <button class="btn" onclick="submitRequest('deposit')">Submit Deposit Request</button>
@@ -177,6 +197,26 @@ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
 if(button)button.classList.add("active");
+}
+
+async function copyAccount(number){
+try{
+if(navigator.clipboard && window.isSecureContext){
+await navigator.clipboard.writeText(number);
+}else{
+const input=document.createElement("textarea");
+input.value=number;
+input.style.position="fixed";
+input.style.opacity="0";
+document.body.appendChild(input);
+input.select();
+document.execCommand("copy");
+input.remove();
+}
+alert("Account number copied: "+number);
+}catch(e){
+alert("Copy failed. Please copy manually: "+number);
+}
 }
 </script>
 
@@ -254,6 +294,7 @@ const amount=Number($(type==="deposit"?"depositAmount":"withdrawAmount").value);
 if(!Number.isFinite(amount)||amount<=0)return alert("Enter a valid amount.");
 if(type==="deposit"&&(amount<300||amount>10000))return alert("Deposit range: 300–10,000 ETB.");
 if(type==="withdrawal"&&(amount<100||amount>5000))return alert("Withdrawal range: 100–5,000 ETB.");
+
 const data={
 userId:user.uid,email:user.email||"",type,
 amount,
@@ -261,8 +302,10 @@ method:type==="deposit"?$("depositMethod").value:$("withdrawMethod").value,
 status:"request-recorded",
 createdAt:serverTimestamp()
 };
+
 if(type==="withdrawal")data.account=$("withdrawAccount").value.trim();
 if(type==="deposit")data.note=$("depositNote").value.trim();
+
 try{
 await addDoc(collection(db,"transactionRequests"),data);
 alert("Your request has been recorded for review. No payment has been processed.");
@@ -296,6 +339,7 @@ catch(e){alert("Your referral code: "+code);}
 
 window.sendSupport=async()=>{
 const user=auth.currentUser;
+if(!user)return alert("Please login first.");
 const message=$("supportMessage").value.trim();
 if(!message)return alert("Write a message first.");
 try{
