@@ -119,8 +119,10 @@ tr:last-child td{border-bottom:0}
 <section id="adminAuth" class="auth-box">
   <h2>BaweReal Admin</h2>
   <p class="muted">Sign in to manage registered users, deposits, withdrawals, investments, and referrals.</p><br>
-  <label>Admin Access Key / PIN</label>
-  <input id="adminPassInput" type="password" placeholder="Enter admin passcode (default: admin123)">
+  <label>Admin Email (optional if using passcode)</label>
+  <input id="adminEmailInput" type="email" placeholder="e.g. admin@bawereal.com">
+  <label>Admin Password / Passcode</label>
+  <input id="adminPassInput" type="password" placeholder="Enter password or passcode (default: admin123)">
   <button class="btn" id="adminLoginBtn">Open Admin Panel</button>
 </section>
 
@@ -311,6 +313,9 @@ tr:last-child td{border-bottom:0}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
+  getAuth, signInWithEmailAndPassword, signInAnonymously, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
   getFirestore, collection, doc, getDoc, updateDoc, onSnapshot,
   serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -326,6 +331,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 const ADMIN_PASSCODE = "admin123";
@@ -732,22 +738,41 @@ function startListeners() {
   });
 }
 
-document.getElementById("adminLoginBtn").addEventListener("click", () => {
+document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("adminEmailInput").value.trim();
   const pass = document.getElementById("adminPassInput").value.trim();
-  if (pass && pass !== ADMIN_PASSCODE) {
-    alert("Invalid admin passcode.");
-    return;
+
+  try {
+    if (email) {
+      if (!pass) {
+        alert("Enter password for admin email.");
+        return;
+      }
+      await signInWithEmailAndPassword(auth, email, pass);
+    } else {
+      if (pass && pass !== ADMIN_PASSCODE) {
+        alert("Invalid admin passcode.");
+        return;
+      }
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      }
+    }
+
+    runStepLoader(() => {
+      document.getElementById("adminAuth").classList.add("hidden");
+      document.getElementById("adminApp").classList.remove("hidden");
+      startListeners();
+    });
+  } catch (err) {
+    alert("Admin sign-in failed: " + err.message);
   }
-  runStepLoader(() => {
-    document.getElementById("adminAuth").classList.add("hidden");
-    document.getElementById("adminApp").classList.remove("hidden");
-    startListeners();
-  });
 });
 
-document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+document.getElementById("adminLogoutBtn").addEventListener("click", async () => {
   if (unsubUsers) { unsubUsers(); unsubUsers = null; }
   if (unsubRequests) { unsubRequests(); unsubRequests = null; }
+  try { await signOut(auth); } catch (_) {}
   document.getElementById("adminApp").classList.add("hidden");
   document.getElementById("adminAuth").classList.remove("hidden");
 });
