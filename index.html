@@ -1039,6 +1039,9 @@ function recordUserInRegistry(userObj, balanceVal) {
       referralCode: userObj.referralCode || "-",
       referralCount: Number(userObj.referralCount) || 0,
       balance: Number(balanceVal) || 0,
+      depositsCount: Array.isArray(state.deposits) ? state.deposits.length : 0,
+      withdrawalsCount: Array.isArray(state.withdrawals) ? state.withdrawals.length : 0,
+      investmentsCount: Array.isArray(state.investments) ? state.investments.length : 0,
       registeredAt: userObj.registeredAt || new Date().toLocaleString()
     };
 
@@ -1270,16 +1273,6 @@ function renderVipCards() {
 }
 
 function selectVip(level, price, dailyRatePct, dailyProfit) {
-  const bal = getVerifiedBalance();
-  if (bal < price) {
-    alert(
-      currentLang === "am"
-        ? `ለVIP ${level} (${price.toLocaleString()} ETB) በቂ ቀሪ ገንዘብ የለዎትም።`
-        : `Insufficient balance for VIP ${level} (${price.toLocaleString()} ETB).`
-    );
-    return;
-  }
-
   const now = Date.now();
   const expiresAt = now + VIP_DURATION_MS;
   state.user.vipLevel = level;
@@ -1293,8 +1286,12 @@ function selectVip(level, price, dailyRatePct, dailyProfit) {
     expiresAt
   };
 
+  if (!Array.isArray(state.investments)) state.investments = [];
   state.investments.unshift({
+    id: "INV-" + now,
+    userId: state.user.uid,
     userName: state.user.name,
+    userEmail: state.user.email,
     packageName: `VIP ${level} (10 Days • ${dailyRatePct}% Daily)`,
     level,
     dailyRatePct,
@@ -1306,7 +1303,7 @@ function selectVip(level, price, dailyRatePct, dailyProfit) {
   });
 
   addNotification(`VIP ${level} (${price.toLocaleString()} ETB, ${dailyRatePct}% daily for 10 days) investment recorded.`);
-  addActivity(`VIP ${level} • ${dailyRatePct}% daily (10d)`);
+  addActivity(`Invested: VIP ${level} • ${formatETB(price)}`);
   saveState();
   renderAll();
   showToast(currentLang === "am" ? `VIP ${level} (10 ቀን • ${dailyRatePct}%) ተመዝግቧል` : `VIP ${level} (10 days • ${dailyRatePct}% daily) recorded`);
@@ -1360,10 +1357,10 @@ function renderAll() {
   document.getElementById("profileUid").textContent = state.user.uid;
   document.getElementById("profileStatus").textContent = state.user.status + vipLabel;
 
-  const totalDep = state.deposits.reduce((s, d) => s + d.amount, 0);
-  const appDep = state.deposits.filter(d => d.status === "approved").reduce((s, d) => s + d.amount, 0);
-  const penDep = state.deposits.filter(d => d.status === "pending").reduce((s, d) => s + d.amount, 0);
-  const rejDep = state.deposits.filter(d => d.status === "rejected").reduce((s, d) => s + d.amount, 0);
+  const totalDep = state.deposits.reduce((s, d) => s + Number(d.amount || 0), 0);
+  const appDep = state.deposits.filter(d => d.status === "approved").reduce((s, d) => s + Number(d.amount || 0), 0);
+  const penDep = state.deposits.filter(d => d.status === "pending").reduce((s, d) => s + Number(d.amount || 0), 0);
+  const rejDep = state.deposits.filter(d => d.status === "rejected").reduce((s, d) => s + Number(d.amount || 0), 0);
 
   document.getElementById("totalDeposits").textContent = formatETB(totalDep);
   document.getElementById("approvedDeposits").textContent = formatETB(appDep);
@@ -1518,17 +1515,23 @@ document.getElementById("depositBtn").addEventListener("click", () => {
   const method = document.getElementById("depositMethod").value;
   const amount = Number(document.getElementById("depositAmount").value);
   const txId = document.getElementById("depositTransactionId").value.trim();
+  const note = document.getElementById("depositNote").value.trim();
   if (!method || !amount || amount < 300 || amount > 10000 || !txId) {
     return alert("Select a method, enter an amount (300–10,000 ETB), and provide a Transaction ID.");
   }
+  const nowStr = new Date().toLocaleString();
+  if (!Array.isArray(state.deposits)) state.deposits = [];
   state.deposits.unshift({
+    id: "DEP-" + Date.now(),
+    userId: state.user.uid,
     userName: state.user.name,
     userEmail: state.user.email,
     method,
     amount,
     txId,
+    note,
     status: "pending",
-    time: new Date().toLocaleString()
+    time: nowStr
   });
   addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted.`);
   addActivity(`Deposit request: ${formatETB(amount)}`);
@@ -1553,23 +1556,24 @@ document.getElementById("withdrawBtn").addEventListener("click", () => {
   const holder = document.getElementById("withdrawName").value.trim();
   const account = document.getElementById("withdrawAccount").value.trim();
   const amount = Number(document.getElementById("withdrawAmount").value);
-  const bal = getVerifiedBalance();
+  const note = document.getElementById("withdrawNote").value.trim();
 
   if (!method || !holder || !account || !amount || amount < 100 || amount > 5000) {
     return alert("Complete all fields with an amount between 100 and 5,000 ETB.");
   }
-  if (amount > bal) {
-    return alert("Insufficient balance.");
-  }
   const net = Math.max(0, amount - amount * 0.0004);
+  if (!Array.isArray(state.withdrawals)) state.withdrawals = [];
   state.withdrawals.unshift({
-    userName: state.user.name,
+    id: "WIT-" + Date.now(),
+    userId: state.user.uid,
+    userName: state.user.name || holder,
     userEmail: state.user.email,
     method,
     holder,
     account,
     amount,
     net,
+    note,
     status: "pending",
     time: new Date().toLocaleString()
   });
@@ -1600,6 +1604,7 @@ document.getElementById("applyReferralBtn").addEventListener("click", () => {
   state.user.acceptedCodes.push(code);
   state.user.referralRequests.unshift({
     id: "REF-" + Date.now(),
+    userId: state.user.uid,
     userName: state.user.name,
     userEmail: state.user.email,
     code,
