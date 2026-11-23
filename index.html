@@ -93,9 +93,9 @@ textarea{resize:vertical;min-height:75px}
 .method .brand{font-size:20px;margin-right:8px}
 .method-left{display:flex;align-items:center}
 .status{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:10.5px;margin-top:5px}
-.status.pending,.status.request-recorded,.status.processing,.status.under-review{background:#fff0ce;color:#946000}
+.status.pending,.status.request-recorded,.status.processing,.status.under-review,.status.review{background:#fff0ce;color:#946000}
 .status.approved,.status.completed,.status.active{background:#d9f7e9;color:#087b4c}
-.status.rejected,.status.failed,.status.cancelled{background:#ffe1e4;color:#bd2636}
+.status.rejected,.status.failed,.status.cancelled,.status.expired{background:#ffe1e4;color:#bd2636}
 .item{border-bottom:1px solid #eee;padding:10px 0}
 .item:last-child{border:0}
 .item-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}
@@ -164,6 +164,20 @@ small{color:var(--muted);font-size:11.5px}
 .vip-level{
   font-size:18px;
   margin-bottom:4px;
+}
+.vip-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:6px;
+  font-size:12px;
+  color:#374151;
+}
+.vip-pill{
+  background:#f4f5fb;
+  padding:4px 8px;
+  border-radius:7px;
+  font-weight:bold;
 }
 .task-icon{
   font-size:19px;
@@ -374,7 +388,7 @@ small{color:var(--muted);font-size:11.5px}
       </button>
     </div>
     <h1 id="balanceText">0.00 ETB</h1>
-    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance (admin-controlled)</small>
+    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance</small>
   </div>
 
   <div class="grid">
@@ -387,7 +401,6 @@ small{color:var(--muted);font-size:11.5px}
     <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong data-i18n="notifications">Notifications</strong></div>
     <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong data-i18n="faq">Help / FAQ</strong></div>
     <div class="action" onclick="openPage('task')"><span class="emoji">🎯</span><strong data-i18n="task">Task</strong></div>
-    <div class="action" onclick="openPage('vip')"><span class="emoji">👑</span><strong>VIP</strong></div>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -513,7 +526,7 @@ small{color:var(--muted);font-size:11.5px}
 <h2 class="page-title" data-i18n="referral">Referral</h2>
 <div class="card">
   <h3 data-i18n="yourReferralCode">Your Referral Code</h3>
-  <p class="muted" data-i18n="inviteRewardInfo">Invite friends and earn 100 ETB per referral! Share your code with others.</p><br>
+  <p class="muted" data-i18n="inviteRewardInfo">Invite friends and earn 100 ETB per referral! Share your invite link or code.</p><br>
   <h2 id="referralCode">Loading...</h2>
 
   <div class="account-box" style="margin-top:12px">
@@ -536,7 +549,7 @@ small{color:var(--muted);font-size:11.5px}
   </div>
 
   <div class="notice" id="referralBonusNotice">
-    Invite bonus: <strong>100 ETB</strong> for inviting a friend (credited after admin approval).
+    Invite bonus: <strong>100 ETB</strong> for inviting a friend.
   </div>
 
   <div class="account-box" style="margin-top:12px">
@@ -550,8 +563,9 @@ small{color:var(--muted);font-size:11.5px}
 <section id="packagesPage" class="hidden">
 <h2 class="page-title" data-i18n="packages">Packages</h2>
 <div class="card">
-  <h3 data-i18n="vipPackagesTitle">VIP Packages (VIP 1 – VIP 10)</h3>
-  <p class="muted" data-i18n="vipStepDesc">Each VIP level increases by 2,000 ETB starting from VIP 1 (2,000 ETB) up to VIP 10 (20,000 ETB).</p>
+  <h3 data-i18n="vipPackagesTitle">VIP Packages (VIP 1 – VIP 10 • 10 Days Validity)</h3>
+  <p class="muted" data-i18n="vipStepDesc">Each VIP lasts for 10 days only. After 10 days, purchase a new VIP. Daily profit starts at 10% for 2,000 ETB, 20% for 4,000 ETB, 30% for 6,000 ETB, up to 100% for 20,000 ETB.</p>
+  <div id="activeVipStatusBox" class="notice" style="margin-top:10px">No active 10-day VIP package right now.</div>
 </div>
 <div id="packagesList"></div>
 </section>
@@ -564,10 +578,10 @@ small{color:var(--muted);font-size:11.5px}
     <div class="task-card">
       <div class="task-icon">⏱️</div>
       <strong>24-Hour Task — 50 ETB</strong>
-      <p class="muted" data-i18n="task24Desc">Earn 50 ETB once every 24 hours. After completing it, a 24-hour cooldown timer runs before it can be completed again.</p>
+      <p class="muted" data-i18n="task24Desc">Complete once every 24 hours. A 24-hour cooldown timer runs after completion.</p>
       <div class="countdown-badge" id="task24Countdown">24:00:00</div>
       <div style="margin-top:10px">
-        <button type="button" class="btn" id="claimTask24Btn">Complete 24-Hour Task (Pending Admin)</button>
+        <button type="button" class="btn" id="claimTask24Btn">Complete 24-Hour Task</button>
       </div>
       <span class="status pending" id="task24Status">Ready</span>
     </div>
@@ -575,21 +589,13 @@ small{color:var(--muted);font-size:11.5px}
     <div class="task-card">
       <div class="task-icon">👥</div>
       <strong>Referral Task — 100 ETB</strong>
-      <p class="muted" data-i18n="inviteRewardDesc">Earn 100 ETB when you invite people to join.</p>
+      <p class="muted" data-i18n="inviteRewardDesc">Earn 100 ETB when invited friends join.</p>
       <span class="status pending">100 ETB</span>
     </div>
 
     <div class="notice" id="balanceControlNotice">
-      Balance is locked & admin-controlled: users cannot manually increase or decrease their balance.
+      Balance is verified and updated after approval.
     </div>
-  </div>
-</section>
-
-<section id="vipPage" class="hidden">
-  <h2 class="page-title">VIP Membership</h2>
-  <div id="vipList"></div>
-  <div class="notice">
-    VIP 1 starts at 2,000 ETB and increases by 2,000 ETB per level up to VIP 10 (20,000 ETB).
   </div>
 </section>
 
@@ -618,7 +624,7 @@ small{color:var(--muted);font-size:11.5px}
     </button>
   </div>
   <h1 id="profileBalance">0.00 ETB</h1>
-  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance (admin-controlled)</small>
+  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance</small>
 </div>
 
 <div class="card">
@@ -676,7 +682,7 @@ small{color:var(--muted);font-size:11.5px}
 <h2 class="page-title" data-i18n="notifications">Notifications</h2>
 <div class="card">
   <h3 data-i18n="myRequestUpdates">My Request Updates</h3>
-  <p class="muted" data-i18n="requestUpdatesDesc">Updates about your deposit and withdrawal requests.</p>
+  <p class="muted" data-i18n="requestUpdatesDesc">Updates about your deposit, withdrawal, and investment requests.</p>
   <div class="feature-row">
     <button class="btn secondary" id="refreshNotificationsBtn">↻ <span data-i18n="refresh">Refresh</span></button>
   </div>
@@ -710,8 +716,8 @@ small{color:var(--muted);font-size:11.5px}
   </div>
 
   <div class="faq-item">
-    <strong>5. How can I reset my password?</strong>
-    <p class="muted">Use Forgot Password on the login screen or the password reset button in your profile.</p>
+    <strong>5. How do VIP packages work?</strong>
+    <p class="muted">VIP packages run from 2,000 ETB (10% daily profit) up to 20,000 ETB (100% daily profit) for 10 days only. After 10 days, purchase a new VIP.</p>
   </div>
 
   <div class="faq-item">
@@ -721,7 +727,7 @@ small{color:var(--muted);font-size:11.5px}
 
   <div class="faq-item">
     <strong>7. Does submitting a request update my balance immediately?</strong>
-    <p class="muted">No. Balance changes are controlled by admin approval and verification.</p>
+    <p class="muted">No. Balance changes happen after review and approval.</p>
   </div>
 </div>
 </section>
@@ -754,7 +760,7 @@ const TRANSLATIONS = {
     backToLogin: "Back to Login",
     logout: "Logout",
     currentBalance: "Current Balance",
-    verifiedBalance: "Verified balance (admin-controlled)",
+    verifiedBalance: "Verified balance",
     refreshBalance: "Refresh Balance",
     deposit: "Deposit",
     withdrawal: "Withdrawal",
@@ -799,8 +805,8 @@ const TRANSLATIONS = {
     inviteRewardInfo: "Invite friends and earn 100 ETB per referral! Share your invite link or code.",
     copyReferralCode: "Copy Referral Code",
     applyInviteCodeBtn: "Accept Invitation (+1 Count)",
-    vipPackagesTitle: "VIP Packages (VIP 1 – VIP 10)",
-    vipStepDesc: "Each VIP level increases by 2,000 ETB starting from VIP 1 (2,000 ETB) up to VIP 10 (20,000 ETB).",
+    vipPackagesTitle: "VIP Packages (VIP 1 – VIP 10 • 10 Days Validity)",
+    vipStepDesc: "Each VIP lasts for 10 days only. After 10 days, purchase a new VIP. Daily profit starts at 10% for 2,000 ETB, 20% for 4,000 ETB, 30% for 6,000 ETB, up to 100% for 20,000 ETB.",
     dailyTasks: "Daily Tasks",
     availableTasks: "Available Tasks",
     task24Desc: "Complete once every 24 hours. A 24-hour cooldown timer runs after completion.",
@@ -829,7 +835,7 @@ const TRANSLATIONS = {
     navHome: "Home",
     navWithdraw: "Withdraw",
     navProfile: "Profile",
-    buyPackage: "Invest in Package"
+    buyPackage: "Buy VIP (10 Days)"
   },
   am: {
     welcomeBack: "እንኳን ደህና መጡ",
@@ -846,7 +852,7 @@ const TRANSLATIONS = {
     backToLogin: "ወደ መግቢያ ይመለሱ",
     logout: "ውጣ",
     currentBalance: "ያለዎት ቀሪ ገንዘብ",
-    verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ (በአድሚን የተጠበቀ)",
+    verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ",
     refreshBalance: "ቀሪ ገንዘብ አድስ",
     deposit: "ገንዘብ ማስገባት",
     withdrawal: "ገንዘብ ማውጣት",
@@ -870,7 +876,7 @@ const TRANSLATIONS = {
     transactionIdLabel: "የግብይት መለያ (Transaction ID)",
     noteOptional: "ማስታወሻ (አማራጭ)",
     submitDeposit: "የገንዘብ ማስገቢያ ጥያቄ ያስገቡ",
-    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው በአድሚን ፍቃድ ብቻ ነው።",
+    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከፍቃድ በኋላ ነው።",
     myDepositHistory: "የእኔ የተቀማጭ ገንዘብ ታሪክ",
     withdrawalRequest: "የገንዘብ ማውጫ ጥያቄ",
     enterPaymentDetails: "የክፍያ መረጃዎን በጥንቃቄ ያስገቡ።",
@@ -891,8 +897,8 @@ const TRANSLATIONS = {
     inviteRewardInfo: "ጓደኞችን ይጋብዙ! ሊንክዎን ወይም ኮድዎን ያጋሩ፤ ግብዣውን ሲቀበሉ ብዛቱ 1፣ 2፣ 3 እያለ ይቆጥራል።",
     copyReferralCode: "የግብዣ ኮድ ቅዳ",
     applyInviteCodeBtn: "ግብዣ ይቀበሉ (+1 ይቁጠር)",
-    vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10)",
-    vipStepDesc: "እያንዳንዱ የVIP ደረጃ ከVIP 1 (2,000 ETB) ጀምሮ እስከ VIP 10 (20,000 ETB) በ2,000 ETB ይጨምራል።",
+    vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10 • ለ10 ቀን ብቻ)",
+    vipStepDesc: "እያንዳንዱ VIP ለ10 ቀን ብቻ ይቆያል፤ ከ10 ቀን በኋላ አዲስ VIP መግዛት ያስፈልጋል። Daily profit በ2,000=10%፣ በ4,000=20%፣ በ6,000=30% እያለ እስከ 20,000=100% ይቀጥላል።",
     dailyTasks: "ዕለታዊ ተግባራት",
     availableTasks: "ያሉ ተግባራት",
     task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ ይስሩ። ካጠናቀቁ በኋላ የ24 ሰዓት መጠበቂያ ሰዓት ይቆጥራል።",
@@ -921,12 +927,14 @@ const TRANSLATIONS = {
     navHome: "መነሻ",
     navWithdraw: "ማውጣት",
     navProfile: "ፕሮፋይል",
-    buyPackage: "ፓኬጅ ኢንቨስት ያድርጉ"
+    buyPackage: "VIP ይግዙ (ለ10 ቀን)"
   }
 };
 
 const STORAGE_KEY = "bawereal_state_v2";
+const USERS_KEY = "bawereal_users_v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
+const VIP_DURATION_MS = 10 * DAY_MS;
 const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
 
 let state = loadState();
@@ -957,9 +965,12 @@ function defaultState() {
       referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
       referralCount: 0,
       acceptedCodes: [],
+      referralRequests: [],
       verified: false,
       status: "Active",
-      vipLevel: 0
+      vipLevel: 0,
+      activeVip: null,
+      registeredAt: new Date().toLocaleString()
     },
     lockedBalance: initialBalance,
     balanceSig: computeBalanceChecksum(initialBalance, uid),
@@ -983,13 +994,6 @@ function getVerifiedBalance() {
   return Number(state.lockedBalance);
 }
 
-// Balance is read-only from the user side; only admin-approved flow updates lockedBalance + balanceSig
-function adminSetBalance(newAmount) {
-  const safeAmt = Math.max(0, Number(newAmount) || 0);
-  state.lockedBalance = safeAmt;
-  state.balanceSig = computeBalanceChecksum(safeAmt, state.user.uid);
-}
-
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -1000,6 +1004,8 @@ function loadState() {
       ...base,
       ...parsed,
       user: { ...base.user, ...(parsed.user || {}) },
+      deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
+      withdrawals: Array.isArray(parsed.withdrawals) ? parsed.withdrawals : [],
       investments: Array.isArray(parsed.investments) ? parsed.investments : []
     };
     const expected = computeBalanceChecksum(merged.lockedBalance, merged.user.uid);
@@ -1013,11 +1019,45 @@ function loadState() {
   }
 }
 
+function recordUserInRegistry(userObj, balanceVal) {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    const arr = Array.isArray(list) ? list : [];
+    const emailKey = (userObj.email || "").trim().toLowerCase();
+    const uidKey = (userObj.uid || "").trim().toLowerCase();
+
+    const idx = arr.findIndex(u =>
+      (emailKey && (u.email || "").trim().toLowerCase() === emailKey) ||
+      (uidKey && (u.uid || "").trim().toLowerCase() === uidKey)
+    );
+
+    const record = {
+      uid: userObj.uid,
+      name: userObj.name || "User",
+      email: userObj.email || "-",
+      referralCode: userObj.referralCode || "-",
+      referralCount: Number(userObj.referralCount) || 0,
+      balance: Number(balanceVal) || 0,
+      registeredAt: userObj.registeredAt || new Date().toLocaleString()
+    };
+
+    if (idx >= 0) {
+      arr[idx] = { ...arr[idx], ...record, registeredAt: arr[idx].registeredAt || record.registeredAt };
+    } else {
+      arr.unshift(record);
+    }
+
+    localStorage.setItem(USERS_KEY, JSON.stringify(arr));
+  } catch (_) {}
+}
+
 function saveState() {
   try {
     state.lang = currentLang;
     state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    recordUserInRegistry(state.user, state.lockedBalance);
   } catch (_) {}
 }
 
@@ -1042,7 +1082,7 @@ function triggerBalanceRefresh(btnId) {
   renderAll();
   const syncEl = document.getElementById("lastSyncText");
   if (syncEl) {
-    syncEl.textContent = (currentLang === "am" ? "የተረጋገጠ ባላንስ (የታደሰ): " : "Verified balance (synced): ") + new Date().toLocaleTimeString();
+    syncEl.textContent = (currentLang === "am" ? "የተረጋገጠ ቀሪ ገንዘብ (የታደሰ): " : "Verified balance (synced): ") + new Date().toLocaleTimeString();
   }
   showToast(currentLang === "am" ? "ቀሪ ገንዘብ ታድሷል" : "Balance refreshed");
 }
@@ -1052,7 +1092,6 @@ function formatETB(val) {
   return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ETB";
 }
 
-// 25% -> 50% -> 75% -> 100%, at least 3,000ms (3 seconds) total
 function runStepLoader(cb) {
   const loader = document.getElementById("stepLoader");
   const pct = document.getElementById("stepPct");
@@ -1064,7 +1103,6 @@ function runStepLoader(cb) {
   pct.textContent = "25%";
   fill.style.width = "25%";
 
-  const stepIntervalMs = 800; // 3 steps after 25% = 2400ms + 700ms hold at 100% = 3,100ms (>= 3s)
   const timer = setInterval(() => {
     idx++;
     if (idx < steps.length) {
@@ -1077,7 +1115,7 @@ function runStepLoader(cb) {
         if (typeof cb === "function") cb();
       }, 700);
     }
-  }, stepIntervalMs);
+  }, 800);
 }
 
 function applyLang(lang) {
@@ -1167,55 +1205,111 @@ function renderLiveTicker() {
   document.getElementById("activityTrack").innerHTML = rows + rows;
 }
 
+function getActiveVipInfo() {
+  const av = state.user.activeVip;
+  if (!av || !av.expiresAt) return null;
+  const remainingMs = Number(av.expiresAt) - Date.now();
+  const daysLeft = Math.max(0, Math.ceil(remainingMs / DAY_MS));
+  return {
+    ...av,
+    isExpired: remainingMs <= 0,
+    daysLeft
+  };
+}
+
 function renderVipCards() {
-  const label = TRANSLATIONS[currentLang].buyPackage || "Invest in Package";
+  const label = TRANSLATIONS[currentLang].buyPackage || "Buy VIP (10 Days)";
+  const activeVip = getActiveVipInfo();
+  const statusBox = document.getElementById("activeVipStatusBox");
+
+  if (statusBox) {
+    if (activeVip && !activeVip.isExpired) {
+      statusBox.textContent = currentLang === "am"
+        ? `ንቁ VIP ${activeVip.level} (${activeVip.price.toLocaleString()} ETB) — Daily Profit ${activeVip.dailyRatePct}% (${activeVip.dailyProfit.toLocaleString()} ETB/ቀን) • ${activeVip.daysLeft} ቀን ቀርቶታል። ከ10 ቀን በኋላ አዲስ VIP ይግዙ።`
+        : `Active VIP ${activeVip.level} (${activeVip.price.toLocaleString()} ETB) — Daily Profit ${activeVip.dailyRatePct}% (${activeVip.dailyProfit.toLocaleString()} ETB/day) • ${activeVip.daysLeft} day(s) left. Buy a new VIP after 10 days.`;
+    } else if (activeVip && activeVip.isExpired) {
+      statusBox.textContent = currentLang === "am"
+        ? `የቀድሞ VIP ${activeVip.level} የ10 ቀን ጊዜው አልቋል። ለመቀጠል አዲስ VIP ይግዙ።`
+        : `Previous VIP ${activeVip.level} (10 days) has expired. Purchase a new VIP to continue.`;
+    } else {
+      statusBox.textContent = currentLang === "am"
+        ? "በአሁኑ ጊዜ ንቁ የ10-ቀን VIP የለም።"
+        : "No active 10-day VIP package right now.";
+    }
+  }
+
   let html = "";
   for (let i = 1; i <= 10; i++) {
     const price = i * 2000;
-    const active = state.user.vipLevel === i;
+    const dailyRatePct = i * 10;
+    const dailyProfit = (price * dailyRatePct) / 100;
+    const isCurrentActive = activeVip && !activeVip.isExpired && activeVip.level === i;
+
     html += `
       <div class="vip-card">
         <div class="vip-top">
           <div class="vip-level">👑 VIP ${i}</div>
           <div class="vip-price">${price.toLocaleString()} ETB</div>
         </div>
-        <p class="muted">Investment Package Tier ${i} (${price.toLocaleString()} ETB).</p>
+        <div class="vip-meta">
+          <span class="vip-pill">⏳ 10 Days Only</span>
+          <span class="vip-pill">📈 Daily Profit: ${dailyRatePct}% (${dailyProfit.toLocaleString()} ETB / day)</span>
+        </div>
+        <p class="muted" style="margin-top:6px">
+          Valid for 10 days only. After 10 days, you must buy a new VIP.
+        </p>
         <div style="margin-top:10px">
-          <button type="button" class="btn ${active ? "secondary" : ""}" onclick="selectVip(${i}, ${price})">
-            ${active ? "Active Investment (VIP " + i + ")" : label}
+          <button type="button" class="btn ${isCurrentActive ? "secondary" : ""}" onclick="selectVip(${i}, ${price}, ${dailyRatePct}, ${dailyProfit})">
+            ${isCurrentActive ? `Active (VIP ${i} • ${activeVip.daysLeft}d left)` : label}
           </button>
         </div>
       </div>
     `;
   }
   document.getElementById("packagesList").innerHTML = html;
-  document.getElementById("vipList").innerHTML = html;
 }
 
-function selectVip(level, price) {
+function selectVip(level, price, dailyRatePct, dailyProfit) {
   const bal = getVerifiedBalance();
   if (bal < price) {
     alert(
       currentLang === "am"
-        ? `ለVIP ${level} (${price.toLocaleString()} ETB) ኢንቨስትመንት በቂ የተረጋገጠ ባላንስ የለዎትም። አድሚን ባላንስ ካጸደቀ በኋላ ይሞክሩ።`
-        : `Insufficient verified balance for VIP ${level} (${price.toLocaleString()} ETB). Admin approval is required for balance updates.`
+        ? `ለVIP ${level} (${price.toLocaleString()} ETB) በቂ ቀሪ ገንዘብ የለዎትም።`
+        : `Insufficient balance for VIP ${level} (${price.toLocaleString()} ETB).`
     );
     return;
   }
-  // Investment request recorded; balance deduction/approval stays under admin control
+
+  const now = Date.now();
+  const expiresAt = now + VIP_DURATION_MS;
   state.user.vipLevel = level;
-  state.investments.unshift({
-    packageName: `VIP ${level} Package`,
+  state.user.activeVip = {
     level,
+    price,
+    dailyRatePct,
+    dailyProfit,
+    durationDays: 10,
+    startedAt: now,
+    expiresAt
+  };
+
+  state.investments.unshift({
+    userName: state.user.name,
+    packageName: `VIP ${level} (10 Days • ${dailyRatePct}% Daily)`,
+    level,
+    dailyRatePct,
+    dailyProfit,
+    durationDays: 10,
     amount: price,
     status: "pending",
-    time: new Date().toLocaleString()
+    time: new Date(now).toLocaleString()
   });
-  addNotification(`Investment request for VIP ${level} (${price.toLocaleString()} ETB) recorded.`);
-  addActivity(`Investment request: VIP ${level} (${price.toLocaleString()} ETB)`);
+
+  addNotification(`VIP ${level} (${price.toLocaleString()} ETB, ${dailyRatePct}% daily for 10 days) investment recorded.`);
+  addActivity(`VIP ${level} • ${dailyRatePct}% daily (10d)`);
   saveState();
   renderAll();
-  showToast(currentLang === "am" ? `የVIP ${level} ኢንቨስትመንት በታሪክ ተመዝግቧል` : `VIP ${level} investment recorded in history`);
+  showToast(currentLang === "am" ? `VIP ${level} (10 ቀን • ${dailyRatePct}%) ተመዝግቧል` : `VIP ${level} (10 days • ${dailyRatePct}% daily) recorded`);
 }
 
 function updateTask24Timer() {
@@ -1255,11 +1349,16 @@ function renderAll() {
   document.getElementById("referralMilestoneText").textContent =
     currentLang === "am" ? `${invCount} ሰው ተቀብሏል` : `${invCount} accepted`;
 
+  const activeVip = getActiveVipInfo();
+  const vipLabel = activeVip && !activeVip.isExpired
+    ? ` • VIP ${activeVip.level} (${activeVip.dailyRatePct}% daily, ${activeVip.daysLeft}d left)`
+    : "";
+
   document.getElementById("profileName").textContent = state.user.name;
   document.getElementById("profileEmail").textContent = state.user.email;
   document.getElementById("emailVerificationStatus").textContent = state.user.verified ? "Verified" : "Unverified";
   document.getElementById("profileUid").textContent = state.user.uid;
-  document.getElementById("profileStatus").textContent = state.user.status + (state.user.vipLevel ? " • VIP " + state.user.vipLevel : "");
+  document.getElementById("profileStatus").textContent = state.user.status + vipLabel;
 
   const totalDep = state.deposits.reduce((s, d) => s + d.amount, 0);
   const appDep = state.deposits.filter(d => d.status === "approved").reduce((s, d) => s + d.amount, 0);
@@ -1340,6 +1439,7 @@ function renderAll() {
     ? state.activities.slice(0, 5).map(a => `<div class="item"><div class="item-top"><span>${a.text}</span><span class="muted">${a.time}</span></div></div>`).join("")
     : `<div class="empty">${TRANSLATIONS[currentLang].noRecentActivity}</div>`;
 
+  renderVipCards();
   updateTask24Timer();
 }
 
@@ -1349,7 +1449,15 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
 
 document.getElementById("loginBtn").addEventListener("click", () => {
   const email = document.getElementById("loginEmail").value.trim();
-  if (email) state.user.email = email;
+  if (email) {
+    state.user.email = email;
+    if (!state.user.name) {
+      state.user.name = email.split("@")[0];
+    }
+  }
+  if (!state.user.registeredAt) {
+    state.user.registeredAt = new Date().toLocaleString();
+  }
   state.loggedIn = true;
   saveState();
   runStepLoader(() => {
@@ -1366,9 +1474,23 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   const conf = document.getElementById("regConfirm").value;
   if (!name || !email || !pass) return alert("Please fill out all required fields.");
   if (pass !== conf) return alert("Passwords do not match.");
-  state.user.name = name;
-  state.user.email = email;
+
+  const newUid = "USR-" + Math.random().toString(36).slice(2, 10).toUpperCase();
+  state.user = {
+    ...defaultState().user,
+    name,
+    email,
+    uid: newUid,
+    referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
+    registeredAt: new Date().toLocaleString()
+  };
+  state.lockedBalance = 0;
+  state.balanceSig = computeBalanceChecksum(0, newUid);
+  state.deposits = [];
+  state.withdrawals = [];
+  state.investments = [];
   state.loggedIn = true;
+
   saveState();
   runStepLoader(() => {
     document.getElementById("auth").classList.add("hidden");
@@ -1400,13 +1522,15 @@ document.getElementById("depositBtn").addEventListener("click", () => {
     return alert("Select a method, enter an amount (300–10,000 ETB), and provide a Transaction ID.");
   }
   state.deposits.unshift({
+    userName: state.user.name,
+    userEmail: state.user.email,
     method,
     amount,
     txId,
     status: "pending",
     time: new Date().toLocaleString()
   });
-  addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted (pending admin approval).`);
+  addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted.`);
   addActivity(`Deposit request: ${formatETB(amount)}`);
   document.getElementById("depositAmount").value = "";
   document.getElementById("depositTransactionId").value = "";
@@ -1435,11 +1559,12 @@ document.getElementById("withdrawBtn").addEventListener("click", () => {
     return alert("Complete all fields with an amount between 100 and 5,000 ETB.");
   }
   if (amount > bal) {
-    return alert("Insufficient verified balance.");
+    return alert("Insufficient balance.");
   }
   const net = Math.max(0, amount - amount * 0.0004);
-  // Balance change requires admin approval
   state.withdrawals.unshift({
+    userName: state.user.name,
+    userEmail: state.user.email,
     method,
     holder,
     account,
@@ -1448,7 +1573,7 @@ document.getElementById("withdrawBtn").addEventListener("click", () => {
     status: "pending",
     time: new Date().toLocaleString()
   });
-  addNotification(`Withdrawal request of ${formatETB(amount)} submitted (pending admin approval).`);
+  addNotification(`Withdrawal request of ${formatETB(amount)} submitted.`);
   addActivity(`Withdrawal request: ${formatETB(amount)}`);
   saveState();
   renderAll();
@@ -1468,24 +1593,33 @@ document.getElementById("applyReferralBtn").addEventListener("click", () => {
   if (!code) return alert("Enter a referral code first.");
   if (code === state.user.referralCode) return alert("You cannot use your own referral code.");
   if (!Array.isArray(state.user.acceptedCodes)) state.user.acceptedCodes = [];
+  if (!Array.isArray(state.user.referralRequests)) state.user.referralRequests = [];
   if (state.user.acceptedCodes.includes(code)) {
     return alert("This referral code has already been accepted.");
   }
   state.user.acceptedCodes.push(code);
-  state.user.referralCount = (Number(state.user.referralCount) || 0) + 1;
+  state.user.referralRequests.unshift({
+    id: "REF-" + Date.now(),
+    userName: state.user.name,
+    userEmail: state.user.email,
+    code,
+    bonus: 100,
+    status: "pending",
+    time: new Date().toLocaleString()
+  });
   document.getElementById("invitedByCodeInput").value = "";
-  addNotification(`Invitation accepted from code ${code}. Total accepted invites: ${state.user.referralCount}.`);
-  addActivity(`Invite accepted (#${state.user.referralCount}) via ${code}`);
+  addNotification(`Invitation from code ${code} submitted.`);
+  addActivity(`Invite submitted via ${code}`);
   saveState();
   renderAll();
-  showToast(`Accepted invite count: ${state.user.referralCount}`);
+  showToast("Invitation submitted");
 });
 
 document.getElementById("claimTask24Btn").addEventListener("click", () => {
   const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
   if (remaining > 0) return;
   state.lastTask24Claim = Date.now();
-  addNotification("24-Hour Task completed (50.00 ETB reward awaits admin verification).");
+  addNotification("24-Hour Task completed (50.00 ETB).");
   addActivity("24-Hour Task completed");
   saveState();
   renderAll();
@@ -1526,7 +1660,6 @@ document.getElementById("refreshNotificationsBtn").addEventListener("click", () 
   showToast("Notifications refreshed");
 });
 
-// If opened via ?ref=CODE, prefill invite code input
 (function handleUrlReferralParam() {
   try {
     const params = new URLSearchParams(window.location.search);
@@ -1538,6 +1671,7 @@ document.getElementById("refreshNotificationsBtn").addEventListener("click", () 
   } catch (_) {}
 })();
 
+recordUserInRegistry(state.user, state.lockedBalance);
 renderLiveTicker();
 applyLang(currentLang);
 renderVipCards();
