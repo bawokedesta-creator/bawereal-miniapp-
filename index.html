@@ -66,8 +66,27 @@ textarea{resize:vertical;min-height:75px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .action{background:white;padding:13px 8px;border-radius:12px;text-align:center;cursor:pointer;border:1px solid #eee;font-size:13px}
 .action .emoji{font-size:21px;display:block;margin-bottom:5px}
-.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:18px;border-radius:15px;margin-bottom:14px}
+
+.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:18px;border-radius:15px;margin-bottom:14px;position:relative}
 .balance h1{font-size:24px;margin-top:8px}
+.balance-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.corner-refresh-btn{
+  background:rgba(255,255,255,.18);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.32);
+  border-radius:9px;
+  padding:6px 10px;
+  font-size:11.5px;
+  font-weight:bold;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  white-space:nowrap;
+}
+.corner-refresh-btn:hover{background:rgba(255,255,255,.28)}
+.corner-refresh-btn.spinning .refresh-icon{display:inline-block;animation:spin .65s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 .method{border:2px solid #eee;border-radius:11px;padding:11px 12px;margin:6px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .method.selected{border-color:var(--primary);background:#f5f4ff}
 .method strong{font-size:14px}
@@ -96,8 +115,20 @@ small{color:var(--muted);font-size:11.5px}
 .feature-row .btn{flex:1}
 .faq-item{padding:10px 0;border-bottom:1px solid #eee;font-size:13px}
 .faq-item:last-child{border:0}
+.toast-msg{
+  position:fixed;
+  bottom:82px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#17172b;
+  color:#fff;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:12px;
+  z-index:50;
+  box-shadow:0 4px 14px rgba(0,0,0,.2);
+}
 
-/* NORMALIZED DASHBOARD FONT SIZES AFTER LOGIN */
 #application{font-size:13.5px}
 #application h2{font-size:17px}
 #application h3{font-size:14.5px}
@@ -108,7 +139,6 @@ small{color:var(--muted);font-size:11.5px}
 #application .btn.small{font-size:11px;padding:6px 9px}
 #application input,#application select,#application textarea{font-size:13px;padding:9px 11px}
 
-/* TASK AND VIP */
 .task-card,.vip-card{
   background:white;
   border:1px solid #eee;
@@ -151,7 +181,6 @@ small{color:var(--muted);font-size:11.5px}
   font-variant-numeric:tabular-nums;
 }
 
-/* ACTIVITY DISPLAY */
 .live-activity{
   background:#17172b;
   color:white;
@@ -207,7 +236,6 @@ small{color:var(--muted);font-size:11.5px}
   to{transform:translateY(-50%)}
 }
 
-/* 25% -> 50% -> 75% -> 100% LOADER */
 #stepLoader{
   position:fixed;
   inset:0;
@@ -265,7 +293,6 @@ small{color:var(--muted);font-size:11.5px}
 
 <body>
 
-<!-- 25% -> 50% -> 75% -> 100% LOADER -->
 <div id="stepLoader" class="hidden">
   <div class="step-box">
     <div class="step-pct" id="stepPct">25%</div>
@@ -274,6 +301,8 @@ small{color:var(--muted);font-size:11.5px}
     </div>
   </div>
 </div>
+
+<div id="toastMsg" class="toast-msg hidden"></div>
 
 <section id="auth" class="auth-wrap">
   <div class="auth-lang-bar">
@@ -337,9 +366,15 @@ small{color:var(--muted);font-size:11.5px}
 
 <section id="homePage">
   <div class="balance">
-    <p data-i18n="currentBalance">Current Balance</p>
+    <div class="balance-top-row">
+      <p data-i18n="currentBalance">Current Balance</p>
+      <button type="button" class="corner-refresh-btn" id="homeCornerRefreshBtn" title="Refresh Balance">
+        <span class="refresh-icon">↻</span>
+        <span data-i18n="refreshBalance">Refresh Balance</span>
+      </button>
+    </div>
     <h1 id="balanceText">0.00 ETB</h1>
-    <small style="color:#eee" data-i18n="verifiedBalance">Verified balance (protected)</small>
+    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance (protected)</small>
     <button class="btn secondary" style="margin-top:12px" id="refreshBalanceBtn">
       ↻ <span data-i18n="refreshBalance">Refresh Balance</span>
     </button>
@@ -376,7 +411,6 @@ small{color:var(--muted);font-size:11.5px}
   </div>
 </section>
 
-<!-- DEPOSIT -->
 <section id="depositPage" class="hidden">
 <h2 class="page-title" data-i18n="deposit">Deposit</h2>
 
@@ -437,7 +471,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- WITHDRAWAL -->
 <section id="withdrawPage" class="hidden">
 <h2 class="page-title" data-i18n="withdrawal">Withdrawal</h2>
 <div class="card">
@@ -479,7 +512,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- REFERRAL -->
 <section id="referralPage" class="hidden">
 <h2 class="page-title" data-i18n="referral">Referral</h2>
 <div class="card">
@@ -499,7 +531,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- PACKAGES (VIP 1 to VIP 10, stepping by 2000 ETB) -->
 <section id="packagesPage" class="hidden">
 <h2 class="page-title" data-i18n="packages">Packages</h2>
 <div class="card">
@@ -509,7 +540,6 @@ small{color:var(--muted);font-size:11.5px}
 <div id="packagesList"></div>
 </section>
 
-<!-- TASK PAGE (24-HOUR TASK = 50 ETB + 24H COOLDOWN) -->
 <section id="taskPage" class="hidden">
   <h2 class="page-title" data-i18n="dailyTasks">Daily Tasks</h2>
   <div class="card">
@@ -539,7 +569,6 @@ small{color:var(--muted);font-size:11.5px}
   </div>
 </section>
 
-<!-- VIP PAGE -->
 <section id="vipPage" class="hidden">
   <h2 class="page-title">VIP Membership</h2>
   <div id="vipList"></div>
@@ -548,7 +577,6 @@ small{color:var(--muted);font-size:11.5px}
   </div>
 </section>
 
-<!-- HISTORY -->
 <section id="historyPage" class="hidden">
 <h2 class="page-title" data-i18n="transactionHistory">Transaction History</h2>
 <div class="card">
@@ -561,12 +589,17 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- PROFILE -->
 <section id="profilePage" class="hidden">
 <h2 class="page-title" data-i18n="myProfile">My Profile</h2>
 
 <div class="balance">
-  <p data-i18n="currentBalance">Current Balance</p>
+  <div class="balance-top-row">
+    <p data-i18n="currentBalance">Current Balance</p>
+    <button type="button" class="corner-refresh-btn" id="profileCornerRefreshBtn" title="Refresh Balance">
+      <span class="refresh-icon">↻</span>
+      <span data-i18n="refreshBalance">Refresh Balance</span>
+    </button>
+  </div>
   <h1 id="profileBalance">0.00 ETB</h1>
   <small style="color:#eee" data-i18n="verifiedBalance">Verified balance (protected)</small>
   <button class="btn secondary" style="margin-top:12px" id="profileRefreshBtn">
@@ -612,7 +645,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- SUPPORT -->
 <section id="supportPage" class="hidden">
 <h2 class="page-title" data-i18n="support">Support</h2>
 <div class="card">
@@ -626,7 +658,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- NOTIFICATIONS -->
 <section id="notificationsPage" class="hidden">
 <h2 class="page-title" data-i18n="notifications">Notifications</h2>
 <div class="card">
@@ -639,7 +670,6 @@ small{color:var(--muted);font-size:11.5px}
 </div>
 </section>
 
-<!-- FAQ -->
 <section id="faqPage" class="hidden">
 <h2 class="page-title" data-i18n="faq">Help / FAQ</h2>
 <div class="card">
@@ -812,969 +842,574 @@ const TRANSLATIONS = {
     recentActivity: "የቅርብ ጊዜ እንቅስቃሴ",
     noRecentActivity: "ምንም የቅርብ ጊዜ እንቅስቃሴ የለም።",
     depositActivity: "የተቀማጭ ገንዘብ እንቅስቃሴ",
-    activityDisplay: "የእንቅስቃሴ ማሳያ",
+    activityDisplay: "እንቅስቃሴ ማሳያ",
     selectPaymentMethod: "የመክፈያ ዘዴ ይምረጡ",
     mobilePayment: "የሞባይል ክፍያ",
-    depositNotice: "ክፍያውን ወደ ተመረጠው አካውንት ያስተላልፉና የትራንዛክሽን መለያ (Transaction ID) ያስገቡ። ቀሪ ገንዘብዎ ከመታደሱ በፊት ጥያቄዎ ይጣራል።",
+    depositNotice: "ክፍያውን ወደ ተመረጠው አካውንት ያስተላልፉ እና የግብይት መለያ (Transaction ID) ያስገቡ። ቀሪ ገንዘብዎ ከመዘምኑ በፊት ጥያቄዎ ይገመገማል።",
     copyTelebirr: "የቴሌብር ቁጥር ቅዳ",
-    copyCbe: "የሲቢኢ ቁጥር ቅዳ",
-    depositAmountLabel: "የሚገባው ገንዘብ መጠን (ETB)",
-    transactionIdLabel: "የትራንዛክሽን መለያ (Transaction ID)",
+    copyCbe: "የCBE ቁጥር ቅዳ",
+    depositAmountLabel: "የሚገባ የገንዘብ መጠን (ETB)",
+    transactionIdLabel: "የግብይት መለያ (Transaction ID)",
     noteOptional: "ማስታወሻ (አማራጭ)",
-    submitDeposit: "የተቀማጭ ጥያቄ ላክ",
-    depositDisclaimer: "ጥያቄ ማስገባት ክፍያ መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከጸደቀ በኋላ ብቻ ነው።",
-    myDepositHistory: "የተቀማጭ ገንዘብ ታሪክ",
+    submitDeposit: "የገንዘብ ማስገቢያ ጥያቄ ያስገቡ",
+    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከተፈቀደ በኋላ ብቻ ነው።",
+    myDepositHistory: "የእኔ የተቀማጭ ገንዘብ ታሪክ",
     withdrawalRequest: "የገንዘብ ማውጫ ጥያቄ",
     enterPaymentDetails: "የክፍያ መረጃዎን በጥንቃቄ ያስገቡ።",
     paymentMethodLabel: "የመክፈያ ዘዴ",
     accountHolderName: "የአካውንት ባለቤት ስም",
     accountNumberLabel: "የአካውንት ቁጥር / ስልክ ቁጥር",
-    withdrawalAmountLabel: "የሚወጣው ገንዘብ መጠን (ETB)",
+    withdrawalAmountLabel: "የሚወጣ የገንዘብ መጠን (ETB)",
     additionalNoteOptional: "ተጨማሪ ማስታወሻ (አማራጭ)",
-    withdrawLimitsNotice: "አነስተኛ ማውጫ፡ 100 ብር። ከፍተኛ ማውጫ፡ 5,000 ብር። ክፍያ፡ 0.04%።",
-    submitWithdrawal: "የማውጫ ጥያቄ ላክ",
-    myWithdrawalHistory: "የማውጫ ታሪክ",
+    withdrawLimitsNotice: "ዝቅተኛ ማውጫ፡ 100 ETB። ከፍተኛ ማውጫ፡ 5,000 ETB። ክፍያ 0.04% ነው።",
+    submitWithdrawal: "የማውጫ ጥያቄ ያስገቡ",
+    myWithdrawalHistory: "የእኔ የማውጫ ታሪክ",
     yourReferralCode: "የእርስዎ የግብዣ ኮድ",
-    inviteRewardInfo: "ሰዎችን ይጋብዙ እና ለእያንዳንዱ ግብዣ 100 ብር ያግኙ! ኮድዎን ያጋሩ።",
+    inviteRewardInfo: "ጓደኞችን ይጋብዙ እና ለእያንዳንዱ ግብዣ 100 ETB ያግኙ! ኮድዎን ያጋሩ።",
     copyReferralCode: "የግብዣ ኮድ ቅዳ",
-    enterInviteCodeTitle: "የጋበዘዎትን ሰው ኮድ ያስገቡ",
-    applyInviteCodeBtn: "የ100 ብር ግብዣ ቦነስ መዝግብ",
+    enterInviteCodeTitle: "የጓደኛ የግብዣ ኮድ ያስገቡ",
+    applyInviteCodeBtn: "100 ETB የግብዣ ጉርሻ ይመዝግቡ",
     vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10)",
-    vipStepDesc: "እያንዳንዱ VIP ከVIP 1 (2,000 ብር) ጀምሮ በ2,000 ብር እየተበላለጠ እስከ VIP 10 (20,000 ብር) ይደርሳል።",
+    vipStepDesc: "እያንዳንዱ የVIP ደረጃ ከVIP 1 (2,000 ETB) ጀምሮ እስከ VIP 10 (20,000 ETB) በ2,000 ETB ይጨምራል።",
     dailyTasks: "ዕለታዊ ተግባራት",
     availableTasks: "ያሉ ተግባራት",
-    task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ 50 ብር ያግኙ። አንዴ ከሰሩ ለሚቀጥሉት 24 ሰዓታት ደቂቃ እየቆጠረ አይሰራም።",
-    inviteRewardDesc: "ሰው ሲጋብዙ 100 ብር ያግኙ።",
-    transactionHistory: "የትራንዛክሽን ታሪክ",
-    myProfile: "መገለጫዬ (My Profile)",
-    depositSummary: "የተቀማጭ ማጠቃለያ",
+    task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ 50 ETB ያግኙ። ካጠናቀቁ በኋላ እንደገና ለመስራት የ24 ሰዓት መጠበቂያ ሰዓት ይቆጥራል።",
+    inviteRewardDesc: "ሰዎችን ሲጋብዙ 100 ETB ያግኙ።",
+    transactionHistory: "የግብይት ታሪክ",
+    myProfile: "የእኔ ፕሮፋይል",
+    depositSummary: "የተቀማጭ ገንዘብ ማጠቃለያ",
     totalDeposits: "ጠቅላላ የተቀመጠ",
     accountInformation: "የመለያ መረጃ",
     fullName: "ሙሉ ስም",
-    emailAddress: "ኢሜይል አድራሻ",
+    emailAddress: "የኢሜይል አድራሻ",
     emailVerification: "የኢሜይል ማረጋገጫ",
     sendVerificationEmail: "የማረጋገጫ ኢሜይል ላክ",
-    copyUserId: "የተጠቃሚ መለያ (UID) ቅዳ",
+    copyUserId: "የተጠቃሚ መለያ (User ID) ቅዳ",
     accountStatus: "የመለያ ሁኔታ",
     accountSecurity: "የመለያ ደህንነት",
-    securityHint: "የይለፍ ቃልዎን ለመቀየር ወደ ኢሜይልዎ የሚላከውን ሊንክ ይጠቀሙ።",
-    neverSharePass: "የይለፍ ቃልዎን ወይም የማረጋገጫ ኮድ ለማንም አያጋሩ።",
-    contactSupport: "ድጋፍ ያግኙ",
+    securityHint: "የይለፍ ቃል ለመቀየር ወደ ኢሜይልዎ የተላከውን ደህንነቱ የተጠበቀ ሊንክ ይጠቀሙ።",
+    neverSharePass: "የይለፍ ቃልዎን ወይም የማረጋገጫ ኮድዎን ለማንም አያጋሩ።",
+    contactSupport: "ድጋፍን ያግኙ",
     sendMessage: "መልዕክት ላክ",
-    mySupportRequests: "የድጋፍ ጥያቄዎቼ",
-    myRequestUpdates: "የጥያቄዎቼ ዝመናዎች",
-    requestUpdatesDesc: "የገንዘብ ማስገባት እና ማውጣት ጥያቄዎችዎ ሁኔታ።",
+    mySupportRequests: "የእኔ የድጋፍ ጥያቄዎች",
+    myRequestUpdates: "የጥያቄ ዝመናዎች",
+    requestUpdatesDesc: "ስለ ገንዘብ ማስገቢያ እና ማውጫ ጥያቄዎችዎ ዝመናዎች።",
     refresh: "አድስ",
-    faqTitle: "ተደጋግመው የሚጠየቁ ጥያቄዎች",
+    faqTitle: "በተደጋጋሚ የሚጠየቁ ጥያቄዎች",
     navHome: "መነሻ",
     navWithdraw: "ማውጣት",
-    navProfile: "መገለጫ",
-    buyPackage: "ፓኬጅ ምረጥ / አንቃ"
+    navProfile: "ፕሮፋይል",
+    buyPackage: "ፓኬጅ ይምረጡ / ያግብሩ"
   }
 };
 
-let currentLang = "en";
+const STORAGE_KEY = "bawereal_demo_state_v1";
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-function setLanguage(lang){
-  currentLang = lang === "am" ? "am" : "en";
+let state = loadState();
+let currentLang = state.lang || "en";
+let currentPage = "home";
+let toastTimer = null;
+
+function defaultState() {
+  return {
+    loggedIn: false,
+    lang: "en",
+    user: {
+      name: "Bawoke Desta",
+      email: "user@bawereal.local",
+      uid: "USR-" + Math.random().toString(36).slice(2, 10).toUpperCase(),
+      referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
+      verified: false,
+      status: "Active",
+      vipLevel: 0,
+      invitedBy: ""
+    },
+    balance: 0,
+    lastTask24Claim: 0,
+    deposits: [],
+    withdrawals: [],
+    supports: [],
+    notifications: [],
+    activities: []
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    return { ...defaultState(), ...JSON.parse(raw) };
+  } catch (_) {
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    state.lang = currentLang;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (_) {}
+}
+
+function showToast(msg) {
+  const el = document.getElementById("toastMsg");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add("hidden"), 2000);
+}
+
+function triggerBalanceRefresh(btnId) {
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.classList.remove("spinning");
+    void btn.offsetWidth;
+    btn.classList.add("spinning");
+    setTimeout(() => btn.classList.remove("spinning"), 700);
+  }
+  renderAll();
+  const syncEl = document.getElementById("lastSyncText");
+  if (syncEl) {
+    syncEl.textContent = "Updated: " + new Date().toLocaleTimeString();
+  }
+  showToast("Balance refreshed");
+}
+
+function formatETB(val) {
+  const num = Number(val) || 0;
+  return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ETB";
+}
+
+function runStepLoader(cb) {
+  const loader = document.getElementById("stepLoader");
+  const pct = document.getElementById("stepPct");
+  const fill = document.getElementById("stepFill");
+  const steps = [25, 50, 75, 100];
+  let idx = 0;
+  loader.classList.remove("hidden");
+  pct.textContent = "25%";
+  fill.style.width = "25%";
+
+  const timer = setInterval(() => {
+    idx++;
+    if (idx < steps.length) {
+      pct.textContent = steps[idx] + "%";
+      fill.style.width = steps[idx] + "%";
+    } else {
+      clearInterval(timer);
+      setTimeout(() => {
+        loader.classList.add("hidden");
+        if (typeof cb === "function") cb();
+      }, 150);
+    }
+  }, 120);
+}
+
+function applyLang(lang) {
+  currentLang = TRANSLATIONS[lang] ? lang : "en";
   document.documentElement.lang = currentLang;
-
-  document.querySelectorAll(".lang-btn").forEach(btn=>{
+  document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.lang === currentLang);
   });
-
   const dict = TRANSLATIONS[currentLang];
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const key = el.dataset.i18n;
-    if(dict[key] !== undefined){
-      el.textContent = dict[key];
-    }
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
   });
-
   renderVipCards();
+  saveState();
 }
 
-document.querySelectorAll(".lang-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>setLanguage(btn.dataset.lang));
-});
-
-const VIP_TIERS = Array.from({length: 10}, (_, idx) => {
-  const level = idx + 1;
-  const price = level * 2000;
-  const badge = level <= 3 ? ["🥉","🥈","🥇"][idx] : "👑";
-  return { level, price, badge };
-});
-
-function renderVipCards(){
-  const btnLabel = TRANSLATIONS[currentLang].buyPackage;
-  const unit = currentLang === "am" ? "ብር" : "ETB";
-  const descText = currentLang === "am"
-    ? "የVIP ፓኬጅ ደረጃ — ከመጀመሪያው በ2,000 ብር የተለየ"
-    : "VIP Package tier — stepping by 2,000 ETB per level";
-
-  const html = VIP_TIERS.map(v => `
-    <div class="vip-card">
-      <div class="vip-top">
-        <div>
-          <span class="vip-level">${v.badge}</span>
-          <h3 style="display:inline-block;margin-left:6px">VIP ${v.level}</h3>
-        </div>
-        <div class="vip-price">${v.price.toLocaleString()} ${unit}</div>
-      </div>
-      <p class="muted">${descText}</p>
-      <button type="button" class="btn secondary" style="margin-top:10px" onclick="window.purchaseVip(${v.level}, ${v.price})">${btnLabel}</button>
-    </div>
-  `).join("");
-
-  const pkgEl = document.getElementById("packagesList");
-  const vipEl = document.getElementById("vipList");
-  if(pkgEl) pkgEl.innerHTML = html;
-  if(vipEl) vipEl.innerHTML = html;
+function showLogin() {
+  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("forgotBox").classList.add("hidden");
 }
 
-renderVipCards();
-
-function showLogin(){
-  loginBox.classList.remove("hidden");
-  registerBox.classList.add("hidden");
-  forgotBox.classList.add("hidden");
-}
-function showRegister(){
-  loginBox.classList.add("hidden");
-  registerBox.classList.remove("hidden");
-  forgotBox.classList.add("hidden");
-}
-function showForgot(){
-  loginBox.classList.add("hidden");
-  registerBox.classList.add("hidden");
-  forgotBox.classList.remove("hidden");
+function showRegister() {
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.remove("hidden");
+  document.getElementById("forgotBox").classList.add("hidden");
 }
 
-function openPage(page){
-  const pages=[
-    "home","deposit","withdraw","referral","packages",
-    "history","profile","support","notifications","faq",
-    "task","vip"
+function showForgot() {
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("forgotBox").classList.remove("hidden");
+}
+
+function openPage(page) {
+  currentPage = page;
+  document.querySelectorAll("main.container > section").forEach(sec => {
+    sec.classList.toggle("hidden", sec.id !== page + "Page");
+  });
+  document.querySelectorAll(".bottom-nav .nav-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === page);
+  });
+  renderAll();
+}
+
+function chooseMethod(method) {
+  document.getElementById("depositMethod").value = method;
+  document.getElementById("telebirrCard").classList.toggle("selected", method === "Telebirr");
+  document.getElementById("cbeCard").classList.toggle("selected", method === "CBE");
+}
+
+function copyAccount(val) {
+  if (navigator.clipboard) navigator.clipboard.writeText(val).catch(() => {});
+  showToast("Copied: " + val);
+}
+
+function addNotification(text) {
+  state.notifications.unshift({ text, time: new Date().toLocaleString() });
+}
+
+function addActivity(text) {
+  state.activities.unshift({ text, time: new Date().toLocaleTimeString() });
+  state.activities = state.activities.slice(0, 15);
+}
+
+function renderLiveTicker() {
+  const sample = [
+    ["Abebe K.", "+1,500 ETB"],
+    ["Selam T.", "+2,000 ETB"],
+    ["Dawit M.", "+5,000 ETB"],
+    ["Hanna B.", "+1,000 ETB"],
+    ["Yonas G.", "+4,000 ETB"],
+    ["Tigist A.", "+2,500 ETB"]
   ];
+  const rows = sample.map(([name, amt]) =>
+    `<div class="activity-entry"><span>${name} — Telebirr / CBE</span><strong>${amt}</strong></div>`
+  ).join("");
+  document.getElementById("activityTrack").innerHTML = rows + rows;
+}
 
-  pages.forEach(p=>{
-    const el=document.getElementById(p+"Page");
-    if(el) el.classList.toggle("hidden",p!==page);
+function renderVipCards() {
+  const label = TRANSLATIONS[currentLang].buyPackage || "Select / Activate Package";
+  let html = "";
+  for (let i = 1; i <= 10; i++) {
+    const price = i * 2000;
+    const active = state.user.vipLevel === i;
+    html += `
+      <div class="vip-card">
+        <div class="vip-top">
+          <div class="vip-level">👑 VIP ${i}</div>
+          <div class="vip-price">${price.toLocaleString()} ETB</div>
+        </div>
+        <p class="muted">Tier ${i} membership package (${price.toLocaleString()} ETB).</p>
+        <div style="margin-top:10px">
+          <button type="button" class="btn ${active ? "secondary" : ""}" onclick="selectVip(${i}, ${price})">
+            ${active ? "Active (VIP " + i + ")" : label}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById("packagesList").innerHTML = html;
+  document.getElementById("vipList").innerHTML = html;
+}
+
+function selectVip(level, price) {
+  if (state.balance < price) {
+    alert("Insufficient balance for VIP " + level + " (" + price.toLocaleString() + " ETB). Submit a deposit first.");
+    return;
+  }
+  state.balance -= price;
+  state.user.vipLevel = level;
+  addNotification("Activated VIP " + level + " (" + price.toLocaleString() + " ETB).");
+  addActivity("Activated VIP " + level);
+  saveState();
+  renderAll();
+  alert("VIP " + level + " activated.");
+}
+
+function updateTask24Timer() {
+  const cdEl = document.getElementById("task24Countdown");
+  const stEl = document.getElementById("task24Status");
+  const btn = document.getElementById("claimTask24Btn");
+  if (!cdEl || !stEl || !btn) return;
+
+  const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
+  if (remaining <= 0) {
+    cdEl.textContent = "00:00:00";
+    stEl.textContent = "Ready";
+    stEl.className = "status approved";
+    btn.disabled = false;
+  } else {
+    const totalSec = Math.floor(remaining / 1000);
+    const hrs = String(Math.floor(totalSec / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
+    const secs = String(totalSec % 60).padStart(2, "0");
+    cdEl.textContent = `${hrs}:${mins}:${secs}`;
+    stEl.textContent = "Cooldown";
+    stEl.className = "status pending";
+    btn.disabled = true;
+  }
+}
+
+function renderAll() {
+  document.getElementById("headerName").textContent = state.user.name || "Welcome";
+  document.getElementById("balanceText").textContent = formatETB(state.balance);
+  document.getElementById("profileBalance").textContent = formatETB(state.balance);
+  document.getElementById("referralCode").textContent = state.user.referralCode;
+
+  document.getElementById("profileName").textContent = state.user.name;
+  document.getElementById("profileEmail").textContent = state.user.email;
+  document.getElementById("emailVerificationStatus").textContent = state.user.verified ? "Verified" : "Unverified";
+  document.getElementById("profileUid").textContent = state.user.uid;
+  document.getElementById("profileStatus").textContent = state.user.status + (state.user.vipLevel ? " • VIP " + state.user.vipLevel : "");
+
+  const totalDep = state.deposits.reduce((s, d) => s + d.amount, 0);
+  const appDep = state.deposits.filter(d => d.status === "approved").reduce((s, d) => s + d.amount, 0);
+  const penDep = state.deposits.filter(d => d.status === "pending").reduce((s, d) => s + d.amount, 0);
+  const rejDep = state.deposits.filter(d => d.status === "rejected").reduce((s, d) => s + d.amount, 0);
+
+  document.getElementById("totalDeposits").textContent = formatETB(totalDep);
+  document.getElementById("approvedDeposits").textContent = formatETB(appDep);
+  document.getElementById("pendingDeposits").textContent = formatETB(penDep);
+  document.getElementById("rejectedDeposits").textContent = formatETB(rejDep);
+
+  const depEl = document.getElementById("depositHistory");
+  depEl.innerHTML = state.deposits.length ? state.deposits.map(d => `
+    <div class="item">
+      <div class="item-top"><strong>${d.method} • ${formatETB(d.amount)}</strong><span class="muted">${d.time}</span></div>
+      <div class="muted">TX: ${d.txId}</div>
+      <span class="status ${d.status}">${d.status}</span>
+    </div>
+  `).join("") : `<div class="empty">No deposit history loaded yet.</div>`;
+
+  const witEl = document.getElementById("withdrawHistory");
+  witEl.innerHTML = state.withdrawals.length ? state.withdrawals.map(w => `
+    <div class="item">
+      <div class="item-top"><strong>${w.method} • ${formatETB(w.amount)}</strong><span class="muted">${w.time}</span></div>
+      <div class="muted">Net: ${formatETB(w.net)} • ${w.account}</div>
+      <span class="status ${w.status}">${w.status}</span>
+    </div>
+  `).join("") : `<div class="empty">No withdrawal history loaded yet.</div>`;
+
+  const filter = document.getElementById("historyFilter").value;
+  const combined = [
+    ...state.deposits.map(d => ({ ...d, kind: "deposit" })),
+    ...state.withdrawals.map(w => ({ ...w, kind: "withdrawal" }))
+  ].filter(item => filter === "all" || item.kind === filter);
+
+  document.getElementById("historyList").innerHTML = combined.length ? combined.map(c => `
+    <div class="item">
+      <div class="item-top"><strong>${c.kind.toUpperCase()} (${c.method})</strong><span>${formatETB(c.amount)}</span></div>
+      <div class="muted">${c.time}</div>
+      <span class="status ${c.status}">${c.status}</span>
+    </div>
+  `).join("") : `<div class="empty">No history loaded yet.</div>`;
+
+  document.getElementById("supportHistory").innerHTML = state.supports.length ? state.supports.map(s => `
+    <div class="item">
+      <div>${s.message}</div>
+      <span class="muted">${s.time}</span>
+    </div>
+  `).join("") : `<div class="empty">No support messages yet.</div>`;
+
+  document.getElementById("notificationsList").innerHTML = state.notifications.length ? state.notifications.map(n => `
+    <div class="item">
+      <div>${n.text}</div>
+      <span class="muted">${n.time}</span>
+    </div>
+  `).join("") : `<div class="empty">No notifications loaded yet.</div>`;
+
+  document.getElementById("recentActivity").innerHTML = state.activities.length
+    ? state.activities.slice(0, 5).map(a => `<div class="item"><div class="item-top"><span>${a.text}</span><span class="muted">${a.time}</span></div></div>`).join("")
+    : `<div class="empty">${TRANSLATIONS[currentLang].noRecentActivity}</div>`;
+
+  updateTask24Timer();
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => applyLang(btn.dataset.lang));
+});
+
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  if (email) state.user.email = email;
+  state.loggedIn = true;
+  saveState();
+  runStepLoader(() => {
+    document.getElementById("auth").classList.add("hidden");
+    document.getElementById("application").classList.remove("hidden");
+    openPage("home");
   });
+});
 
-  document.querySelectorAll(".nav-btn").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.page===page);
+document.getElementById("registerBtn").addEventListener("click", () => {
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const pass = document.getElementById("regPassword").value;
+  const conf = document.getElementById("regConfirm").value;
+  if (!name || !email || !pass) return alert("Please fill out all required fields.");
+  if (pass !== conf) return alert("Passwords do not match.");
+  state.user.name = name;
+  state.user.email = email;
+  state.loggedIn = true;
+  saveState();
+  runStepLoader(() => {
+    document.getElementById("auth").classList.add("hidden");
+    document.getElementById("application").classList.remove("hidden");
+    openPage("home");
   });
-
-  if(page === "deposit" && typeof window.loadDepositHistory === "function") window.loadDepositHistory();
-  if(page === "withdraw" && typeof window.loadWithdrawalHistory === "function") window.loadWithdrawalHistory();
-  if(page === "history" && typeof window.loadHistory === "function") window.loadHistory();
-  if(page === "profile" && typeof window.loadDepositSummary === "function") window.loadDepositSummary();
-  if(page === "support" && typeof window.loadSupportHistory === "function") window.loadSupportHistory();
-  if(page === "notifications" && typeof window.loadNotifications === "function") window.loadNotifications();
-}
-window.openPage=openPage;
-
-window.copyAccount=async function(number){
-  try{
-    await navigator.clipboard.writeText(number);
-    alert("Account number copied: "+number);
-  }catch(e){
-    const temp=document.createElement("textarea");
-    temp.value=number;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    temp.remove();
-    alert("Account number copied.");
-  }
-};
-
-window.chooseMethod=function(method){
-  document.getElementById("depositMethod").value=method;
-  document.getElementById("telebirrCard").classList.toggle("selected",method==="Telebirr");
-  document.getElementById("cbeCard").classList.toggle("selected",method==="CBE");
-};
-
-/* ACTIVITY DISPLAY */
-const activityNumbers=[
-  "0912*******25",
-  "0916*******75",
-  "0948*******62",
-  "0932*******12",
-  "0944*******55",
-  "0925*******07",
-  "0906*******24",
-  "0987*******20",
-  "0909*******14"
-];
-
-const activityTrack=document.getElementById("activityTrack");
-
-if(activityTrack){
-  const entries=[...activityNumbers,...activityNumbers];
-
-  activityTrack.innerHTML=entries.map(number=>`
-    <div class="activity-entry">
-      <span>📱 ${number}</span>
-      <strong>Deposit</strong>
-    </div>
-  `).join("");
-}
-</script>
-
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-  getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,
-  sendPasswordResetEmail,onAuthStateChanged,signOut,
-  sendEmailVerification,reload
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-  getFirestore,doc,setDoc,getDoc,addDoc,collection,query,
-  where,getDocs,serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
-  authDomain:"bawereal.firebaseapp.com",
-  projectId:"bawereal",
-  storageBucket:"bawereal.firebasestorage.app",
-  messagingSenderId:"756822160410",
-  appId:"1:756822160410:web:e2a09b254d851c229a4da3",
-  measurementId:"G-VN3D9QM7P8"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-let currentUser=null;
-let currentUserData={};
-let hasPlayedBootLoader=false;
-
-const BalanceGuard = Object.freeze({
-  COOLDOWN_MS: 24 * 60 * 60 * 1000
 });
 
-const $=id=>document.getElementById(id);
-function notify(message){alert(message);}
+document.getElementById("resetBtn").addEventListener("click", () => {
+  alert("Password reset instructions sent if the email is registered.");
+  showLogin();
+});
 
-function setLoading(button,loading,label){
-  button.disabled=loading;
-  button.textContent=loading?"Please wait...":label;
-}
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  state.loggedIn = false;
+  saveState();
+  document.getElementById("application").classList.add("hidden");
+  document.getElementById("auth").classList.remove("hidden");
+});
 
-function makeReferral(uid){
-  return "BW"+uid.substring(0,8).toUpperCase();
-}
+document.getElementById("homeCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
+document.getElementById("profileCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("profileCornerRefreshBtn"));
+document.getElementById("refreshBalanceBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
+document.getElementById("profileRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("profileCornerRefreshBtn"));
 
-function safeText(value){
-  return String(value??"").replace(/[&<>"']/g,char=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  })[char]);
-}
-
-function statusClass(status){
-  const s=String(status||"request-recorded").toLowerCase();
-  if(["approved","completed","paid"].includes(s)) return "approved";
-  if(["rejected","failed","cancelled"].includes(s)) return "rejected";
-  if(s==="processing") return "processing";
-  if(s==="under-review"||s==="under review") return "under-review";
-  return "pending";
-}
-
-function readableStatus(status){
-  return String(status||"Request recorded")
-    .replace(/-/g," ")
-    .replace(/\b\w/g,c=>c.toUpperCase());
-}
-
-function formatMoney(value){
-  return Number(value||0).toFixed(2)+" ETB";
-}
-
-function getDate(record){
-  return record.createdAt?.toDate
-    ?record.createdAt.toDate().toLocaleString()
-    :"Date unavailable";
-}
-
-function renderBalanceDisplays(balance){
-  const safeVal = Number(balance||0);
-  const formatted = formatMoney(safeVal);
-  $("balanceText").textContent = formatted;
-  $("profileBalance").textContent = formatted;
-}
-
-/* 25% -> 50% -> 75% -> 100% LOADER */
-function playStepLoader(){
-  return new Promise(resolve=>{
-    const loader=$("stepLoader");
-    const pct=$("stepPct");
-    const fill=$("stepFill");
-    loader.classList.remove("hidden");
-    const steps=[25,50,75,100];
-    let idx=0;
-    function next(){
-      const v=steps[idx];
-      pct.textContent=v+"%";
-      fill.style.width=v+"%";
-      idx++;
-      if(idx<steps.length){
-        setTimeout(next,140);
-      }else{
-        setTimeout(()=>{
-          loader.classList.add("hidden");
-          resolve();
-        },160);
-      }
-    }
-    next();
+document.getElementById("depositBtn").addEventListener("click", () => {
+  const method = document.getElementById("depositMethod").value;
+  const amount = Number(document.getElementById("depositAmount").value);
+  const txId = document.getElementById("depositTransactionId").value.trim();
+  if (!method || !amount || amount < 300 || amount > 10000 || !txId) {
+    return alert("Select a method, enter an amount (300–10,000 ETB), and provide a Transaction ID.");
+  }
+  state.deposits.unshift({
+    method,
+    amount,
+    txId,
+    status: "pending",
+    time: new Date().toLocaleString()
   });
-}
-
-/* 24-HOUR TASK TIMER & 50 ETB REWARD */
-function getTaskStorageKey(){
-  return currentUser ? `bawe_task24_${currentUser.uid}` : "bawe_task24_guest";
-}
-
-function getLastTaskClaimTime(){
-  const fromDoc = Number(currentUserData?.lastTask24ClaimAt || 0);
-  const fromLocal = Number(localStorage.getItem(getTaskStorageKey()) || 0);
-  return Math.max(fromDoc, fromLocal);
-}
-
-function formatDuration(ms){
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  const hrs = Math.floor(totalSec / 3600);
-  const mins = Math.floor((totalSec % 3600) / 60);
-  const secs = totalSec % 60;
-  return [hrs, mins, secs].map(n => String(n).padStart(2, "0")).join(":");
-}
-
-function updateTask24UI(){
-  const countdownEl = $("task24Countdown");
-  const btnEl = $("claimTask24Btn");
-  const statusEl = $("task24Status");
-  if(!countdownEl || !btnEl || !statusEl) return;
-
-  const lastClaim = getLastTaskClaimTime();
-  const elapsed = Date.now() - lastClaim;
-  const remaining = BalanceGuard.COOLDOWN_MS - elapsed;
-
-  if(lastClaim > 0 && remaining > 0){
-    countdownEl.textContent = formatDuration(remaining);
-    btnEl.disabled = true;
-    btnEl.textContent = "Cooldown Active (24h)";
-    statusEl.textContent = "Locked (24h)";
-    statusEl.className = "status pending";
-  }else{
-    countdownEl.textContent = "00:00:00";
-    btnEl.disabled = false;
-    btnEl.textContent = "Claim 50 ETB";
-    statusEl.textContent = "Ready";
-    statusEl.className = "status approved";
-  }
-}
-
-setInterval(updateTask24UI, 1000);
-
-$("claimTask24Btn").addEventListener("click", async()=>{
-  if(!currentUser) return notify("Please login first.");
-
-  const now = Date.now();
-  const prevClaim = getLastTaskClaimTime();
-  if(prevClaim > 0 && (now - prevClaim) < BalanceGuard.COOLDOWN_MS){
-    const left = formatDuration(BalanceGuard.COOLDOWN_MS - (now - prevClaim));
-    return notify(`Task is locked. Wait ${left} before claiming again.`);
-  }
-
-  const btn = $("claimTask24Btn");
-  setLoading(btn, true, "Claim 50 ETB");
-
-  try{
-    const claimTime = Date.now();
-    await setDoc(doc(db, "users", currentUser.uid), {
-      lastTask24ClaimAt: claimTime,
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-
-    localStorage.setItem(getTaskStorageKey(), String(claimTime));
-    currentUserData.lastTask24ClaimAt = claimTime;
-
-    await addDoc(collection(db, "transactionRequests"), {
-      userId: currentUser.uid,
-      email: currentUser.email || "",
-      type: "task_reward",
-      amount: 50,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
-
-    updateTask24UI();
-    notify("50 ETB task claim recorded! Next claim available after 24 hours.");
-  }catch(err){
-    notify(err.message);
-  }finally{
-    updateTask24UI();
-  }
+  addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted (pending review).`);
+  addActivity(`Deposit request: ${formatETB(amount)}`);
+  document.getElementById("depositAmount").value = "";
+  document.getElementById("depositTransactionId").value = "";
+  document.getElementById("depositNote").value = "";
+  saveState();
+  renderAll();
+  showToast("Deposit request submitted");
 });
 
-/* WITHDRAWAL FEE (0.04%) */
-function calcWithdrawFee(amount){
-  const amt=Number(amount)||0;
-  if(amt<=0) return 0;
-  return Number((amt*0.0004).toFixed(4));
-}
-
-function updateWithdrawFeePreview(){
-  const amt=Math.max(0,Number($("withdrawAmount").value)||0);
-  const fee=Math.min(amt,calcWithdrawFee(amt));
-  const net=Number(Math.max(0,amt-fee).toFixed(4));
-  $("withdrawFee").value=fee.toFixed(2)+" ETB";
-  $("withdrawNet").value=net.toFixed(2)+" ETB";
-}
-$("withdrawAmount").addEventListener("input",updateWithdrawFeePreview);
-
-/* VIP PACKAGE PURCHASE */
-window.purchaseVip = async function(level, price){
-  if(!currentUser) return notify("Please login first.");
-  if(!confirm(`Select / Request VIP ${level} (${price.toLocaleString()} ETB)?`)) return;
-
-  try{
-    const userRef = doc(db, "users", currentUser.uid);
-    const snap = await getDoc(userRef);
-
-    if(!snap.exists()){
-      await setDoc(userRef, {
-        uid: currentUser.uid,
-        fullName: currentUserData.fullName || "User",
-        email: currentUser.email || "",
-        balance: 0,
-        status: "active",
-        vipLevel: level,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-    } else {
-      const curBal = Number(snap.data().balance ?? 0);
-      const safeBal = Number.isFinite(curBal) ? curBal : 0;
-      if(safeBal < price){
-        return notify(`Insufficient balance (${safeBal.toFixed(2)} ETB available, ${price.toFixed(2)} ETB required).`);
-      }
-
-      await setDoc(userRef, {
-        vipLevel: level,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    }
-
-    await addDoc(collection(db, "transactionRequests"), {
-      userId: currentUser.uid,
-      email: currentUser.email || "",
-      type: "package",
-      packageName: `VIP ${level}`,
-      amount: price,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
-
-    currentUserData.vipLevel = level;
-    notify(`VIP ${level} request recorded (${price.toLocaleString()} ETB).`);
-  }catch(err){
-    notify(err.message);
-  }
-};
-
-/* REGISTER */
-$("registerBtn").addEventListener("click",async()=>{
-  const name=$("regName").value.trim();
-  const email=$("regEmail").value.trim();
-  const password=$("regPassword").value;
-  const confirmPassword=$("regConfirm").value;
-
-  if(!name||!email||!password||!confirmPassword)
-    return notify("Please complete all fields.");
-  if(password.length<6)
-    return notify("Password must be at least 6 characters.");
-  if(password!==confirmPassword)
-    return notify("Passwords do not match.");
-
-  const btn=$("registerBtn");
-  setLoading(btn,true,"Register");
-
-  try{
-    const result=await createUserWithEmailAndPassword(auth,email,password);
-    const uid=result.user.uid;
-
-    await setDoc(doc(db,"users",uid),{
-      uid,
-      fullName:name,
-      email,
-      balance:0,
-      status:"active",
-      createdAt:serverTimestamp()
-    });
-
-    try{
-      await sendEmailVerification(result.user);
-      notify("Account created. A verification email has been sent.");
-    }catch(e){
-      notify("Account created successfully. You can request email verification from your profile.");
-    }
-  }catch(error){
-    notify(error.message);
-  }finally{
-    setLoading(btn,false,"Register");
-  }
+document.getElementById("withdrawAmount").addEventListener("input", e => {
+  const amt = Math.max(0, Number(e.target.value) || 0);
+  const fee = amt * 0.0004;
+  const net = Math.max(0, amt - fee);
+  document.getElementById("withdrawFee").value = formatETB(fee);
+  document.getElementById("withdrawNet").value = formatETB(net);
 });
 
-/* LOGIN */
-$("loginBtn").addEventListener("click",async()=>{
-  const email=$("loginEmail").value.trim();
-  const password=$("loginPassword").value;
-  if(!email||!password) return notify("Enter email and password.");
-
-  const btn=$("loginBtn");
-  setLoading(btn,true,"Login");
-  try{
-    await signInWithEmailAndPassword(auth,email,password);
-  }catch(error){
-    notify(error.message);
-  }finally{
-    setLoading(btn,false,"Login");
+document.getElementById("withdrawBtn").addEventListener("click", () => {
+  const method = document.getElementById("withdrawMethod").value;
+  const holder = document.getElementById("withdrawName").value.trim();
+  const account = document.getElementById("withdrawAccount").value.trim();
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  if (!method || !holder || !account || !amount || amount < 100 || amount > 5000) {
+    return alert("Complete all fields with an amount between 100 and 5,000 ETB.");
   }
-});
-
-/* PASSWORD RESET */
-async function sendReset(email){
-  if(!email) return notify("Email address is not available.");
-  try{
-    await sendPasswordResetEmail(auth,email);
-    notify("Password reset link sent. Check your email.");
-  }catch(error){
-    notify(error.message);
+  if (amount > state.balance) {
+    return alert("Insufficient balance.");
   }
-}
-
-$("resetBtn").addEventListener("click",async()=>{
-  const email=$("forgotEmail").value.trim();
-  if(!email) return notify("Enter your email address.");
-
-  const btn=$("resetBtn");
-  setLoading(btn,true,"Send Reset Link");
-  try{
-    await sendPasswordResetEmail(auth,email);
-    notify("Password reset link sent. Check your email.");
-    showLogin();
-  }catch(error){
-    notify(error.message);
-  }finally{
-    setLoading(btn,false,"Send Reset Link");
-  }
-});
-
-$("profileResetPasswordBtn").addEventListener("click",async()=>{
-  if(!currentUser) return;
-  await sendReset(currentUser.email);
-});
-
-/* EMAIL VERIFICATION */
-$("verifyEmailBtn").addEventListener("click",async()=>{
-  if(!currentUser) return;
-  const btn=$("verifyEmailBtn");
-  setLoading(btn,true,"Send Verification Email");
-  try{
-    await sendEmailVerification(currentUser);
-    notify("Verification email sent. Check your inbox.");
-  }catch(error){
-    notify(error.message);
-  }finally{
-    setLoading(btn,false,"Send Verification Email");
-  }
-});
-
-/* LOGOUT */
-$("logoutBtn").addEventListener("click",async()=>{
-  if(confirm("Are you sure you want to logout?")){
-    hasPlayedBootLoader=false;
-    await signOut(auth);
-  }
-});
-
-/* AUTH STATE — NO AUTO REFRESH ON ENTRY */
-onAuthStateChanged(auth,async user=>{
-  currentUser=user;
-  if(!user){
-    hasPlayedBootLoader=false;
-    currentUserData={};
-    $("auth").classList.remove("hidden");
-    $("application").classList.add("hidden");
-    return;
-  }
-
-  $("auth").classList.add("hidden");
-  $("application").classList.remove("hidden");
-
-  $("headerName").textContent="Hello, "+(user.email||"User");
-  $("profileEmail").textContent=user.email||"-";
-  $("profileUid").textContent=user.uid;
-  $("referralCode").textContent=makeReferral(user.uid);
-  updateTask24UI();
-
-  if(!hasPlayedBootLoader){
-    hasPlayedBootLoader=true;
-    await playStepLoader();
-  }
-});
-
-/* EMAIL VERIFICATION STATUS */
-async function updateEmailVerificationStatus(){
-  if(!currentUser) return;
-  try{
-    await reload(currentUser);
-    const verified=auth.currentUser.emailVerified;
-    $("emailVerificationStatus").textContent=verified?"Verified ✓":"Not verified";
-    $("emailVerificationStatus").style.color=verified?"#087b4c":"#bd2636";
-    $("verifyEmailBtn").style.display=verified?"none":"block";
-  }catch(error){
-    $("emailVerificationStatus").textContent="Unable to check";
-  }
-}
-
-/* MANUAL REFRESH BALANCE (ONLY ON BUTTON CLICK) */
-async function refreshBalance(){
-  if(!currentUser) return;
-  try{
-    const userRef=doc(db,"users",currentUser.uid);
-    let snap=await getDoc(userRef);
-
-    if(!snap.exists()){
-      await setDoc(userRef,{
-        uid:currentUser.uid,
-        fullName:"User",
-        email:currentUser.email,
-        balance:0,
-        status:"active",
-        createdAt:serverTimestamp()
-      });
-      snap=await getDoc(userRef);
-    }
-
-    currentUserData=snap.exists()?snap.data():{};
-    const name=currentUserData.fullName||"User";
-    const balance=Number(currentUserData.balance||0);
-
-    $("headerName").textContent="Hello, "+name;
-    $("profileName").textContent=name;
-    $("profileEmail").textContent=currentUser.email||"-";
-    $("profileUid").textContent=currentUser.uid;
-    $("profileStatus").textContent=currentUserData.status||"Active";
-    $("referralCode").textContent=currentUserData.referralCode||makeReferral(currentUser.uid);
-
-    renderBalanceDisplays(balance);
-    updateTask24UI();
-
-    await updateEmailVerificationStatus();
-    notify("Balance refreshed.");
-  }catch(error){
-    console.error("Balance refresh error:",error);
-    notify("Could not refresh balance.");
-  }
-}
-
-$("refreshBalanceBtn").addEventListener("click",refreshBalance);
-$("profileRefreshBtn").addEventListener("click",refreshBalance);
-
-/* COPY USER ID & REFERRAL (100 ETB INVITE REWARD) */
-$("copyUidBtn").addEventListener("click",async()=>{
-  if(!currentUser) return;
-  try{
-    await navigator.clipboard.writeText(currentUser.uid);
-    notify("User ID copied.");
-  }catch(error){
-    notify("User ID copied.");
-  }
-});
-
-$("copyReferralBtn").addEventListener("click",async()=>{
-  const code=$("referralCode").textContent;
-  try{
-    await navigator.clipboard.writeText(code);
-    notify("Referral code copied ("+code+"). Invite bonus: 100 ETB.");
-  }catch(error){
-    notify("Referral code copied. Invite bonus: 100 ETB.");
-  }
-});
-
-$("applyReferralBtn").addEventListener("click",async()=>{
-  if(!currentUser) return notify("Please login first.");
-  const invCode=$("invitedByCodeInput").value.trim().toUpperCase();
-  const ownCode=makeReferral(currentUser.uid);
-  if(!invCode) return notify("Please enter a referral code.");
-  if(invCode===ownCode) return notify("You cannot use your own referral code.");
-
-  try{
-    await addDoc(collection(db,"transactionRequests"),{
-      userId:currentUser.uid,
-      email:currentUser.email||"",
-      type:"referral",
-      referralCode:invCode,
-      rewardAmount:100,
-      amount:100,
-      status:"pending",
-      createdAt:serverTimestamp()
-    });
-    $("invitedByCodeInput").value="";
-    notify("Referral recorded (100 ETB invite reward).");
-  }catch(err){
-    notify("Referral error: "+err.message);
-  }
-});
-
-/* DEPOSIT REQUEST */
-$("depositBtn").addEventListener("click",async()=>{
-  if(!currentUser) return notify("Please login first.");
-
-  const method=$("depositMethod").value;
-  const amount=Number($("depositAmount").value);
-  const txId=$("depositTransactionId").value.trim();
-  const note=$("depositNote").value.trim();
-
-  if(!method) return notify("Please select a payment method.");
-  if(!Number.isFinite(amount)||amount<300||amount>10000)
-    return notify("Deposit amount must be between 300 and 10,000 ETB.");
-  if(!txId) return notify("Please enter transaction ID.");
-
-  const btn=$("depositBtn");
-  setLoading(btn,true,"Submit Deposit Request");
-  try{
-    await addDoc(collection(db,"transactionRequests"),{
-      userId:currentUser.uid,
-      email:currentUser.email||"",
-      type:"deposit",
-      amount,
-      method,
-      transactionId:txId,
-      note,
-      status:"pending",
-      createdAt:serverTimestamp()
-    });
-    $("depositAmount").value="";
-    $("depositTransactionId").value="";
-    $("depositNote").value="";
-    notify("Deposit request submitted.");
-    if(typeof window.loadDepositHistory === "function") window.loadDepositHistory();
-  }catch(error){
-    notify("Deposit failed: "+error.message);
-  }finally{
-    setLoading(btn,false,"Submit Deposit Request");
-  }
-});
-
-/* WITHDRAWAL REQUEST */
-$("withdrawBtn").addEventListener("click",async()=>{
-  if(!currentUser) return notify("Please login first.");
-
-  const method=$("withdrawMethod").value;
-  const accountName=$("withdrawName").value.trim();
-  const accountNumber=$("withdrawAccount").value.trim();
-  const amount=Number($("withdrawAmount").value);
-  const note=$("withdrawNote").value.trim();
-
-  if(!method) return notify("Please select a payment method.");
-  if(!accountName||!accountNumber) return notify("Please enter account holder name and account number.");
-  if(!Number.isFinite(amount)||amount<100||amount>5000)
-    return notify("Withdrawal amount must be between 100 and 5,000 ETB.");
-
-  const withdrawalFee=Math.min(amount,calcWithdrawFee(amount));
-  const netAmount=Number(Math.max(0,amount-withdrawalFee).toFixed(4));
-
-  const btn=$("withdrawBtn");
-  setLoading(btn,true,"Submit Withdrawal Request");
-  try{
-    await addDoc(collection(db,"transactionRequests"),{
-      userId:currentUser.uid,
-      email:currentUser.email||"",
-      type:"withdrawal",
-      amount,
-      withdrawalFee,
-      netAmount,
-      method,
-      accountName,
-      accountNumber,
-      note,
-      status:"pending",
-      createdAt:serverTimestamp()
-    });
-    $("withdrawName").value="";
-    $("withdrawAccount").value="";
-    $("withdrawAmount").value="";
-    $("withdrawNote").value="";
-    updateWithdrawFeePreview();
-    notify("Withdrawal request submitted.");
-    if(typeof window.loadWithdrawalHistory === "function") window.loadWithdrawalHistory();
-  }catch(error){
-    notify("Withdrawal failed: "+error.message);
-  }finally{
-    setLoading(btn,false,"Submit Withdrawal Request");
-  }
-});
-
-/* SUPPORT */
-$("supportBtn").addEventListener("click",async()=>{
-  if(!currentUser) return notify("Please login first.");
-  const message=$("supportMessage").value.trim();
-  if(!message) return notify("Please write a message.");
-
-  const btn=$("supportBtn");
-  setLoading(btn,true,"Send Message");
-  try{
-    await addDoc(collection(db,"supportRequests"),{
-      userId:currentUser.uid,
-      email:currentUser.email||"",
-      message,
-      status:"pending",
-      createdAt:serverTimestamp()
-    });
-    $("supportMessage").value="";
-    notify("Support message sent.");
-    if(typeof window.loadSupportHistory === "function") window.loadSupportHistory();
-  }catch(error){
-    notify("Support failed: "+error.message);
-  }finally{
-    setLoading(btn,false,"Send Message");
-  }
-});
-
-/* ON-DEMAND LOADERS */
-window.loadHistory=async function(){
-  if(!currentUser) return;
-  const filter=$("historyFilter").value;
-  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid));
-  const snap=await getDocs(q);
-  let rows=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(filter!=="all") rows=rows.filter(r=>r.type===filter);
-  if(!rows.length){
-    $("historyList").innerHTML='<div class="empty">No requests found.</div>';
-    return;
-  }
-  $("historyList").innerHTML=rows.map(r=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${safeText(String(r.type||"").toUpperCase())} — ${formatMoney(r.amount)}</strong>
-        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
-      </div>
-      <p class="muted">${safeText(r.method||"-")} · ${safeText(getDate(r))}${r.adminNote?" · Note: "+safeText(r.adminNote):""}</p>
-    </div>
-  `).join("");
-};
-$("historyFilter").addEventListener("change",()=>window.loadHistory());
-
-window.loadDepositHistory=async function(){
-  if(!currentUser) return;
-  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","deposit"));
-  const snap=await getDocs(q);
-  const rows=snap.docs.map(d=>d.data());
-  if(!rows.length){
-    $("depositHistory").innerHTML='<div class="empty">No deposits yet.</div>';
-    return;
-  }
-  $("depositHistory").innerHTML=rows.map(r=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${formatMoney(r.amount)}</strong>
-        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
-      </div>
-      <p class="muted">${safeText(r.method||"-")} · ${safeText(r.transactionId||"-")} · ${safeText(getDate(r))}</p>
-    </div>
-  `).join("");
-};
-
-window.loadWithdrawalHistory=async function(){
-  if(!currentUser) return;
-  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","withdrawal"));
-  const snap=await getDocs(q);
-  const rows=snap.docs.map(d=>d.data());
-  if(!rows.length){
-    $("withdrawHistory").innerHTML='<div class="empty">No withdrawals yet.</div>';
-    return;
-  }
-  $("withdrawHistory").innerHTML=rows.map(r=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${formatMoney(r.amount)}</strong>
-        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
-      </div>
-      <p class="muted">${safeText(r.method||"-")}${r.withdrawalFee!=null?" · Fee: "+Number(r.withdrawalFee).toFixed(2)+" ETB":""}${r.netAmount!=null?" · Net: "+Number(r.netAmount).toFixed(2)+" ETB":""} · ${safeText(getDate(r))}</p>
-    </div>
-  `).join("");
-};
-
-window.loadDepositSummary=async function(){
-  if(!currentUser) return;
-  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid),where("type","==","deposit"));
-  const snap=await getDocs(q);
-  let total=0,approved=0,pending=0,rejected=0;
-  snap.docs.forEach(d=>{
-    const x=d.data();
-    const amt=Number(x.amount||0);
-    total+=amt;
-    const st=String(x.status||"pending").toLowerCase();
-    if(st==="approved"||st==="completed") approved+=amt;
-    else if(st==="rejected"||st==="failed") rejected+=amt;
-    else pending+=amt;
+  const net = Math.max(0, amount - amount * 0.0004);
+  state.balance -= amount;
+  state.withdrawals.unshift({
+    method,
+    holder,
+    account,
+    amount,
+    net,
+    status: "pending",
+    time: new Date().toLocaleString()
   });
-  $("totalDeposits").textContent=formatMoney(total);
-  $("approvedDeposits").textContent=formatMoney(approved);
-  $("pendingDeposits").textContent=formatMoney(pending);
-  $("rejectedDeposits").textContent=formatMoney(rejected);
-};
+  addNotification(`Withdrawal request of ${formatETB(amount)} submitted.`);
+  addActivity(`Withdrawal request: ${formatETB(amount)}`);
+  saveState();
+  renderAll();
+  showToast("Withdrawal request submitted");
+});
 
-window.loadSupportHistory=async function(){
-  if(!currentUser) return;
-  const q=query(collection(db,"supportRequests"),where("userId","==",currentUser.uid));
-  const snap=await getDocs(q);
-  const rows=snap.docs.map(d=>d.data());
-  if(!rows.length){
-    $("supportHistory").innerHTML='<div class="empty">No support messages yet.</div>';
-    return;
-  }
-  $("supportHistory").innerHTML=rows.map(r=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${safeText(r.message)}</strong>
-        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
-      </div>
-      <p class="muted">${safeText(getDate(r))}</p>
-    </div>
-  `).join("");
-};
+document.getElementById("copyReferralBtn").addEventListener("click", () => {
+  copyAccount(state.user.referralCode);
+});
 
-window.loadNotifications=async function(){
-  if(!currentUser) return;
-  const q=query(collection(db,"transactionRequests"),where("userId","==",currentUser.uid));
-  const snap=await getDocs(q);
-  const rows=snap.docs.map(d=>d.data());
-  if(!rows.length){
-    $("notificationsList").innerHTML='<div class="empty">No updates yet.</div>';
-    return;
-  }
-  $("notificationsList").innerHTML=rows.map(r=>`
-    <div class="item">
-      <div class="item-top">
-        <strong>${safeText(String(r.type||"").toUpperCase())} (${formatMoney(r.amount)})</strong>
-        <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
-      </div>
-      <p class="muted">${r.adminNote?safeText(r.adminNote)+" · ":""}${safeText(getDate(r))}</p>
-    </div>
-  `).join("");
-};
+document.getElementById("applyReferralBtn").addEventListener("click", () => {
+  const code = document.getElementById("invitedByCodeInput").value.trim();
+  if (!code) return alert("Enter a referral code first.");
+  if (state.user.invitedBy) return alert("An invite code is already recorded for this account.");
+  state.user.invitedBy = code;
+  state.balance += 100;
+  addNotification("Recorded referral code " + code + " (+100.00 ETB).");
+  addActivity("Referral bonus: +100.00 ETB");
+  saveState();
+  renderAll();
+  showToast("100.00 ETB referral bonus recorded");
+});
 
-$("refreshNotificationsBtn").addEventListener("click",()=>window.loadNotifications());
+document.getElementById("claimTask24Btn").addEventListener("click", () => {
+  const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
+  if (remaining > 0) return;
+  state.lastTask24Claim = Date.now();
+  state.balance += 50;
+  addNotification("Claimed 24-Hour Task reward (+50.00 ETB).");
+  addActivity("24-Hour Task: +50.00 ETB");
+  saveState();
+  renderAll();
+  showToast("+50.00 ETB claimed");
+});
+
+document.getElementById("historyFilter").addEventListener("change", renderAll);
+
+document.getElementById("verifyEmailBtn").addEventListener("click", () => {
+  state.user.verified = true;
+  addNotification("Email marked as verified.");
+  saveState();
+  renderAll();
+  showToast("Email verified");
+});
+
+document.getElementById("copyUidBtn").addEventListener("click", () => {
+  copyAccount(state.user.uid);
+});
+
+document.getElementById("profileResetPasswordBtn").addEventListener("click", () => {
+  alert("Password reset link sent to " + state.user.email);
+});
+
+document.getElementById("supportBtn").addEventListener("click", () => {
+  const msg = document.getElementById("supportMessage").value.trim();
+  if (!msg) return;
+  state.supports.unshift({ message: msg, time: new Date().toLocaleString() });
+  document.getElementById("supportMessage").value = "";
+  addNotification("Support message sent.");
+  saveState();
+  renderAll();
+  showToast("Support message sent");
+});
+
+document.getElementById("refreshNotificationsBtn").addEventListener("click", () => {
+  renderAll();
+  showToast("Notifications refreshed");
+});
+
+renderLiveTicker();
+applyLang(currentLang);
+renderVipCards();
+renderAll();
+setInterval(updateTask24Timer, 1000);
+
+if (state.loggedIn) {
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("application").classList.remove("hidden");
+  openPage("home");
+}
 </script>
 </body>
 </html>
