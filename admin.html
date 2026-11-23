@@ -36,7 +36,7 @@ header h1{font-size:18px}
 header small{color:#cbd5e1;font-size:12px}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-.container{max-width:1120px;margin:18px auto;padding:0 14px}
+.container{max-width:1160px;margin:18px auto;padding:0 14px}
 .auth-box{max-width:400px;margin:48px auto;background:#fff;padding:22px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
 .auth-box h2{margin-bottom:6px;font-size:20px}
 .muted{color:var(--muted);font-size:12px}
@@ -64,7 +64,7 @@ input:focus,select:focus{border-color:var(--primary)}
 .card-header h3{font-size:15.5px}
 
 .table-wrap{width:100%;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:680px}
+table{width:100%;border-collapse:collapse;min-width:720px}
 th,td{padding:10px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:12.5px;vertical-align:middle}
 th{background:#f8f9fd;color:#374151;font-weight:bold}
 tr:last-child td{border-bottom:0}
@@ -118,7 +118,7 @@ tr:last-child td{border-bottom:0}
 
 <section id="adminAuth" class="auth-box">
   <h2>BaweReal Admin</h2>
-  <p class="muted">Sign in to review deposits, withdrawals, investments, and referrals.</p><br>
+  <p class="muted">Sign in to manage registered users, deposits, withdrawals, investments, and referrals.</p><br>
   <label>Admin Access Key / PIN</label>
   <input id="adminPassInput" type="password" placeholder="Enter admin passcode (default: admin123)">
   <button class="btn" id="adminLoginBtn">Open Admin Panel</button>
@@ -128,7 +128,7 @@ tr:last-child td{border-bottom:0}
   <header>
     <div>
       <h1>BaweReal — Admin Control Panel</h1>
-      <small id="adminUserSummary">User: - | Verified Balance: 0.00 ETB</small>
+      <small id="adminUserSummary">Registered Users: 0 | Active User: - | Balance: 0.00 ETB</small>
     </div>
     <div class="header-actions">
       <button class="btn small secondary" id="refreshAdminBtn">↻ Refresh Data</button>
@@ -138,7 +138,8 @@ tr:last-child td{border-bottom:0}
 
   <main class="container">
     <div class="stats-grid">
-      <div class="stat-card"><span>Verified User Balance</span><strong id="statBalance">0.00 ETB</strong></div>
+      <div class="stat-card"><span>Registered Users</span><strong id="statUsersCount">0</strong></div>
+      <div class="stat-card"><span>Active User Balance</span><strong id="statBalance">0.00 ETB</strong></div>
       <div class="stat-card"><span>Pending Deposits</span><strong id="statPendingDep">0</strong></div>
       <div class="stat-card"><span>Pending Withdrawals</span><strong id="statPendingWit">0</strong></div>
       <div class="stat-card"><span>Pending Investments</span><strong id="statPendingInv">0</strong></div>
@@ -146,15 +147,41 @@ tr:last-child td{border-bottom:0}
     </div>
 
     <div class="tabs">
-      <button type="button" class="tab-btn active" data-tab="depositsTab">Deposits</button>
+      <button type="button" class="tab-btn active" data-tab="usersTab">Users</button>
+      <button type="button" class="tab-btn" data-tab="depositsTab">Deposits</button>
       <button type="button" class="tab-btn" data-tab="withdrawalsTab">Withdrawals</button>
       <button type="button" class="tab-btn" data-tab="investmentsTab">Investments</button>
       <button type="button" class="tab-btn" data-tab="referralsTab">Referrals</button>
       <button type="button" class="tab-btn" data-tab="historyTab">Full History</button>
     </div>
 
+    <!-- REGISTERED USERS TABLE -->
+    <section id="usersTab" class="card">
+      <div class="card-header">
+        <h3>Registered Users</h3>
+        <span class="muted">Shows all users registered or logged in from index.html</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User Name</th>
+              <th>Email</th>
+              <th>User ID</th>
+              <th>Referral Code</th>
+              <th>Invites</th>
+              <th>Balance</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- DEPOSITS TABLE -->
-    <section id="depositsTab" class="card">
+    <section id="depositsTab" class="card hidden">
       <div class="card-header">
         <h3>Deposit Requests</h3>
         <span class="muted">Approve credits balance • Reject or Review updates status</span>
@@ -251,7 +278,7 @@ tr:last-child td{border-bottom:0}
       </div>
     </section>
 
-    <!-- FULL HISTORY TABLE (DEPOSIT, WITHDRAWAL, INVESTMENT WITH USER NAME) -->
+    <!-- FULL HISTORY TABLE -->
     <section id="historyTab" class="card hidden">
       <div class="card-header">
         <h3>All Transactions History (Deposits, Withdrawals & Investments)</h3>
@@ -284,12 +311,14 @@ tr:last-child td{border-bottom:0}
 
 <script>
 const STORAGE_KEY = "bawereal_state_v2";
+const USERS_KEY = "bawereal_users_v2";
 const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
 const ADMIN_PASSCODE = "admin123";
 const REFERRAL_BONUS_ETB = 100;
 
 let state = loadState();
-let activeTab = "depositsTab";
+let usersList = loadUsers();
+let activeTab = "usersTab";
 
 function computeBalanceChecksum(balanceVal, uidVal) {
   const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
@@ -316,7 +345,8 @@ function defaultState() {
       referralRequests: [],
       verified: false,
       status: "Active",
-      vipLevel: 0
+      vipLevel: 0,
+      registeredAt: new Date().toLocaleString()
     },
     lockedBalance: 0,
     balanceSig: computeBalanceChecksum(0, uid),
@@ -328,6 +358,45 @@ function defaultState() {
     notifications: [],
     activities: []
   };
+}
+
+function loadUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function syncUsersRegistry() {
+  try {
+    const map = new Map();
+    usersList.forEach(u => {
+      if (u && (u.email || u.uid)) {
+        map.set((u.email || u.uid).toLowerCase(), { ...u });
+      }
+    });
+
+    if (state && state.user && (state.user.email || state.user.name)) {
+      const key = (state.user.email || state.user.uid || state.user.name).toLowerCase();
+      const existing = map.get(key) || {};
+      map.set(key, {
+        ...existing,
+        uid: state.user.uid || existing.uid || "USR-UNKNOWN",
+        name: state.user.name || existing.name || "User",
+        email: state.user.email || existing.email || "-",
+        referralCode: state.user.referralCode || existing.referralCode || "-",
+        referralCount: Number(state.user.referralCount) || 0,
+        balance: Number(state.lockedBalance) || 0,
+        registeredAt: state.user.registeredAt || existing.registeredAt || new Date().toLocaleString()
+      });
+    }
+
+    usersList = Array.from(map.values());
+    localStorage.setItem(USERS_KEY, JSON.stringify(usersList));
+  } catch (_) {}
 }
 
 function loadState() {
@@ -348,7 +417,6 @@ function loadState() {
       ? merged.user.referralRequests
       : [];
 
-    // Seed referral requests if user accepted codes earlier without request records
     if (merged.user.referralRequests.length === 0 && Array.isArray(merged.user.acceptedCodes) && merged.user.acceptedCodes.length > 0) {
       merged.user.referralRequests = merged.user.acceptedCodes.map((code, i) => ({
         id: "REF-SEED-" + i,
@@ -369,6 +437,7 @@ function saveState() {
   try {
     state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncUsersRegistry();
   } catch (_) {}
 }
 
@@ -424,7 +493,7 @@ function switchTab(tabId) {
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.tab === tabId);
   });
-  ["depositsTab", "withdrawalsTab", "investmentsTab", "referralsTab", "historyTab"].forEach(id => {
+  ["usersTab", "depositsTab", "withdrawalsTab", "investmentsTab", "referralsTab", "historyTab"].forEach(id => {
     document.getElementById(id).classList.toggle("hidden", id !== tabId);
   });
 }
@@ -544,11 +613,13 @@ function actionReferral(index, nextStatus) {
 }
 
 function renderAll() {
+  syncUsersRegistry();
   const userName = state.user.name || "User";
   const bal = Number(state.lockedBalance) || 0;
 
   document.getElementById("adminUserSummary").textContent =
-    `User: ${userName} (${state.user.email || "-"}) | Verified Balance: ${formatETB(bal)}`;
+    `Registered Users: ${usersList.length} | Active User: ${userName} (${state.user.email || "-"}) | Balance: ${formatETB(bal)}`;
+  document.getElementById("statUsersCount").textContent = String(usersList.length);
   document.getElementById("statBalance").textContent = formatETB(bal);
   document.getElementById("statPendingDep").textContent =
     String(state.deposits.filter(d => d.status === "pending" || d.status === "review").length);
@@ -557,6 +628,21 @@ function renderAll() {
   document.getElementById("statPendingInv").textContent =
     String(state.investments.filter(i => i.status === "pending" || i.status === "review").length);
   document.getElementById("statRefCount").textContent = String(Number(state.user.referralCount) || 0);
+
+  // Registered users table
+  const usersBody = document.getElementById("usersTableBody");
+  usersBody.innerHTML = usersList.length ? usersList.map((u, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${u.name || "-"}</strong></td>
+      <td>${u.email || "-"}</td>
+      <td>${u.uid || "-"}</td>
+      <td>${u.referralCode || "-"}</td>
+      <td>${Number(u.referralCount) || 0}</td>
+      <td>${formatETB(u.balance)}</td>
+      <td>${u.registeredAt || "-"}</td>
+    </tr>
+  `).join("") : `<tr><td colspan="8" class="empty">No registered users yet.</td></tr>`;
 
   // Deposits table
   const depBody = document.getElementById("depositsTableBody");
@@ -695,6 +781,7 @@ document.getElementById("adminLoginBtn").addEventListener("click", () => {
   }
   runStepLoader(() => {
     state = loadState();
+    usersList = loadUsers();
     document.getElementById("adminAuth").classList.add("hidden");
     document.getElementById("adminApp").classList.remove("hidden");
     renderAll();
@@ -708,6 +795,7 @@ document.getElementById("adminLogoutBtn").addEventListener("click", () => {
 
 document.getElementById("refreshAdminBtn").addEventListener("click", () => {
   state = loadState();
+  usersList = loadUsers();
   renderAll();
 });
 
