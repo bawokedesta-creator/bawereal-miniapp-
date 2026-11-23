@@ -965,6 +965,13 @@ function openPage(page){
   document.querySelectorAll(".nav-btn").forEach(btn=>{
     btn.classList.toggle("active",btn.dataset.page===page);
   });
+
+  if(page === "deposit" && typeof window.loadDepositHistory === "function") window.loadDepositHistory();
+  if(page === "withdraw" && typeof window.loadWithdrawalHistory === "function") window.loadWithdrawalHistory();
+  if(page === "history" && typeof window.loadHistory === "function") window.loadHistory();
+  if(page === "profile" && typeof window.loadDepositSummary === "function") window.loadDepositSummary();
+  if(page === "support" && typeof window.loadSupportHistory === "function") window.loadSupportHistory();
+  if(page === "notifications" && typeof window.loadNotifications === "function") window.loadNotifications();
 }
 window.openPage=openPage;
 
@@ -1027,7 +1034,7 @@ import {
 
 import {
   getFirestore,doc,setDoc,getDoc,addDoc,collection,query,
-  where,getDocs,runTransaction,serverTimestamp
+  where,getDocs,serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
@@ -1048,22 +1055,8 @@ let currentUser=null;
 let currentUserData={};
 let hasPlayedBootLoader=false;
 
-/* BALANCE CONTROL GUARD (PREVENT ARBITRARY MANUAL BALANCE TAMPERING) */
 const BalanceGuard = Object.freeze({
-  MAX_SINGLE_REWARD: 50,
-  COOLDOWN_MS: 24 * 60 * 60 * 1000,
-  assertAuthorizedDelta(delta, reason){
-    const allowedReasons = ["VIP_PURCHASE", "TASK_24H_REWARD"];
-    if(!allowedReasons.includes(reason)){
-      throw new Error("Unauthorized balance modification blocked.");
-    }
-    if(!Number.isFinite(delta)){
-      throw new Error("Invalid balance delta.");
-    }
-    if(reason === "TASK_24H_REWARD" && delta !== 50){
-      throw new Error("24-hour task reward must be strictly 50 ETB.");
-    }
-  }
+  COOLDOWN_MS: 24 * 60 * 60 * 1000
 });
 
 const $=id=>document.getElementById(id);
@@ -1203,43 +1196,26 @@ $("claimTask24Btn").addEventListener("click", async()=>{
   setLoading(btn, true, "Claim 50 ETB");
 
   try{
-    BalanceGuard.assertAuthorizedDelta(50, "TASK_24H_REWARD");
-    const userRef = doc(db, "users", currentUser.uid);
+    const claimTime = Date.now();
+    await setDoc(doc(db, "users", currentUser.uid), {
+      lastTask24ClaimAt: claimTime,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
 
-    await runTransaction(db, async tx => {
-      const snap = await tx.get(userRef);
-      const data = snap.exists() ? snap.data() : {};
-      const dbClaim = Number(data.lastTask24ClaimAt || 0);
-      const effectiveClaim = Math.max(dbClaim, prevClaim);
-      if(effectiveClaim > 0 && (Date.now() - effectiveClaim) < BalanceGuard.COOLDOWN_MS){
-        throw new Error("24-hour cooldown is still active.");
-      }
-
-      const curBal = Number(data.balance ?? 0);
-      const safeBal = Number.isFinite(curBal) ? curBal : 0;
-      const nextBal = safeBal + 50;
-
-      tx.set(userRef, {
-        balance: nextBal,
-        lastTask24ClaimAt: Date.now(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    });
-
-    localStorage.setItem(getTaskStorageKey(), String(Date.now()));
-    currentUserData.lastTask24ClaimAt = Date.now();
+    localStorage.setItem(getTaskStorageKey(), String(claimTime));
+    currentUserData.lastTask24ClaimAt = claimTime;
 
     await addDoc(collection(db, "transactionRequests"), {
       userId: currentUser.uid,
       email: currentUser.email || "",
       type: "task_reward",
       amount: 50,
-      status: "approved",
+      status: "pending",
       createdAt: serverTimestamp()
     });
 
     updateTask24UI();
-    notify("50 ETB task reward credited! Next claim available after 24 hours.");
+    notify("50 ETB task claim recorded! Next claim available after 24 hours.");
   }catch(err){
     notify(err.message);
   }finally{
@@ -1266,24 +1242,35 @@ $("withdrawAmount").addEventListener("input",updateWithdrawFeePreview);
 /* VIP PACKAGE PURCHASE */
 window.purchaseVip = async function(level, price){
   if(!currentUser) return notify("Please login first.");
-  if(!confirm(`Activate VIP ${level} for ${price.toLocaleString()} ETB?`)) return;
+  if(!confirm(`Select / Request VIP ${level} (${price.toLocaleString()} ETB)?`)) return;
 
   try{
-    BalanceGuard.assertAuthorizedDelta(-price, "VIP_PURCHASE");
     const userRef = doc(db, "users", currentUser.uid);
-    await runTransaction(db, async tx => {
-      const snap = await tx.get(userRef);
-      const curBal = snap.exists() ? Number(snap.data().balance ?? 0) : 0;
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      await setDoc(userRef, {
+        uid: currentUser.uid,
+        fullName: currentUserData.fullName || "User",
+        email: currentUser.email || "",
+        balance: 0,
+        status: "active",
+        vipLevel: level,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      const curBal = Number(snap.data().balance ?? 0);
       const safeBal = Number.isFinite(curBal) ? curBal : 0;
       if(safeBal < price){
-        throw new Error(`Insufficient balance (${safeBal.toFixed(2)} ETB available, ${price.toFixed(2)} ETB required).`);
+        return notify(`Insufficient balance (${safeBal.toFixed(2)} ETB available, ${price.toFixed(2)} ETB required).`);
       }
-      tx.set(userRef, {
-        balance: safeBal - price,
+
+      await setDoc(userRef, {
         vipLevel: level,
         updatedAt: serverTimestamp()
       }, { merge: true });
-    });
+    }
 
     await addDoc(collection(db, "transactionRequests"), {
       userId: currentUser.uid,
@@ -1291,11 +1278,12 @@ window.purchaseVip = async function(level, price){
       type: "package",
       packageName: `VIP ${level}`,
       amount: price,
-      status: "approved",
+      status: "pending",
       createdAt: serverTimestamp()
     });
 
-    notify(`VIP ${level} activated (${price.toLocaleString()} ETB). Tap Refresh Balance to view updated balance.`);
+    currentUserData.vipLevel = level;
+    notify(`VIP ${level} request recorded (${price.toLocaleString()} ETB).`);
   }catch(err){
     notify(err.message);
   }
@@ -1579,6 +1567,7 @@ $("depositBtn").addEventListener("click",async()=>{
     $("depositTransactionId").value="";
     $("depositNote").value="";
     notify("Deposit request submitted.");
+    if(typeof window.loadDepositHistory === "function") window.loadDepositHistory();
   }catch(error){
     notify("Deposit failed: "+error.message);
   }finally{
@@ -1627,6 +1616,7 @@ $("withdrawBtn").addEventListener("click",async()=>{
     $("withdrawNote").value="";
     updateWithdrawFeePreview();
     notify("Withdrawal request submitted.");
+    if(typeof window.loadWithdrawalHistory === "function") window.loadWithdrawalHistory();
   }catch(error){
     notify("Withdrawal failed: "+error.message);
   }finally{
@@ -1652,6 +1642,7 @@ $("supportBtn").addEventListener("click",async()=>{
     });
     $("supportMessage").value="";
     notify("Support message sent.");
+    if(typeof window.loadSupportHistory === "function") window.loadSupportHistory();
   }catch(error){
     notify("Support failed: "+error.message);
   }finally{
@@ -1698,7 +1689,7 @@ window.loadDepositHistory=async function(){
         <strong>${formatMoney(r.amount)}</strong>
         <span class="status ${statusClass(r.status)}">${safeText(readableStatus(r.status))}</span>
       </div>
-      <p class="muted">${safeText(r.method||"-")} · ${safeText(getDate(r))}</p>
+      <p class="muted">${safeText(r.method||"-")} · ${safeText(r.transactionId||"-")} · ${safeText(getDate(r))}</p>
     </div>
   `).join("");
 };
