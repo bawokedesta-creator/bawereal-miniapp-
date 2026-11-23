@@ -94,7 +94,7 @@ textarea{resize:vertical;min-height:75px}
 .method-left{display:flex;align-items:center}
 .status{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:10.5px;margin-top:5px}
 .status.pending,.status.request-recorded,.status.processing,.status.under-review{background:#fff0ce;color:#946000}
-.status.approved,.status.completed{background:#d9f7e9;color:#087b4c}
+.status.approved,.status.completed,.status.active{background:#d9f7e9;color:#087b4c}
 .status.rejected,.status.failed,.status.cancelled{background:#ffe1e4;color:#bd2636}
 .item{border-bottom:1px solid #eee;padding:10px 0}
 .item:last-child{border:0}
@@ -273,7 +273,7 @@ small{color:var(--muted);font-size:11.5px}
   height:100%;
   background:#fff;
   border-radius:999px;
-  transition:width .2s ease;
+  transition:width .35s ease;
 }
 
 @media(max-width:600px){
@@ -374,10 +374,7 @@ small{color:var(--muted);font-size:11.5px}
       </button>
     </div>
     <h1 id="balanceText">0.00 ETB</h1>
-    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance (protected)</small>
-    <button class="btn secondary" style="margin-top:12px" id="refreshBalanceBtn">
-      ↻ <span data-i18n="refreshBalance">Refresh Balance</span>
-    </button>
+    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance (admin-controlled)</small>
   </div>
 
   <div class="grid">
@@ -517,16 +514,35 @@ small{color:var(--muted);font-size:11.5px}
 <div class="card">
   <h3 data-i18n="yourReferralCode">Your Referral Code</h3>
   <p class="muted" data-i18n="inviteRewardInfo">Invite friends and earn 100 ETB per referral! Share your code with others.</p><br>
-  <h2 id="referralCode">Loading...</h2><br>
-  <button class="btn" id="copyReferralBtn" data-i18n="copyReferralCode">Copy Referral Code</button>
+  <h2 id="referralCode">Loading...</h2>
+
+  <div class="account-box" style="margin-top:12px">
+    <strong data-i18n="yourInviteLink">Your Invite Link</strong>
+    <input id="referralLinkInput" type="text" readonly>
+    <button class="btn secondary" id="copyReferralLinkBtn" data-i18n="copyInviteLink">Copy Invite Link</button>
+  </div>
+
+  <button class="btn" style="margin-top:8px" id="copyReferralBtn" data-i18n="copyReferralCode">Copy Referral Code</button>
+
+  <div class="stat-grid" style="margin-top:12px">
+    <div class="stat">
+      <span class="muted" data-i18n="acceptedInvites">Accepted Invitations</span>
+      <strong id="referralCountText">0</strong>
+    </div>
+    <div class="stat">
+      <span class="muted" data-i18n="referralStatusLabel">Invitation Status</span>
+      <strong id="referralMilestoneText">0 accepted</strong>
+    </div>
+  </div>
+
   <div class="notice" id="referralBonusNotice">
-    Invite bonus: <strong>100 ETB</strong> for inviting a friend.
+    Invite bonus: <strong>100 ETB</strong> for inviting a friend (credited after admin approval).
   </div>
 
   <div class="account-box" style="margin-top:12px">
-    <strong data-i18n="enterInviteCodeTitle">Enter Friend's Referral Code</strong>
+    <strong data-i18n="acceptInviteTitle">Accept / Record Friend's Referral Code</strong>
     <input id="invitedByCodeInput" type="text" placeholder="e.g. BW12345678">
-    <button class="btn secondary" id="applyReferralBtn" data-i18n="applyInviteCodeBtn">Claim / Record 100 ETB Invite Bonus</button>
+    <button class="btn secondary" id="applyReferralBtn" data-i18n="applyInviteCodeBtn">Accept Invitation (+1 Count)</button>
   </div>
 </div>
 </section>
@@ -551,7 +567,7 @@ small{color:var(--muted);font-size:11.5px}
       <p class="muted" data-i18n="task24Desc">Earn 50 ETB once every 24 hours. After completing it, a 24-hour cooldown timer runs before it can be completed again.</p>
       <div class="countdown-badge" id="task24Countdown">24:00:00</div>
       <div style="margin-top:10px">
-        <button type="button" class="btn" id="claimTask24Btn">Claim 50 ETB</button>
+        <button type="button" class="btn" id="claimTask24Btn">Complete 24-Hour Task (Pending Admin)</button>
       </div>
       <span class="status pending" id="task24Status">Ready</span>
     </div>
@@ -564,7 +580,7 @@ small{color:var(--muted);font-size:11.5px}
     </div>
 
     <div class="notice" id="balanceControlNotice">
-      Balance is system-controlled: users cannot manually increase or decrease their balance arbitrarily.
+      Balance is locked & admin-controlled: users cannot manually increase or decrease their balance.
     </div>
   </div>
 </section>
@@ -581,9 +597,10 @@ small{color:var(--muted);font-size:11.5px}
 <h2 class="page-title" data-i18n="transactionHistory">Transaction History</h2>
 <div class="card">
   <select id="historyFilter">
-    <option value="all">All Requests</option>
+    <option value="all">All Requests (Deposits, Withdrawals, Investments)</option>
     <option value="deposit">Deposits</option>
     <option value="withdrawal">Withdrawals</option>
+    <option value="investment">Investments</option>
   </select>
   <div id="historyList"><div class="empty">No history loaded yet.</div></div>
 </div>
@@ -601,10 +618,7 @@ small{color:var(--muted);font-size:11.5px}
     </button>
   </div>
   <h1 id="profileBalance">0.00 ETB</h1>
-  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance (protected)</small>
-  <button class="btn secondary" style="margin-top:12px" id="profileRefreshBtn">
-    ↻ <span data-i18n="refreshBalance">Refresh Balance</span>
-  </button>
+  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance (admin-controlled)</small>
 </div>
 
 <div class="card">
@@ -707,7 +721,7 @@ small{color:var(--muted);font-size:11.5px}
 
   <div class="faq-item">
     <strong>7. Does submitting a request update my balance immediately?</strong>
-    <p class="muted">No. A deposit request does not change your balance until it is verified and approved through the secure admin process.</p>
+    <p class="muted">No. Balance changes are controlled by admin approval and verification.</p>
   </div>
 </div>
 </section>
@@ -740,7 +754,7 @@ const TRANSLATIONS = {
     backToLogin: "Back to Login",
     logout: "Logout",
     currentBalance: "Current Balance",
-    verifiedBalance: "Verified balance (protected)",
+    verifiedBalance: "Verified balance (admin-controlled)",
     refreshBalance: "Refresh Balance",
     deposit: "Deposit",
     withdrawal: "Withdrawal",
@@ -777,16 +791,20 @@ const TRANSLATIONS = {
     submitWithdrawal: "Submit Withdrawal Request",
     myWithdrawalHistory: "My Withdrawal History",
     yourReferralCode: "Your Referral Code",
-    inviteRewardInfo: "Invite friends and earn 100 ETB per referral! Share your code with others.",
+    yourInviteLink: "Your Invite Link",
+    copyInviteLink: "Copy Invite Link",
+    acceptedInvites: "Accepted Invitations",
+    referralStatusLabel: "Invitation Status",
+    acceptInviteTitle: "Accept / Record Friend's Referral Code",
+    inviteRewardInfo: "Invite friends and earn 100 ETB per referral! Share your invite link or code.",
     copyReferralCode: "Copy Referral Code",
-    enterInviteCodeTitle: "Enter Friend's Referral Code",
-    applyInviteCodeBtn: "Claim / Record 100 ETB Invite Bonus",
+    applyInviteCodeBtn: "Accept Invitation (+1 Count)",
     vipPackagesTitle: "VIP Packages (VIP 1 – VIP 10)",
     vipStepDesc: "Each VIP level increases by 2,000 ETB starting from VIP 1 (2,000 ETB) up to VIP 10 (20,000 ETB).",
     dailyTasks: "Daily Tasks",
     availableTasks: "Available Tasks",
-    task24Desc: "Earn 50 ETB once every 24 hours. After completing it, a 24-hour cooldown timer runs before it can be completed again.",
-    inviteRewardDesc: "Earn 100 ETB when you invite people to join.",
+    task24Desc: "Complete once every 24 hours. A 24-hour cooldown timer runs after completion.",
+    inviteRewardDesc: "Earn 100 ETB when invited friends join.",
     transactionHistory: "Transaction History",
     myProfile: "My Profile",
     depositSummary: "Deposit Summary",
@@ -805,13 +823,13 @@ const TRANSLATIONS = {
     sendMessage: "Send Message",
     mySupportRequests: "My Support Requests",
     myRequestUpdates: "My Request Updates",
-    requestUpdatesDesc: "Updates about your deposit and withdrawal requests.",
+    requestUpdatesDesc: "Updates about your deposit, withdrawal, and investment requests.",
     refresh: "Refresh",
     faqTitle: "Frequently Asked Questions",
     navHome: "Home",
     navWithdraw: "Withdraw",
     navProfile: "Profile",
-    buyPackage: "Select / Activate Package"
+    buyPackage: "Invest in Package"
   },
   am: {
     welcomeBack: "እንኳን ደህና መጡ",
@@ -828,7 +846,7 @@ const TRANSLATIONS = {
     backToLogin: "ወደ መግቢያ ይመለሱ",
     logout: "ውጣ",
     currentBalance: "ያለዎት ቀሪ ገንዘብ",
-    verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ (የተጠበቀ)",
+    verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ (በአድሚን የተጠበቀ)",
     refreshBalance: "ቀሪ ገንዘብ አድስ",
     deposit: "ገንዘብ ማስገባት",
     withdrawal: "ገንዘብ ማውጣት",
@@ -852,7 +870,7 @@ const TRANSLATIONS = {
     transactionIdLabel: "የግብይት መለያ (Transaction ID)",
     noteOptional: "ማስታወሻ (አማራጭ)",
     submitDeposit: "የገንዘብ ማስገቢያ ጥያቄ ያስገቡ",
-    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከተፈቀደ በኋላ ብቻ ነው።",
+    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው በአድሚን ፍቃድ ብቻ ነው።",
     myDepositHistory: "የእኔ የተቀማጭ ገንዘብ ታሪክ",
     withdrawalRequest: "የገንዘብ ማውጫ ጥያቄ",
     enterPaymentDetails: "የክፍያ መረጃዎን በጥንቃቄ ያስገቡ።",
@@ -865,16 +883,20 @@ const TRANSLATIONS = {
     submitWithdrawal: "የማውጫ ጥያቄ ያስገቡ",
     myWithdrawalHistory: "የእኔ የማውጫ ታሪክ",
     yourReferralCode: "የእርስዎ የግብዣ ኮድ",
-    inviteRewardInfo: "ጓደኞችን ይጋብዙ እና ለእያንዳንዱ ግብዣ 100 ETB ያግኙ! ኮድዎን ያጋሩ።",
+    yourInviteLink: "የእርስዎ የግብዣ ሊንክ (Invite Link)",
+    copyInviteLink: "የግብዣ ሊንክ ቅዳ",
+    acceptedInvites: "ግብዣውን የተቀበሉ ሰዎች ብዛት",
+    referralStatusLabel: "የግብዣ ሁኔታ",
+    acceptInviteTitle: "የጓደኛ የግብዣ ኮድ ይቀበሉ / ይመዝግቡ",
+    inviteRewardInfo: "ጓደኞችን ይጋብዙ! ሊንክዎን ወይም ኮድዎን ያጋሩ፤ ግብዣውን ሲቀበሉ ብዛቱ 1፣ 2፣ 3 እያለ ይቆጥራል።",
     copyReferralCode: "የግብዣ ኮድ ቅዳ",
-    enterInviteCodeTitle: "የጓደኛ የግብዣ ኮድ ያስገቡ",
-    applyInviteCodeBtn: "100 ETB የግብዣ ጉርሻ ይመዝግቡ",
+    applyInviteCodeBtn: "ግብዣ ይቀበሉ (+1 ይቁጠር)",
     vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10)",
     vipStepDesc: "እያንዳንዱ የVIP ደረጃ ከVIP 1 (2,000 ETB) ጀምሮ እስከ VIP 10 (20,000 ETB) በ2,000 ETB ይጨምራል።",
     dailyTasks: "ዕለታዊ ተግባራት",
     availableTasks: "ያሉ ተግባራት",
-    task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ 50 ETB ያግኙ። ካጠናቀቁ በኋላ እንደገና ለመስራት የ24 ሰዓት መጠበቂያ ሰዓት ይቆጥራል።",
-    inviteRewardDesc: "ሰዎችን ሲጋብዙ 100 ETB ያግኙ።",
+    task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ ይስሩ። ካጠናቀቁ በኋላ የ24 ሰዓት መጠበቂያ ሰዓት ይቆጥራል።",
+    inviteRewardDesc: "የተጋበዙ ሰዎች ሲቀላቀሉ የ100 ETB ግብዣ ተግባር ይመዘገባል።",
     transactionHistory: "የግብይት ታሪክ",
     myProfile: "የእኔ ፕሮፋይል",
     depositSummary: "የተቀማጭ ገንዘብ ማጠቃለያ",
@@ -893,53 +915,99 @@ const TRANSLATIONS = {
     sendMessage: "መልዕክት ላክ",
     mySupportRequests: "የእኔ የድጋፍ ጥያቄዎች",
     myRequestUpdates: "የጥያቄ ዝመናዎች",
-    requestUpdatesDesc: "ስለ ገንዘብ ማስገቢያ እና ማውጫ ጥያቄዎችዎ ዝመናዎች።",
+    requestUpdatesDesc: "ስለ ገንዘብ ማስገቢያ፣ ማውጫ እና ኢንቨስትመንት ጥያቄዎችዎ ዝመናዎች።",
     refresh: "አድስ",
     faqTitle: "በተደጋጋሚ የሚጠየቁ ጥያቄዎች",
     navHome: "መነሻ",
     navWithdraw: "ማውጣት",
     navProfile: "ፕሮፋይል",
-    buyPackage: "ፓኬጅ ይምረጡ / ያግብሩ"
+    buyPackage: "ፓኬጅ ኢንቨስት ያድርጉ"
   }
 };
 
-const STORAGE_KEY = "bawereal_demo_state_v1";
+const STORAGE_KEY = "bawereal_state_v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
+const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
 
 let state = loadState();
 let currentLang = state.lang || "en";
 let currentPage = "home";
 let toastTimer = null;
 
+function computeBalanceChecksum(balanceVal, uidVal) {
+  const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
+  let hash = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16);
+}
+
 function defaultState() {
+  const uid = "USR-" + Math.random().toString(36).slice(2, 10).toUpperCase();
+  const initialBalance = 0;
   return {
     loggedIn: false,
     lang: "en",
     user: {
       name: "Bawoke Desta",
       email: "user@bawereal.local",
-      uid: "USR-" + Math.random().toString(36).slice(2, 10).toUpperCase(),
+      uid,
       referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
+      referralCount: 0,
+      acceptedCodes: [],
       verified: false,
       status: "Active",
-      vipLevel: 0,
-      invitedBy: ""
+      vipLevel: 0
     },
-    balance: 0,
+    lockedBalance: initialBalance,
+    balanceSig: computeBalanceChecksum(initialBalance, uid),
     lastTask24Claim: 0,
     deposits: [],
     withdrawals: [],
+    investments: [],
     supports: [],
     notifications: [],
     activities: []
   };
 }
 
+function getVerifiedBalance() {
+  const expectedSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
+  if (state.balanceSig !== expectedSig || typeof state.lockedBalance !== "number" || Number.isNaN(state.lockedBalance)) {
+    state.lockedBalance = 0;
+    state.balanceSig = computeBalanceChecksum(0, state.user.uid);
+    saveState();
+  }
+  return Number(state.lockedBalance);
+}
+
+// Balance is read-only from the user side; only admin-approved flow updates lockedBalance + balanceSig
+function adminSetBalance(newAmount) {
+  const safeAmt = Math.max(0, Number(newAmount) || 0);
+  state.lockedBalance = safeAmt;
+  state.balanceSig = computeBalanceChecksum(safeAmt, state.user.uid);
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
-    return { ...defaultState(), ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    const base = defaultState();
+    const merged = {
+      ...base,
+      ...parsed,
+      user: { ...base.user, ...(parsed.user || {}) },
+      investments: Array.isArray(parsed.investments) ? parsed.investments : []
+    };
+    const expected = computeBalanceChecksum(merged.lockedBalance, merged.user.uid);
+    if (merged.balanceSig !== expected || typeof merged.lockedBalance !== "number" || Number.isNaN(merged.lockedBalance)) {
+      merged.lockedBalance = 0;
+      merged.balanceSig = computeBalanceChecksum(0, merged.user.uid);
+    }
+    return merged;
   } catch (_) {
     return defaultState();
   }
@@ -948,6 +1016,7 @@ function loadState() {
 function saveState() {
   try {
     state.lang = currentLang;
+    state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (_) {}
 }
@@ -958,7 +1027,7 @@ function showToast(msg) {
   el.textContent = msg;
   el.classList.remove("hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add("hidden"), 2000);
+  toastTimer = setTimeout(() => el.classList.add("hidden"), 2200);
 }
 
 function triggerBalanceRefresh(btnId) {
@@ -969,12 +1038,13 @@ function triggerBalanceRefresh(btnId) {
     btn.classList.add("spinning");
     setTimeout(() => btn.classList.remove("spinning"), 700);
   }
+  state = loadState();
   renderAll();
   const syncEl = document.getElementById("lastSyncText");
   if (syncEl) {
-    syncEl.textContent = "Updated: " + new Date().toLocaleTimeString();
+    syncEl.textContent = (currentLang === "am" ? "የተረጋገጠ ባላንስ (የታደሰ): " : "Verified balance (synced): ") + new Date().toLocaleTimeString();
   }
-  showToast("Balance refreshed");
+  showToast(currentLang === "am" ? "ቀሪ ገንዘብ ታድሷል" : "Balance refreshed");
 }
 
 function formatETB(val) {
@@ -982,16 +1052,19 @@ function formatETB(val) {
   return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ETB";
 }
 
+// 25% -> 50% -> 75% -> 100%, at least 3,000ms (3 seconds) total
 function runStepLoader(cb) {
   const loader = document.getElementById("stepLoader");
   const pct = document.getElementById("stepPct");
   const fill = document.getElementById("stepFill");
   const steps = [25, 50, 75, 100];
   let idx = 0;
+
   loader.classList.remove("hidden");
   pct.textContent = "25%";
   fill.style.width = "25%";
 
+  const stepIntervalMs = 800; // 3 steps after 25% = 2400ms + 700ms hold at 100% = 3,100ms (>= 3s)
   const timer = setInterval(() => {
     idx++;
     if (idx < steps.length) {
@@ -1002,9 +1075,9 @@ function runStepLoader(cb) {
       setTimeout(() => {
         loader.classList.add("hidden");
         if (typeof cb === "function") cb();
-      }, 150);
+      }, 700);
     }
-  }, 120);
+  }, stepIntervalMs);
 }
 
 function applyLang(lang) {
@@ -1019,6 +1092,7 @@ function applyLang(lang) {
     if (dict[key]) el.textContent = dict[key];
   });
   renderVipCards();
+  renderAll();
   saveState();
 }
 
@@ -1062,6 +1136,13 @@ function copyAccount(val) {
   showToast("Copied: " + val);
 }
 
+function getInviteLink() {
+  const base = window.location.origin && window.location.origin !== "null"
+    ? window.location.origin + window.location.pathname
+    : "https://bawereal.app/join";
+  return `${base}?ref=${encodeURIComponent(state.user.referralCode)}`;
+}
+
 function addNotification(text) {
   state.notifications.unshift({ text, time: new Date().toLocaleString() });
 }
@@ -1087,7 +1168,7 @@ function renderLiveTicker() {
 }
 
 function renderVipCards() {
-  const label = TRANSLATIONS[currentLang].buyPackage || "Select / Activate Package";
+  const label = TRANSLATIONS[currentLang].buyPackage || "Invest in Package";
   let html = "";
   for (let i = 1; i <= 10; i++) {
     const price = i * 2000;
@@ -1098,10 +1179,10 @@ function renderVipCards() {
           <div class="vip-level">👑 VIP ${i}</div>
           <div class="vip-price">${price.toLocaleString()} ETB</div>
         </div>
-        <p class="muted">Tier ${i} membership package (${price.toLocaleString()} ETB).</p>
+        <p class="muted">Investment Package Tier ${i} (${price.toLocaleString()} ETB).</p>
         <div style="margin-top:10px">
           <button type="button" class="btn ${active ? "secondary" : ""}" onclick="selectVip(${i}, ${price})">
-            ${active ? "Active (VIP " + i + ")" : label}
+            ${active ? "Active Investment (VIP " + i + ")" : label}
           </button>
         </div>
       </div>
@@ -1112,17 +1193,29 @@ function renderVipCards() {
 }
 
 function selectVip(level, price) {
-  if (state.balance < price) {
-    alert("Insufficient balance for VIP " + level + " (" + price.toLocaleString() + " ETB). Submit a deposit first.");
+  const bal = getVerifiedBalance();
+  if (bal < price) {
+    alert(
+      currentLang === "am"
+        ? `ለVIP ${level} (${price.toLocaleString()} ETB) ኢንቨስትመንት በቂ የተረጋገጠ ባላንስ የለዎትም። አድሚን ባላንስ ካጸደቀ በኋላ ይሞክሩ።`
+        : `Insufficient verified balance for VIP ${level} (${price.toLocaleString()} ETB). Admin approval is required for balance updates.`
+    );
     return;
   }
-  state.balance -= price;
+  // Investment request recorded; balance deduction/approval stays under admin control
   state.user.vipLevel = level;
-  addNotification("Activated VIP " + level + " (" + price.toLocaleString() + " ETB).");
-  addActivity("Activated VIP " + level);
+  state.investments.unshift({
+    packageName: `VIP ${level} Package`,
+    level,
+    amount: price,
+    status: "pending",
+    time: new Date().toLocaleString()
+  });
+  addNotification(`Investment request for VIP ${level} (${price.toLocaleString()} ETB) recorded.`);
+  addActivity(`Investment request: VIP ${level} (${price.toLocaleString()} ETB)`);
   saveState();
   renderAll();
-  alert("VIP " + level + " activated.");
+  showToast(currentLang === "am" ? `የVIP ${level} ኢንቨስትመንት በታሪክ ተመዝግቧል` : `VIP ${level} investment recorded in history`);
 }
 
 function updateTask24Timer() {
@@ -1134,7 +1227,7 @@ function updateTask24Timer() {
   const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
   if (remaining <= 0) {
     cdEl.textContent = "00:00:00";
-    stEl.textContent = "Ready";
+    stEl.textContent = currentLang === "am" ? "ዝግጁ" : "Ready";
     stEl.className = "status approved";
     btn.disabled = false;
   } else {
@@ -1143,17 +1236,24 @@ function updateTask24Timer() {
     const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
     const secs = String(totalSec % 60).padStart(2, "0");
     cdEl.textContent = `${hrs}:${mins}:${secs}`;
-    stEl.textContent = "Cooldown";
+    stEl.textContent = currentLang === "am" ? "በመጠባበቅ ላይ" : "Cooldown";
     stEl.className = "status pending";
     btn.disabled = true;
   }
 }
 
 function renderAll() {
+  const verifiedBal = getVerifiedBalance();
   document.getElementById("headerName").textContent = state.user.name || "Welcome";
-  document.getElementById("balanceText").textContent = formatETB(state.balance);
-  document.getElementById("profileBalance").textContent = formatETB(state.balance);
+  document.getElementById("balanceText").textContent = formatETB(verifiedBal);
+  document.getElementById("profileBalance").textContent = formatETB(verifiedBal);
   document.getElementById("referralCode").textContent = state.user.referralCode;
+  document.getElementById("referralLinkInput").value = getInviteLink();
+
+  const invCount = Number(state.user.referralCount) || 0;
+  document.getElementById("referralCountText").textContent = String(invCount);
+  document.getElementById("referralMilestoneText").textContent =
+    currentLang === "am" ? `${invCount} ሰው ተቀብሏል` : `${invCount} accepted`;
 
   document.getElementById("profileName").textContent = state.user.name;
   document.getElementById("profileEmail").textContent = state.user.email;
@@ -1191,13 +1291,32 @@ function renderAll() {
 
   const filter = document.getElementById("historyFilter").value;
   const combined = [
-    ...state.deposits.map(d => ({ ...d, kind: "deposit" })),
-    ...state.withdrawals.map(w => ({ ...w, kind: "withdrawal" }))
+    ...state.deposits.map(d => ({
+      kind: "deposit",
+      title: `DEPOSIT (${d.method})`,
+      amount: d.amount,
+      status: d.status,
+      time: d.time
+    })),
+    ...state.withdrawals.map(w => ({
+      kind: "withdrawal",
+      title: `WITHDRAWAL (${w.method})`,
+      amount: w.amount,
+      status: w.status,
+      time: w.time
+    })),
+    ...state.investments.map(inv => ({
+      kind: "investment",
+      title: `INVESTMENT (${inv.packageName})`,
+      amount: inv.amount,
+      status: inv.status,
+      time: inv.time
+    }))
   ].filter(item => filter === "all" || item.kind === filter);
 
   document.getElementById("historyList").innerHTML = combined.length ? combined.map(c => `
     <div class="item">
-      <div class="item-top"><strong>${c.kind.toUpperCase()} (${c.method})</strong><span>${formatETB(c.amount)}</span></div>
+      <div class="item-top"><strong>${c.title}</strong><span>${formatETB(c.amount)}</span></div>
       <div class="muted">${c.time}</div>
       <span class="status ${c.status}">${c.status}</span>
     </div>
@@ -1272,8 +1391,6 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
 document.getElementById("homeCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
 document.getElementById("profileCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("profileCornerRefreshBtn"));
-document.getElementById("refreshBalanceBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
-document.getElementById("profileRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("profileCornerRefreshBtn"));
 
 document.getElementById("depositBtn").addEventListener("click", () => {
   const method = document.getElementById("depositMethod").value;
@@ -1289,7 +1406,7 @@ document.getElementById("depositBtn").addEventListener("click", () => {
     status: "pending",
     time: new Date().toLocaleString()
   });
-  addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted (pending review).`);
+  addNotification(`Deposit request of ${formatETB(amount)} via ${method} submitted (pending admin approval).`);
   addActivity(`Deposit request: ${formatETB(amount)}`);
   document.getElementById("depositAmount").value = "";
   document.getElementById("depositTransactionId").value = "";
@@ -1312,14 +1429,16 @@ document.getElementById("withdrawBtn").addEventListener("click", () => {
   const holder = document.getElementById("withdrawName").value.trim();
   const account = document.getElementById("withdrawAccount").value.trim();
   const amount = Number(document.getElementById("withdrawAmount").value);
+  const bal = getVerifiedBalance();
+
   if (!method || !holder || !account || !amount || amount < 100 || amount > 5000) {
     return alert("Complete all fields with an amount between 100 and 5,000 ETB.");
   }
-  if (amount > state.balance) {
-    return alert("Insufficient balance.");
+  if (amount > bal) {
+    return alert("Insufficient verified balance.");
   }
   const net = Math.max(0, amount - amount * 0.0004);
-  state.balance -= amount;
+  // Balance change requires admin approval
   state.withdrawals.unshift({
     method,
     holder,
@@ -1329,7 +1448,7 @@ document.getElementById("withdrawBtn").addEventListener("click", () => {
     status: "pending",
     time: new Date().toLocaleString()
   });
-  addNotification(`Withdrawal request of ${formatETB(amount)} submitted.`);
+  addNotification(`Withdrawal request of ${formatETB(amount)} submitted (pending admin approval).`);
   addActivity(`Withdrawal request: ${formatETB(amount)}`);
   saveState();
   renderAll();
@@ -1340,29 +1459,37 @@ document.getElementById("copyReferralBtn").addEventListener("click", () => {
   copyAccount(state.user.referralCode);
 });
 
+document.getElementById("copyReferralLinkBtn").addEventListener("click", () => {
+  copyAccount(getInviteLink());
+});
+
 document.getElementById("applyReferralBtn").addEventListener("click", () => {
-  const code = document.getElementById("invitedByCodeInput").value.trim();
+  const code = document.getElementById("invitedByCodeInput").value.trim().toUpperCase();
   if (!code) return alert("Enter a referral code first.");
-  if (state.user.invitedBy) return alert("An invite code is already recorded for this account.");
-  state.user.invitedBy = code;
-  state.balance += 100;
-  addNotification("Recorded referral code " + code + " (+100.00 ETB).");
-  addActivity("Referral bonus: +100.00 ETB");
+  if (code === state.user.referralCode) return alert("You cannot use your own referral code.");
+  if (!Array.isArray(state.user.acceptedCodes)) state.user.acceptedCodes = [];
+  if (state.user.acceptedCodes.includes(code)) {
+    return alert("This referral code has already been accepted.");
+  }
+  state.user.acceptedCodes.push(code);
+  state.user.referralCount = (Number(state.user.referralCount) || 0) + 1;
+  document.getElementById("invitedByCodeInput").value = "";
+  addNotification(`Invitation accepted from code ${code}. Total accepted invites: ${state.user.referralCount}.`);
+  addActivity(`Invite accepted (#${state.user.referralCount}) via ${code}`);
   saveState();
   renderAll();
-  showToast("100.00 ETB referral bonus recorded");
+  showToast(`Accepted invite count: ${state.user.referralCount}`);
 });
 
 document.getElementById("claimTask24Btn").addEventListener("click", () => {
   const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
   if (remaining > 0) return;
   state.lastTask24Claim = Date.now();
-  state.balance += 50;
-  addNotification("Claimed 24-Hour Task reward (+50.00 ETB).");
-  addActivity("24-Hour Task: +50.00 ETB");
+  addNotification("24-Hour Task completed (50.00 ETB reward awaits admin verification).");
+  addActivity("24-Hour Task completed");
   saveState();
   renderAll();
-  showToast("+50.00 ETB claimed");
+  showToast("24-Hour Task recorded");
 });
 
 document.getElementById("historyFilter").addEventListener("change", renderAll);
@@ -1398,6 +1525,18 @@ document.getElementById("refreshNotificationsBtn").addEventListener("click", () 
   renderAll();
   showToast("Notifications refreshed");
 });
+
+// If opened via ?ref=CODE, prefill invite code input
+(function handleUrlReferralParam() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      const input = document.getElementById("invitedByCodeInput");
+      if (input) input.value = ref.trim().toUpperCase();
+    }
+  } catch (_) {}
+})();
 
 renderLiveTicker();
 applyLang(currentLang);
