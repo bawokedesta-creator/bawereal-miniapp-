@@ -78,7 +78,7 @@ tr:last-child td{border-bottom:0}
 .act-group{display:flex;gap:5px;flex-wrap:wrap}
 .empty{text-align:center;color:var(--muted);padding:18px;font-size:13px}
 
-/* 25% -> 50% -> 75% -> 100% LOADER (>= 3 seconds) */
+/* 25% -> 50% -> 75% -> 100% LOADER */
 #stepLoader{
   position:fixed;
   inset:0;
@@ -128,10 +128,9 @@ tr:last-child td{border-bottom:0}
   <header>
     <div>
       <h1>BaweReal — Admin Control Panel</h1>
-      <small id="adminUserSummary">Registered Users: 0 | Active User: - | Balance: 0.00 ETB</small>
+      <small id="adminUserSummary">Live Firestore Sync • Registered Users: 0</small>
     </div>
     <div class="header-actions">
-      <button class="btn small secondary" id="refreshAdminBtn">↻ Refresh Data</button>
       <button class="btn small danger" id="adminLogoutBtn">Lock</button>
     </div>
   </header>
@@ -139,7 +138,7 @@ tr:last-child td{border-bottom:0}
   <main class="container">
     <div class="stats-grid">
       <div class="stat-card"><span>Registered Users</span><strong id="statUsersCount">0</strong></div>
-      <div class="stat-card"><span>Active User Balance</span><strong id="statBalance">0.00 ETB</strong></div>
+      <div class="stat-card"><span>Total Users Balance</span><strong id="statBalance">0.00 ETB</strong></div>
       <div class="stat-card"><span>Pending Deposits</span><strong id="statPendingDep">0</strong></div>
       <div class="stat-card"><span>Pending Withdrawals</span><strong id="statPendingWit">0</strong></div>
       <div class="stat-card"><span>Pending Investments</span><strong id="statPendingInv">0</strong></div>
@@ -159,7 +158,7 @@ tr:last-child td{border-bottom:0}
     <section id="usersTab" class="card">
       <div class="card-header">
         <h3>Registered Users</h3>
-        <span class="muted">Shows all users registered or logged in from index.html</span>
+        <span class="muted">Live from Firestore users collection</span>
       </div>
       <div class="table-wrap">
         <table>
@@ -191,7 +190,7 @@ tr:last-child td{border-bottom:0}
           <thead>
             <tr>
               <th>#</th>
-              <th>User Name</th>
+              <th>User Name / Email</th>
               <th>Method</th>
               <th>Amount</th>
               <th>Transaction ID</th>
@@ -209,14 +208,14 @@ tr:last-child td{border-bottom:0}
     <section id="withdrawalsTab" class="card hidden">
       <div class="card-header">
         <h3>Withdrawal Requests</h3>
-        <span class="muted">Approve deducts verified balance • Reject or Review updates status</span>
+        <span class="muted">Approve deducts balance • Reject or Review updates status</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th>User Name</th>
+              <th>User Name / Holder</th>
               <th>Method</th>
               <th>Account</th>
               <th>Amount / Net</th>
@@ -234,14 +233,14 @@ tr:last-child td{border-bottom:0}
     <section id="investmentsTab" class="card hidden">
       <div class="card-header">
         <h3>Investment Requests (VIP Packages)</h3>
-        <span class="muted">Approve activates & deducts balance • Reject or Review updates status</span>
+        <span class="muted">Approve activates VIP & deducts balance • Reject or Review updates status</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th>User Name</th>
+              <th>User Name / Email</th>
               <th>Package</th>
               <th>Amount</th>
               <th>Time</th>
@@ -265,7 +264,7 @@ tr:last-child td{border-bottom:0}
           <thead>
             <tr>
               <th>#</th>
-              <th>Inviter / User Name</th>
+              <th>User / Email</th>
               <th>Referral Code</th>
               <th>Bonus</th>
               <th>Time</th>
@@ -294,7 +293,7 @@ tr:last-child td{border-bottom:0}
           <thead>
             <tr>
               <th>#</th>
-              <th>User Name</th>
+              <th>User Name / Email</th>
               <th>Type</th>
               <th>Details</th>
               <th>Amount</th>
@@ -309,142 +308,39 @@ tr:last-child td{border-bottom:0}
   </main>
 </section>
 
-<script>
-const STORAGE_KEY = "bawereal_state_v2";
-const USERS_KEY = "bawereal_users_v2";
-const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDoc, updateDoc, onSnapshot,
+  serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCcWPe8a6_WImYyGtuTG2BgmYLTv0hHLxg",
+  authDomain: "bawereal.firebaseapp.com",
+  projectId: "bawereal",
+  storageBucket: "bawereal.firebasestorage.app",
+  messagingSenderId: "756822160410",
+  appId: "1:756822160410:web:e2a09b254d851c229a4da3",
+  measurementId: "G-VN3D9QM7P8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const ADMIN_PASSCODE = "admin123";
 const REFERRAL_BONUS_ETB = 100;
 
-let state = loadState();
-let usersList = loadUsers();
+let usersCache = [];
+let requestsCache = [];
+let unsubUsers = null;
+let unsubRequests = null;
 let activeTab = "usersTab";
 
-function computeBalanceChecksum(balanceVal, uidVal) {
-  const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
-  let hash = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    hash ^= str.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(16);
-}
-
-function defaultState() {
-  const uid = "USR-DEMO0001";
-  return {
-    loggedIn: false,
-    lang: "en",
-    user: {
-      name: "Bawoke Desta",
-      email: "user@bawereal.local",
-      uid,
-      referralCode: "BW10000001",
-      referralCount: 0,
-      acceptedCodes: [],
-      referralRequests: [],
-      verified: false,
-      status: "Active",
-      vipLevel: 0,
-      registeredAt: new Date().toLocaleString()
-    },
-    lockedBalance: 0,
-    balanceSig: computeBalanceChecksum(0, uid),
-    lastTask24Claim: 0,
-    deposits: [],
-    withdrawals: [],
-    investments: [],
-    supports: [],
-    notifications: [],
-    activities: []
-  };
-}
-
-function loadUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (_) {
-    return [];
-  }
-}
-
-function syncUsersRegistry() {
-  try {
-    const map = new Map();
-    usersList.forEach(u => {
-      if (u && (u.email || u.uid)) {
-        map.set((u.email || u.uid).toLowerCase(), { ...u });
-      }
-    });
-
-    if (state && state.user && (state.user.email || state.user.name)) {
-      const key = (state.user.email || state.user.uid || state.user.name).toLowerCase();
-      const existing = map.get(key) || {};
-      map.set(key, {
-        ...existing,
-        uid: state.user.uid || existing.uid || "USR-UNKNOWN",
-        name: state.user.name || existing.name || "User",
-        email: state.user.email || existing.email || "-",
-        referralCode: state.user.referralCode || existing.referralCode || "-",
-        referralCount: Number(state.user.referralCount) || 0,
-        balance: Number(state.lockedBalance) || 0,
-        registeredAt: state.user.registeredAt || existing.registeredAt || new Date().toLocaleString()
-      });
-    }
-
-    usersList = Array.from(map.values());
-    localStorage.setItem(USERS_KEY, JSON.stringify(usersList));
-  } catch (_) {}
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState();
-    const parsed = JSON.parse(raw);
-    const base = defaultState();
-    const merged = {
-      ...base,
-      ...parsed,
-      user: { ...base.user, ...(parsed.user || {}) },
-      deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
-      withdrawals: Array.isArray(parsed.withdrawals) ? parsed.withdrawals : [],
-      investments: Array.isArray(parsed.investments) ? parsed.investments : []
-    };
-    merged.user.referralRequests = Array.isArray(merged.user.referralRequests)
-      ? merged.user.referralRequests
-      : [];
-
-    if (merged.user.referralRequests.length === 0 && Array.isArray(merged.user.acceptedCodes) && merged.user.acceptedCodes.length > 0) {
-      merged.user.referralRequests = merged.user.acceptedCodes.map((code, i) => ({
-        id: "REF-SEED-" + i,
-        userName: merged.user.name,
-        code,
-        bonus: REFERRAL_BONUS_ETB,
-        status: i < (Number(merged.user.referralCount) || 0) ? "approved" : "pending",
-        time: new Date().toLocaleString()
-      }));
-    }
-    return merged;
-  } catch (_) {
-    return defaultState();
-  }
-}
-
-function saveState() {
-  try {
-    state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    syncUsersRegistry();
-  } catch (_) {}
-}
-
-function setAdminBalance(amount) {
-  const safe = Math.max(0, Number(amount) || 0);
-  state.lockedBalance = safe;
-  state.balanceSig = computeBalanceChecksum(safe, state.user.uid);
+function safeText(val) {
+  return String(val ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[ch]));
 }
 
 function formatETB(val) {
@@ -452,16 +348,21 @@ function formatETB(val) {
   return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ETB";
 }
 
-function pushUserNotification(text) {
-  state.notifications.unshift({ text, time: new Date().toLocaleString() });
+function formatDate(ts) {
+  if (!ts) return "-";
+  if (ts.toDate) return ts.toDate().toLocaleString();
+  return String(ts);
 }
 
-function pushUserActivity(text) {
-  state.activities.unshift({ text, time: new Date().toLocaleTimeString() });
-  state.activities = state.activities.slice(0, 15);
+function getUserLabel(userId, fallbackName, fallbackEmail) {
+  const u = usersCache.find(x => x.id === userId || x.uid === userId);
+  if (u && u.fullName) return u.fullName;
+  if (fallbackName) return fallbackName;
+  if (u && u.email) return u.email;
+  if (fallbackEmail) return fallbackEmail;
+  return userId || "User";
 }
 
-// 25% -> 50% -> 75% -> 100%, at least 3,000ms (3 seconds) total
 function runStepLoader(cb) {
   const loader = document.getElementById("stepLoader");
   const pct = document.getElementById("stepPct");
@@ -483,9 +384,9 @@ function runStepLoader(cb) {
       setTimeout(() => {
         loader.classList.add("hidden");
         if (typeof cb === "function") cb();
-      }, 700);
+      }, 600);
     }
-  }, 800);
+  }, 700);
 }
 
 function switchTab(tabId) {
@@ -498,168 +399,208 @@ function switchTab(tabId) {
   });
 }
 
-function actionDeposit(index, nextStatus) {
-  const item = state.deposits[index];
-  if (!item) return;
-  const prevStatus = item.status;
-  const amt = Number(item.amount) || 0;
+window.actionDeposit = async function(reqId, nextStatus) {
+  const req = requestsCache.find(r => r.id === reqId);
+  if (!req) return;
+  const prevStatus = String(req.status || "pending").toLowerCase();
+  const amt = Number(req.amount) || 0;
 
-  if (nextStatus === "approved" && prevStatus !== "approved") {
-    setAdminBalance((Number(state.lockedBalance) || 0) + amt);
-    pushUserNotification(`Deposit of ${formatETB(amt)} (${item.method}) approved by admin.`);
-    pushUserActivity(`Deposit approved: +${formatETB(amt)}`);
-  } else if (prevStatus === "approved" && nextStatus !== "approved") {
-    setAdminBalance((Number(state.lockedBalance) || 0) - amt);
-  }
+  try {
+    await updateDoc(doc(db, "transactionRequests", reqId), {
+      status: nextStatus,
+      updatedAt: serverTimestamp()
+    });
 
-  item.status = nextStatus;
-  if (nextStatus === "review") {
-    pushUserNotification(`Deposit of ${formatETB(amt)} is under admin review.`);
-  } else if (nextStatus === "rejected") {
-    pushUserNotification(`Deposit of ${formatETB(amt)} was rejected by admin.`);
-  }
-
-  saveState();
-  renderAll();
-}
-
-function actionWithdrawal(index, nextStatus) {
-  const item = state.withdrawals[index];
-  if (!item) return;
-  const prevStatus = item.status;
-  const amt = Number(item.amount) || 0;
-
-  if (nextStatus === "approved" && prevStatus !== "approved") {
-    const currentBal = Number(state.lockedBalance) || 0;
-    if (currentBal < amt) {
-      alert("User balance is lower than withdrawal amount.");
-      return;
+    if (req.userId) {
+      const userRef = doc(db, "users", req.userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        if (nextStatus === "approved" && prevStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(amt),
+            updatedAt: serverTimestamp()
+          });
+        } else if (prevStatus === "approved" && nextStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(-amt),
+            updatedAt: serverTimestamp()
+          });
+        }
+      }
     }
-    setAdminBalance(currentBal - amt);
-    pushUserNotification(`Withdrawal of ${formatETB(amt)} (${item.method}) approved.`);
-    pushUserActivity(`Withdrawal approved: -${formatETB(amt)}`);
-  } else if (prevStatus === "approved" && nextStatus !== "approved") {
-    setAdminBalance((Number(state.lockedBalance) || 0) + amt);
+  } catch (err) {
+    alert("Error updating deposit: " + err.message);
   }
+};
 
-  item.status = nextStatus;
-  if (nextStatus === "review") {
-    pushUserNotification(`Withdrawal of ${formatETB(amt)} is under admin review.`);
-  } else if (nextStatus === "rejected") {
-    pushUserNotification(`Withdrawal of ${formatETB(amt)} was rejected.`);
-  }
+window.actionWithdrawal = async function(reqId, nextStatus) {
+  const req = requestsCache.find(r => r.id === reqId);
+  if (!req) return;
+  const prevStatus = String(req.status || "pending").toLowerCase();
+  const amt = Number(req.amount) || 0;
 
-  saveState();
-  renderAll();
-}
-
-function actionInvestment(index, nextStatus) {
-  const item = state.investments[index];
-  if (!item) return;
-  const prevStatus = item.status;
-  const amt = Number(item.amount) || 0;
-
-  if (nextStatus === "approved" && prevStatus !== "approved") {
-    const currentBal = Number(state.lockedBalance) || 0;
-    if (currentBal < amt) {
-      alert("User balance is lower than investment package price.");
-      return;
+  try {
+    if (req.userId) {
+      const userRef = doc(db, "users", req.userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const curBal = Number(userSnap.data().balance) || 0;
+        if (nextStatus === "approved" && prevStatus !== "approved") {
+          if (curBal < amt) {
+            alert("User balance is lower than withdrawal amount.");
+            return;
+          }
+          await updateDoc(userRef, {
+            balance: increment(-amt),
+            updatedAt: serverTimestamp()
+          });
+        } else if (prevStatus === "approved" && nextStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(amt),
+            updatedAt: serverTimestamp()
+          });
+        }
+      }
     }
-    setAdminBalance(currentBal - amt);
-    if (item.level) state.user.vipLevel = Number(item.level);
-    pushUserNotification(`Investment ${item.packageName} (${formatETB(amt)}) approved.`);
-    pushUserActivity(`Investment approved: ${item.packageName}`);
-  } else if (prevStatus === "approved" && nextStatus !== "approved") {
-    setAdminBalance((Number(state.lockedBalance) || 0) + amt);
+
+    await updateDoc(doc(db, "transactionRequests", reqId), {
+      status: nextStatus,
+      updatedAt: serverTimestamp()
+    });
+  } catch (err) {
+    alert("Error updating withdrawal: " + err.message);
   }
+};
 
-  item.status = nextStatus;
-  if (nextStatus === "review") {
-    pushUserNotification(`Investment ${item.packageName} is under admin review.`);
-  } else if (nextStatus === "rejected") {
-    pushUserNotification(`Investment ${item.packageName} was rejected.`);
+window.actionInvestment = async function(reqId, nextStatus) {
+  const req = requestsCache.find(r => r.id === reqId);
+  if (!req) return;
+  const prevStatus = String(req.status || "pending").toLowerCase();
+  const amt = Number(req.amount) || 0;
+
+  try {
+    if (req.userId) {
+      const userRef = doc(db, "users", req.userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const curBal = Number(userSnap.data().balance) || 0;
+        if (nextStatus === "approved" && prevStatus !== "approved") {
+          if (curBal < amt) {
+            alert("User balance is lower than package amount.");
+            return;
+          }
+          const levelNum = req.packageName ? parseInt(String(req.packageName).replace(/\D+/g, ""), 10) || 1 : 1;
+          await updateDoc(userRef, {
+            balance: increment(-amt),
+            vipLevel: levelNum,
+            updatedAt: serverTimestamp()
+          });
+        } else if (prevStatus === "approved" && nextStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(amt),
+            updatedAt: serverTimestamp()
+          });
+        }
+      }
+    }
+
+    await updateDoc(doc(db, "transactionRequests", reqId), {
+      status: nextStatus,
+      updatedAt: serverTimestamp()
+    });
+  } catch (err) {
+    alert("Error updating investment: " + err.message);
   }
+};
 
-  saveState();
-  renderAll();
-}
+window.actionReferral = async function(reqId, nextStatus) {
+  const req = requestsCache.find(r => r.id === reqId);
+  if (!req) return;
+  const prevStatus = String(req.status || "pending").toLowerCase();
+  const bonus = Number(req.rewardAmount || req.amount) || REFERRAL_BONUS_ETB;
 
-function actionReferral(index, nextStatus) {
-  const reqs = state.user.referralRequests || [];
-  const item = reqs[index];
-  if (!item) return;
-  const prevStatus = item.status;
-  const bonus = Number(item.bonus) || REFERRAL_BONUS_ETB;
+  try {
+    await updateDoc(doc(db, "transactionRequests", reqId), {
+      status: nextStatus,
+      updatedAt: serverTimestamp()
+    });
 
-  if (nextStatus === "approved" && prevStatus !== "approved") {
-    state.user.referralCount = (Number(state.user.referralCount) || 0) + 1;
-    setAdminBalance((Number(state.lockedBalance) || 0) + bonus);
-    pushUserNotification(`Referral approved! Count is now ${state.user.referralCount} (+${formatETB(bonus)}).`);
-    pushUserActivity(`Referral #${state.user.referralCount} approved (+${formatETB(bonus)})`);
-  } else if (prevStatus === "approved" && nextStatus !== "approved") {
-    state.user.referralCount = Math.max(0, (Number(state.user.referralCount) || 0) - 1);
-    setAdminBalance((Number(state.lockedBalance) || 0) - bonus);
+    if (req.userId) {
+      const userRef = doc(db, "users", req.userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        if (nextStatus === "approved" && prevStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(bonus),
+            referralCount: increment(1),
+            updatedAt: serverTimestamp()
+          });
+        } else if (prevStatus === "approved" && nextStatus !== "approved") {
+          await updateDoc(userRef, {
+            balance: increment(-bonus),
+            referralCount: increment(-1),
+            updatedAt: serverTimestamp()
+          });
+        }
+      }
+    }
+  } catch (err) {
+    alert("Error updating referral: " + err.message);
   }
-
-  item.status = nextStatus;
-  if (nextStatus === "review") {
-    pushUserNotification(`Referral code ${item.code} is under admin review.`);
-  } else if (nextStatus === "rejected") {
-    pushUserNotification(`Referral code ${item.code} was rejected.`);
-  }
-
-  saveState();
-  renderAll();
-}
+};
 
 function renderAll() {
-  syncUsersRegistry();
-  const userName = state.user.name || "User";
-  const bal = Number(state.lockedBalance) || 0;
+  const deposits = requestsCache.filter(r => r.type === "deposit");
+  const withdrawals = requestsCache.filter(r => r.type === "withdrawal");
+  const investments = requestsCache.filter(r => r.type === "package" || r.type === "investment");
+  const referrals = requestsCache.filter(r => r.type === "referral");
+
+  const totalBalances = usersCache.reduce((sum, u) => sum + (Number(u.balance) || 0), 0);
 
   document.getElementById("adminUserSummary").textContent =
-    `Registered Users: ${usersList.length} | Active User: ${userName} (${state.user.email || "-"}) | Balance: ${formatETB(bal)}`;
-  document.getElementById("statUsersCount").textContent = String(usersList.length);
-  document.getElementById("statBalance").textContent = formatETB(bal);
+    `Live Firestore Sync • Registered Users: ${usersCache.length} • Requests: ${requestsCache.length}`;
+  document.getElementById("statUsersCount").textContent = String(usersCache.length);
+  document.getElementById("statBalance").textContent = formatETB(totalBalances);
   document.getElementById("statPendingDep").textContent =
-    String(state.deposits.filter(d => d.status === "pending" || d.status === "review").length);
+    String(deposits.filter(d => d.status === "pending" || d.status === "review").length);
   document.getElementById("statPendingWit").textContent =
-    String(state.withdrawals.filter(w => w.status === "pending" || w.status === "review").length);
+    String(withdrawals.filter(w => w.status === "pending" || w.status === "review").length);
   document.getElementById("statPendingInv").textContent =
-    String(state.investments.filter(i => i.status === "pending" || i.status === "review").length);
-  document.getElementById("statRefCount").textContent = String(Number(state.user.referralCount) || 0);
+    String(investments.filter(i => i.status === "pending" || i.status === "review").length);
+  document.getElementById("statRefCount").textContent =
+    String(referrals.filter(r => r.status === "approved").length);
 
-  // Registered users table
+  // Users table
   const usersBody = document.getElementById("usersTableBody");
-  usersBody.innerHTML = usersList.length ? usersList.map((u, i) => `
+  usersBody.innerHTML = usersCache.length ? usersCache.map((u, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${u.name || "-"}</strong></td>
-      <td>${u.email || "-"}</td>
-      <td>${u.uid || "-"}</td>
-      <td>${u.referralCode || "-"}</td>
+      <td><strong>${safeText(u.fullName || u.name || "User")}</strong></td>
+      <td>${safeText(u.email || "-")}</td>
+      <td>${safeText(u.uid || u.id || "-")}</td>
+      <td>${safeText(u.referralCode || ("BW" + String(u.uid || u.id || "").substring(0, 8).toUpperCase()))}</td>
       <td>${Number(u.referralCount) || 0}</td>
       <td>${formatETB(u.balance)}</td>
-      <td>${u.registeredAt || "-"}</td>
+      <td>${safeText(formatDate(u.createdAt))}</td>
     </tr>
   `).join("") : `<tr><td colspan="8" class="empty">No registered users yet.</td></tr>`;
 
   // Deposits table
   const depBody = document.getElementById("depositsTableBody");
-  depBody.innerHTML = state.deposits.length ? state.deposits.map((d, i) => `
+  depBody.innerHTML = deposits.length ? deposits.map((d, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${d.userName || userName}</strong></td>
-      <td>${d.method}</td>
+      <td><strong>${safeText(getUserLabel(d.userId, d.userName, d.email))}</strong></td>
+      <td>${safeText(d.method || "-")}</td>
       <td>${formatETB(d.amount)}</td>
-      <td>${d.txId || "-"}</td>
-      <td>${d.time || "-"}</td>
-      <td><span class="badge ${d.status}">${d.status}</span></td>
+      <td>${safeText(d.transactionId || d.txId || "-")}</td>
+      <td>${safeText(formatDate(d.createdAt))}</td>
+      <td><span class="badge ${safeText(d.status || "pending")}">${safeText(d.status || "pending")}</span></td>
       <td>
         <div class="act-group">
-          <button class="btn small success" onclick="actionDeposit(${i}, 'approved')">Approve</button>
-          <button class="btn small warn" onclick="actionDeposit(${i}, 'review')">Review</button>
-          <button class="btn small danger" onclick="actionDeposit(${i}, 'rejected')">Reject</button>
+          <button class="btn small success" onclick="actionDeposit('${safeText(d.id)}', 'approved')">Approve</button>
+          <button class="btn small warn" onclick="actionDeposit('${safeText(d.id)}', 'review')">Review</button>
+          <button class="btn small danger" onclick="actionDeposit('${safeText(d.id)}', 'rejected')">Reject</button>
         </div>
       </td>
     </tr>
@@ -667,20 +608,20 @@ function renderAll() {
 
   // Withdrawals table
   const witBody = document.getElementById("withdrawalsTableBody");
-  witBody.innerHTML = state.withdrawals.length ? state.withdrawals.map((w, i) => `
+  witBody.innerHTML = withdrawals.length ? withdrawals.map((w, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${w.userName || w.holder || userName}</strong></td>
-      <td>${w.method}</td>
-      <td>${w.account || "-"}</td>
-      <td>${formatETB(w.amount)} <span class="muted">(Net: ${formatETB(w.net)})</span></td>
-      <td>${w.time || "-"}</td>
-      <td><span class="badge ${w.status}">${w.status}</span></td>
+      <td><strong>${safeText(w.accountName || getUserLabel(w.userId, w.userName, w.email))}</strong></td>
+      <td>${safeText(w.method || "-")}</td>
+      <td>${safeText(w.accountNumber || w.account || "-")}</td>
+      <td>${formatETB(w.amount)} <span class="muted">(Net: ${formatETB(w.netAmount ?? w.net)})</span></td>
+      <td>${safeText(formatDate(w.createdAt))}</td>
+      <td><span class="badge ${safeText(w.status || "pending")}">${safeText(w.status || "pending")}</span></td>
       <td>
         <div class="act-group">
-          <button class="btn small success" onclick="actionWithdrawal(${i}, 'approved')">Approve</button>
-          <button class="btn small warn" onclick="actionWithdrawal(${i}, 'review')">Review</button>
-          <button class="btn small danger" onclick="actionWithdrawal(${i}, 'rejected')">Reject</button>
+          <button class="btn small success" onclick="actionWithdrawal('${safeText(w.id)}', 'approved')">Approve</button>
+          <button class="btn small warn" onclick="actionWithdrawal('${safeText(w.id)}', 'review')">Review</button>
+          <button class="btn small danger" onclick="actionWithdrawal('${safeText(w.id)}', 'rejected')">Reject</button>
         </div>
       </td>
     </tr>
@@ -688,89 +629,107 @@ function renderAll() {
 
   // Investments table
   const invBody = document.getElementById("investmentsTableBody");
-  invBody.innerHTML = state.investments.length ? state.investments.map((inv, i) => `
+  invBody.innerHTML = investments.length ? investments.map((inv, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${inv.userName || userName}</strong></td>
-      <td>${inv.packageName || ("VIP " + inv.level)}</td>
+      <td><strong>${safeText(getUserLabel(inv.userId, inv.userName, inv.email))}</strong></td>
+      <td>${safeText(inv.packageName || "VIP Package")}</td>
       <td>${formatETB(inv.amount)}</td>
-      <td>${inv.time || "-"}</td>
-      <td><span class="badge ${inv.status}">${inv.status}</span></td>
+      <td>${safeText(formatDate(inv.createdAt))}</td>
+      <td><span class="badge ${safeText(inv.status || "pending")}">${safeText(inv.status || "pending")}</span></td>
       <td>
         <div class="act-group">
-          <button class="btn small success" onclick="actionInvestment(${i}, 'approved')">Approve</button>
-          <button class="btn small warn" onclick="actionInvestment(${i}, 'review')">Review</button>
-          <button class="btn small danger" onclick="actionInvestment(${i}, 'rejected')">Reject</button>
+          <button class="btn small success" onclick="actionInvestment('${safeText(inv.id)}', 'approved')">Approve</button>
+          <button class="btn small warn" onclick="actionInvestment('${safeText(inv.id)}', 'review')">Review</button>
+          <button class="btn small danger" onclick="actionInvestment('${safeText(inv.id)}', 'rejected')">Reject</button>
         </div>
       </td>
     </tr>
   `).join("") : `<tr><td colspan="7" class="empty">No investment requests found.</td></tr>`;
 
   // Referrals table
-  const refList = state.user.referralRequests || [];
   const refBody = document.getElementById("referralsTableBody");
-  refBody.innerHTML = refList.length ? refList.map((r, i) => `
+  refBody.innerHTML = referrals.length ? referrals.map((r, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${r.userName || userName}</strong></td>
-      <td>${r.code}</td>
-      <td>${formatETB(r.bonus || REFERRAL_BONUS_ETB)}</td>
-      <td>${r.time || "-"}</td>
-      <td><span class="badge ${r.status}">${r.status}</span></td>
+      <td><strong>${safeText(getUserLabel(r.userId, r.userName, r.email))}</strong></td>
+      <td>${safeText(r.referralCode || r.code || "-")}</td>
+      <td>${formatETB(r.rewardAmount ?? r.amount ?? REFERRAL_BONUS_ETB)}</td>
+      <td>${safeText(formatDate(r.createdAt))}</td>
+      <td><span class="badge ${safeText(r.status || "pending")}">${safeText(r.status || "pending")}</span></td>
       <td>
         <div class="act-group">
-          <button class="btn small success" onclick="actionReferral(${i}, 'approved')">Approve</button>
-          <button class="btn small warn" onclick="actionReferral(${i}, 'review')">Review</button>
-          <button class="btn small danger" onclick="actionReferral(${i}, 'rejected')">Reject</button>
+          <button class="btn small success" onclick="actionReferral('${safeText(r.id)}', 'approved')">Approve</button>
+          <button class="btn small warn" onclick="actionReferral('${safeText(r.id)}', 'review')">Review</button>
+          <button class="btn small danger" onclick="actionReferral('${safeText(r.id)}', 'rejected')">Reject</button>
         </div>
       </td>
     </tr>
   `).join("") : `<tr><td colspan="7" class="empty">No referral records found.</td></tr>`;
 
-  // Combined History table with User Name
+  // Full history table
   const filter = document.getElementById("adminHistoryFilter").value;
-  const combined = [
-    ...state.deposits.map(d => ({
-      kind: "deposit",
-      userName: d.userName || userName,
-      typeLabel: "Deposit",
-      details: `${d.method} • TX: ${d.txId || "-"}`,
-      amount: d.amount,
-      time: d.time || "-",
-      status: d.status
-    })),
-    ...state.withdrawals.map(w => ({
-      kind: "withdrawal",
-      userName: w.userName || w.holder || userName,
-      typeLabel: "Withdrawal",
-      details: `${w.method} • ${w.account || "-"}`,
-      amount: w.amount,
-      time: w.time || "-",
-      status: w.status
-    })),
-    ...state.investments.map(inv => ({
-      kind: "investment",
-      userName: inv.userName || userName,
-      typeLabel: "Investment",
-      details: inv.packageName || ("VIP " + inv.level),
-      amount: inv.amount,
-      time: inv.time || "-",
-      status: inv.status
-    }))
-  ].filter(row => filter === "all" || row.kind === filter);
+  const combined = requestsCache
+    .filter(r => ["deposit", "withdrawal", "package", "investment"].includes(r.type))
+    .map(r => {
+      const kind = (r.type === "package" || r.type === "investment") ? "investment" : r.type;
+      const typeLabel = kind === "deposit" ? "Deposit" : kind === "withdrawal" ? "Withdrawal" : "Investment";
+      const details = kind === "deposit"
+        ? `${r.method || "-"} • TX: ${r.transactionId || r.txId || "-"}`
+        : kind === "withdrawal"
+          ? `${r.method || "-"} • ${r.accountNumber || r.account || "-"}`
+          : (r.packageName || "VIP Package");
+      return {
+        kind,
+        userName: getUserLabel(r.userId, r.userName, r.email),
+        typeLabel,
+        details,
+        amount: r.amount,
+        time: formatDate(r.createdAt),
+        status: r.status || "pending",
+        tsMs: r.createdAt?.toMillis ? r.createdAt.toMillis() : 0
+      };
+    })
+    .filter(row => filter === "all" || row.kind === filter)
+    .sort((a, b) => b.tsMs - a.tsMs);
 
   const histBody = document.getElementById("adminHistoryTableBody");
   histBody.innerHTML = combined.length ? combined.map((row, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td><strong>${row.userName}</strong></td>
-      <td>${row.typeLabel}</td>
-      <td>${row.details}</td>
+      <td><strong>${safeText(row.userName)}</strong></td>
+      <td>${safeText(row.typeLabel)}</td>
+      <td>${safeText(row.details)}</td>
       <td>${formatETB(row.amount)}</td>
-      <td>${row.time}</td>
-      <td><span class="badge ${row.status}">${row.status}</span></td>
+      <td>${safeText(row.time)}</td>
+      <td><span class="badge ${safeText(row.status)}">${safeText(row.status)}</span></td>
     </tr>
   `).join("") : `<tr><td colspan="7" class="empty">No transactions in history yet.</td></tr>`;
+}
+
+function startListeners() {
+  if (unsubUsers) unsubUsers();
+  if (unsubRequests) unsubRequests();
+
+  unsubUsers = onSnapshot(collection(db, "users"), snap => {
+    usersCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+  }, err => {
+    console.error("Users listener error:", err);
+  });
+
+  unsubRequests = onSnapshot(collection(db, "transactionRequests"), snap => {
+    requestsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    requestsCache.sort((a, b) => {
+      const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+    renderAll();
+  }, err => {
+    console.error("Requests listener error:", err);
+    alert("Could not load requests: " + err.message);
+  });
 }
 
 document.getElementById("adminLoginBtn").addEventListener("click", () => {
@@ -780,23 +739,17 @@ document.getElementById("adminLoginBtn").addEventListener("click", () => {
     return;
   }
   runStepLoader(() => {
-    state = loadState();
-    usersList = loadUsers();
     document.getElementById("adminAuth").classList.add("hidden");
     document.getElementById("adminApp").classList.remove("hidden");
-    renderAll();
+    startListeners();
   });
 });
 
 document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+  if (unsubUsers) { unsubUsers(); unsubUsers = null; }
+  if (unsubRequests) { unsubRequests(); unsubRequests = null; }
   document.getElementById("adminApp").classList.add("hidden");
   document.getElementById("adminAuth").classList.remove("hidden");
-});
-
-document.getElementById("refreshAdminBtn").addEventListener("click", () => {
-  state = loadState();
-  usersList = loadUsers();
-  renderAll();
 });
 
 document.getElementById("adminHistoryFilter").addEventListener("change", renderAll);
