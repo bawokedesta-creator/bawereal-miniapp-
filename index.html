@@ -978,6 +978,7 @@ function defaultState() {
     deposits: [],
     withdrawals: [],
     investments: [],
+    history: [],
     supports: [],
     notifications: [],
     activities: []
@@ -1006,8 +1007,45 @@ function loadState() {
       user: { ...base.user, ...(parsed.user || {}) },
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
       withdrawals: Array.isArray(parsed.withdrawals) ? parsed.withdrawals : [],
-      investments: Array.isArray(parsed.investments) ? parsed.investments : []
+      investments: Array.isArray(parsed.investments) ? parsed.investments : [],
+      history: Array.isArray(parsed.history) ? parsed.history : [],
+      activities: Array.isArray(parsed.activities) ? parsed.activities : []
     };
+
+    // If history exists but specific arrays were empty, hydrate them
+    if (merged.history.length > 0) {
+      merged.history.forEach(h => {
+        if (h.kind === "deposit" && !merged.deposits.some(d => d.id === h.id)) {
+          merged.deposits.push({
+            id: h.id || ("DEP-" + Math.random()),
+            method: h.method || "Telebirr",
+            amount: Number(h.amount) || 0,
+            txId: h.txId || "-",
+            status: h.status || "pending",
+            time: h.time || new Date().toLocaleString()
+          });
+        } else if (h.kind === "withdrawal" && !merged.withdrawals.some(w => w.id === h.id)) {
+          merged.withdrawals.push({
+            id: h.id || ("WIT-" + Math.random()),
+            method: h.method || "Telebirr",
+            account: h.account || "-",
+            amount: Number(h.amount) || 0,
+            net: Number(h.net) || Number(h.amount) || 0,
+            status: h.status || "pending",
+            time: h.time || new Date().toLocaleString()
+          });
+        } else if (h.kind === "investment" && !merged.investments.some(inv => inv.id === h.id)) {
+          merged.investments.push({
+            id: h.id || ("INV-" + Math.random()),
+            packageName: h.packageName || "VIP",
+            amount: Number(h.amount) || 0,
+            status: h.status || "pending",
+            time: h.time || new Date().toLocaleString()
+          });
+        }
+      });
+    }
+
     const expected = computeBalanceChecksum(merged.lockedBalance, merged.user.uid);
     if (merged.balanceSig !== expected || typeof merged.lockedBalance !== "number" || Number.isNaN(merged.lockedBalance)) {
       merged.lockedBalance = 0;
@@ -1039,9 +1077,6 @@ function recordUserInRegistry(userObj, balanceVal) {
       referralCode: userObj.referralCode || "-",
       referralCount: Number(userObj.referralCount) || 0,
       balance: Number(balanceVal) || 0,
-      depositsCount: Array.isArray(state.deposits) ? state.deposits.length : 0,
-      withdrawalsCount: Array.isArray(state.withdrawals) ? state.withdrawals.length : 0,
-      investmentsCount: Array.isArray(state.investments) ? state.investments.length : 0,
       registeredAt: userObj.registeredAt || new Date().toLocaleString()
     };
 
@@ -1055,10 +1090,46 @@ function recordUserInRegistry(userObj, balanceVal) {
   } catch (_) {}
 }
 
+function rebuildHistoryArray() {
+  state.history = [
+    ...state.deposits.map(d => ({
+      id: d.id,
+      kind: "deposit",
+      title: `DEPOSIT (${d.method})`,
+      method: d.method,
+      txId: d.txId,
+      amount: Number(d.amount) || 0,
+      status: d.status || "pending",
+      time: d.time || new Date().toLocaleString()
+    })),
+    ...state.withdrawals.map(w => ({
+      id: w.id,
+      kind: "withdrawal",
+      title: `WITHDRAWAL (${w.method})`,
+      method: w.method,
+      account: w.account,
+      amount: Number(w.amount) || 0,
+      net: Number(w.net) || 0,
+      status: w.status || "pending",
+      time: w.time || new Date().toLocaleString()
+    })),
+    ...state.investments.map(inv => ({
+      id: inv.id,
+      kind: "investment",
+      title: `INVESTMENT (${inv.packageName})`,
+      packageName: inv.packageName,
+      amount: Number(inv.amount) || 0,
+      status: inv.status || "pending",
+      time: inv.time || new Date().toLocaleString()
+    }))
+  ];
+}
+
 function saveState() {
   try {
     state.lang = currentLang;
     state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
+    rebuildHistoryArray();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     recordUserInRegistry(state.user, state.lockedBalance);
   } catch (_) {}
@@ -1157,6 +1228,7 @@ function showForgot() {
 
 function openPage(page) {
   currentPage = page;
+  state = loadState();
   document.querySelectorAll("main.container > section").forEach(sec => {
     sec.classList.toggle("hidden", sec.id !== page + "Page");
   });
@@ -1303,7 +1375,7 @@ function selectVip(level, price, dailyRatePct, dailyProfit) {
   });
 
   addNotification(`VIP ${level} (${price.toLocaleString()} ETB, ${dailyRatePct}% daily for 10 days) investment recorded.`);
-  addActivity(`Invested: VIP ${level} • ${formatETB(price)}`);
+  addActivity(`Investment request: VIP ${level} (${price.toLocaleString()} ETB)`);
   saveState();
   renderAll();
   showToast(currentLang === "am" ? `VIP ${level} (10 ቀን • ${dailyRatePct}%) ተመዝግቧል` : `VIP ${level} (10 days • ${dailyRatePct}% daily) recorded`);
@@ -1486,6 +1558,7 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   state.deposits = [];
   state.withdrawals = [];
   state.investments = [];
+  state.history = [];
   state.loggedIn = true;
 
   saveState();
