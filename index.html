@@ -167,7 +167,7 @@ small{color:var(--muted);font-size:11.5px}
 
 <div id="toastMsg" class="toast-msg hidden"></div>
 
-<!-- UPDATED AUTH SECTION -->
+<!-- AUTH SECTION -->
 <section id="auth" class="auth-wrap">
   <div class="auth-lang-bar">
     <div class="lang-switch">
@@ -807,9 +807,11 @@ const TRANSLATIONS = {
   }
 };
 
-const STORAGE_KEY_PREFIX = "bawereal_user_v3_"; 
-const SESSION_KEY = "bawereal_session_v3";
-const SESSION_EMAIL_KEY = "bawereal_session_email_v3";
+// Changed to v4 to clear any broken old data
+const STORAGE_KEY_PREFIX = "bawereal_user_v4_"; 
+const CREDS_KEY_PREFIX = "bawereal_creds_v4_"; // Store credentials separately
+const SESSION_KEY = "bawereal_session_v4";
+const SESSION_EMAIL_KEY = "bawereal_session_email_v4";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VIP_DURATION_MS = 10 * DAY_MS;
 const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
@@ -819,16 +821,35 @@ let currentLang = "en";
 let currentPage = "home";
 let toastTimer = null;
 
-function getStorageKey(email) {
-  if (!email) return STORAGE_KEY_PREFIX + "guest";
-  const cleanEmail = email.trim().toLowerCase();
+// --- SECURITY & AUTHENTICATION HELPERS ---
+
+function simpleHash(str) {
   let hash = 0;
-  for (let i = 0; i < cleanEmail.length; i++) {
-    hash = ((hash << 5) - hash) + cleanEmail.charCodeAt(i);
-    hash |= 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; 
   }
-  return STORAGE_KEY_PREFIX + Math.abs(hash);
+  return hash.toString(16);
 }
+
+function getStorageKey(email) {
+  return STORAGE_KEY_PREFIX + simpleHash(email.trim().toLowerCase());
+}
+
+function saveCredentials(email, password) {
+  const credsKey = CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase());
+  localStorage.setItem(credsKey, simpleHash(password));
+}
+
+function verifyCredentials(email, password) {
+  const credsKey = CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase());
+  const storedHash = localStorage.getItem(credsKey);
+  if (!storedHash) return false; // User doesn't exist
+  return storedHash === simpleHash(password);
+}
+
+// --- STATE MANAGEMENT ---
 
 function computeBalanceChecksum(balanceVal, uidVal) {
   const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
@@ -960,6 +981,8 @@ function saveState() {
   } catch (_) {}
 }
 
+// --- SESSION MANAGEMENT ---
+
 function startSession(email) {
   try {
     sessionStorage.setItem(SESSION_KEY, "true");
@@ -981,6 +1004,8 @@ function hasActiveSession() {
     return false;
   }
 }
+
+// --- UI HELPERS ---
 
 function showToast(msg) {
   const el = document.getElementById("toastMsg");
@@ -1059,7 +1084,6 @@ function applyLang(lang) {
   }
 }
 
-// New Auth Switcher logic
 function switchAuthTab(tab) {
   document.getElementById("forgotBox").classList.add("hidden");
   const loginBox = document.getElementById("loginBox");
@@ -1068,13 +1092,11 @@ function switchAuthTab(tab) {
   const tabRegister = document.getElementById("tabRegisterBtn");
   
   if (window.innerWidth > 599) {
-    // Desktop: Show both
     loginBox.classList.remove("hidden");
     registerBox.classList.remove("hidden");
     tabLogin.classList.add("active");
     tabRegister.classList.remove("active");
   } else {
-    // Mobile: Toggle
     if (tab === 'login') {
       loginBox.classList.remove("hidden");
       registerBox.classList.add("hidden");
@@ -1089,14 +1111,12 @@ function switchAuthTab(tab) {
   }
 }
 
-// Handle window resize to reset tabs
 window.addEventListener('resize', () => {
   if(!document.getElementById("forgotBox").classList.contains("hidden")) return;
   if (window.innerWidth > 599) {
     document.getElementById("loginBox").classList.remove("hidden");
     document.getElementById("registerBox").classList.remove("hidden");
   } else {
-    // Default to whichever tab has active class
     if(document.getElementById("tabLoginBtn").classList.contains("active")) {
       switchAuthTab('login');
     } else {
@@ -1437,11 +1457,19 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
   btn.addEventListener("click", () => applyLang(btn.dataset.lang));
 });
 
+// --- LOGIN & REGISTER LOGIC WITH PASSWORDS ---
+
 document.getElementById("loginBtn").addEventListener("click", () => {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
+  
   if (!email || !password) {
-    return alert("Please enter email and password.");
+    return alert("Please enter both email and password.");
+  }
+
+  // Verify Password
+  if (!verifyCredentials(email, password)) {
+    return alert("Incorrect email or password. If you haven't registered, please create an account.");
   }
   
   state = loadStateForEmail(email);
@@ -1455,6 +1483,8 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   state.loggedIn = true;
   startSession(email);
   saveState();
+  
+  document.getElementById("loginPassword").value = ""; // Clear password field
   
   runStepLoader(() => {
     document.getElementById("auth").classList.add("hidden");
@@ -1471,7 +1501,17 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   
   if (!name || !email || !pass) return alert("Please fill out all required fields.");
   if (pass !== conf) return alert("Passwords do not match.");
+  if (pass.length < 6) return alert("Password must be at least 6 characters long.");
 
+  // Check if email already exists
+  const credsKey = CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase());
+  if (localStorage.getItem(credsKey)) {
+    return alert("An account with this email already exists. Please login.");
+  }
+
+  // Save credentials and create state
+  saveCredentials(email, pass);
+  
   state = defaultState(email);
   state.user.name = name;
   state.user.email = email;
@@ -1480,6 +1520,9 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   
   saveState();
   
+  document.getElementById("regPassword").value = "";
+  document.getElementById("regConfirm").value = "";
+
   runStepLoader(() => {
     document.getElementById("auth").classList.add("hidden");
     document.getElementById("application").classList.remove("hidden");
@@ -1487,8 +1530,9 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   });
 });
 
-// Guest Login Function
 function guestLogin() {
+  // In a real app, guest login might not be allowed, but here we create a temporary
+  // unique account so they can view the dashboard.
   const guestEmail = "guest_" + Date.now() + "@bawereal.local";
   state = defaultState(guestEmail);
   state.user.name = "Guest User";
@@ -1504,7 +1548,9 @@ function guestLogin() {
 }
 
 document.getElementById("resetBtn").addEventListener("click", () => {
-  alert("Password reset instructions sent if the email is registered.");
+  const email = document.getElementById("forgotEmail").value.trim();
+  if(!email) return alert("Please enter your email.");
+  alert("If this email is registered, password reset instructions have been sent.");
   showLogin();
 });
 
