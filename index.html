@@ -407,18 +407,6 @@ small{color:var(--muted);font-size:11.5px}
     <h3 data-i18n="recentActivity">Recent Activity</h3>
     <div id="recentActivity" class="empty" data-i18n="noRecentActivity">No recent activity.</div>
   </div>
-
-  <div class="live-activity">
-    <div class="live-title">
-      <strong data-i18n="depositActivity">Deposit Activity</strong>
-      <span style="font-size:11.5px;color:#67e5ae">
-        <span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span>
-      </span>
-    </div>
-    <div class="activity-window">
-      <div class="activity-track" id="activityTrack"></div>
-    </div>
-  </div>
 </section>
 
 <section id="depositPage" class="hidden">
@@ -475,7 +463,19 @@ small{color:var(--muted);font-size:11.5px}
   </p>
 </div>
 
-<div class="card">
+<div class="live-activity">
+  <div class="live-title">
+    <strong data-i18n="depositActivity">Deposit Activity</strong>
+    <span style="font-size:11.5px;color:#67e5ae">
+      <span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span>
+    </span>
+  </div>
+  <div class="activity-window">
+    <div class="activity-track" id="depositActivityTrack"></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:13px">
   <h3 data-i18n="myDepositHistory">My Deposit History</h3>
   <div id="depositHistory"><div class="empty">No deposit history loaded yet.</div></div>
 </div>
@@ -516,7 +516,19 @@ small{color:var(--muted);font-size:11.5px}
   <button class="btn" id="withdrawBtn" data-i18n="submitWithdrawal">Submit Withdrawal Request</button>
 </div>
 
-<div class="card">
+<div class="live-activity">
+  <div class="live-title">
+    <strong data-i18n="withdrawalActivity">Withdrawal Activity</strong>
+    <span style="font-size:11.5px;color:#67e5ae">
+      <span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span>
+    </span>
+  </div>
+  <div class="activity-window">
+    <div class="activity-track" id="withdrawActivityTrack"></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:13px">
   <h3 data-i18n="myWithdrawalHistory">My Withdrawal History</h3>
   <div id="withdrawHistory"><div class="empty">No withdrawal history loaded yet.</div></div>
 </div>
@@ -774,6 +786,7 @@ const TRANSLATIONS = {
     recentActivity: "Recent Activity",
     noRecentActivity: "No recent activity.",
     depositActivity: "Deposit Activity",
+    withdrawalActivity: "Withdrawal Activity",
     activityDisplay: "Activity Display",
     selectPaymentMethod: "Select Payment Method",
     mobilePayment: "Mobile payment",
@@ -866,6 +879,7 @@ const TRANSLATIONS = {
     recentActivity: "የቅርብ ጊዜ እንቅስቃሴ",
     noRecentActivity: "ምንም የቅርብ ጊዜ እንቅስቃሴ የለም።",
     depositActivity: "የተቀማጭ ገንዘብ እንቅስቃሴ",
+    withdrawalActivity: "የማውጫ ገንዘብ እንቅስቃሴ",
     activityDisplay: "እንቅስቃሴ ማሳያ",
     selectPaymentMethod: "የመክፈያ ዘዴ ይምረጡ",
     mobilePayment: "የሞባይል ክፍያ",
@@ -1012,7 +1026,6 @@ function loadState() {
       activities: Array.isArray(parsed.activities) ? parsed.activities : []
     };
 
-    // If history exists but specific arrays were empty, hydrate them
     if (merged.history.length > 0) {
       merged.history.forEach(h => {
         if (h.kind === "deposit" && !merged.deposits.some(d => d.id === h.id)) {
@@ -1265,8 +1278,8 @@ function addActivity(text) {
   state.activities = state.activities.slice(0, 15);
 }
 
-function renderLiveTicker() {
-  const sample = [
+function renderLiveTickers() {
+  const depositSample = [
     ["Abebe K.", "+1,500 ETB"],
     ["Selam T.", "+2,000 ETB"],
     ["Dawit M.", "+5,000 ETB"],
@@ -1274,10 +1287,26 @@ function renderLiveTicker() {
     ["Yonas G.", "+4,000 ETB"],
     ["Tigist A.", "+2,500 ETB"]
   ];
-  const rows = sample.map(([name, amt]) =>
+  const withdrawSample = [
+    ["Biniyam D.", "-1,200 ETB"],
+    ["Rahel W.", "-850 ETB"],
+    ["Kaleb M.", "-3,000 ETB"],
+    ["Mekdes T.", "-500 ETB"],
+    ["Nahom G.", "-2,200 ETB"],
+    ["Eden A.", "-1,600 ETB"]
+  ];
+
+  const depRows = depositSample.map(([name, amt]) =>
     `<div class="activity-entry"><span>${name} — Telebirr / CBE</span><strong>${amt}</strong></div>`
   ).join("");
-  document.getElementById("activityTrack").innerHTML = rows + rows;
+  const witRows = withdrawSample.map(([name, amt]) =>
+    `<div class="activity-entry"><span>${name} — Telebirr / CBE</span><strong>${amt}</strong></div>`
+  ).join("");
+
+  const depTrack = document.getElementById("depositActivityTrack");
+  const witTrack = document.getElementById("withdrawActivityTrack");
+  if (depTrack) depTrack.innerHTML = depRows + depRows;
+  if (witTrack) witTrack.innerHTML = witRows + witRows;
 }
 
 function getActiveVipInfo() {
@@ -1750,7 +1779,7 @@ document.getElementById("refreshNotificationsBtn").addEventListener("click", () 
 })();
 
 recordUserInRegistry(state.user, state.lockedBalance);
-renderLiveTicker();
+renderLiveTickers();
 applyLang(currentLang);
 renderVipCards();
 renderAll();
