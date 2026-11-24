@@ -43,7 +43,7 @@ textarea{resize:vertical;min-height:75px}
 .auth-wrap .card{padding:20px}
 .logo{text-align:center;font-size:24px;font-weight:bold;color:var(--primary);margin-bottom:12px}
 
-/* New Auth Tabs Styling */
+/* Auth Tabs Styling */
 .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f4f5fb; padding: 5px; border-radius: 12px; }
 .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; color: var(--muted); border: none; background: transparent; }
 .auth-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -195,9 +195,6 @@ small{color:var(--muted);font-size:11.5px}
         <input id="loginPassword" type="password" placeholder="Password">
         <button class="btn" id="loginBtn" data-i18n="loginBtn">Login</button><br><br>
         <p class="link" onclick="showForgot()" data-i18n="forgotPassword">Forgot Password?</p>
-        <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-          <button class="btn secondary" onclick="guestLogin()" style="font-size: 12px;">👤 Continue as Guest</button>
-        </div>
       </div>
 
       <!-- Register Form -->
@@ -807,11 +804,10 @@ const TRANSLATIONS = {
   }
 };
 
-// Changed to v4 to clear any broken old data
-const STORAGE_KEY_PREFIX = "bawereal_user_v4_"; 
-const CREDS_KEY_PREFIX = "bawereal_creds_v4_"; // Store credentials separately
-const SESSION_KEY = "bawereal_session_v4";
-const SESSION_EMAIL_KEY = "bawereal_session_email_v4";
+const STORAGE_KEY_PREFIX = "bawereal_user_v5_"; 
+const CREDS_KEY_PREFIX = "bawereal_creds_v5_"; 
+const SESSION_KEY = "bawereal_session_v5";
+const SESSION_EMAIL_KEY = "bawereal_session_email_v5";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VIP_DURATION_MS = 10 * DAY_MS;
 const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
@@ -820,8 +816,6 @@ let state = null;
 let currentLang = "en";
 let currentPage = "home";
 let toastTimer = null;
-
-// --- SECURITY & AUTHENTICATION HELPERS ---
 
 function simpleHash(str) {
   let hash = 0;
@@ -848,8 +842,6 @@ function verifyCredentials(email, password) {
   if (!storedHash) return false; // User doesn't exist
   return storedHash === simpleHash(password);
 }
-
-// --- STATE MANAGEMENT ---
 
 function computeBalanceChecksum(balanceVal, uidVal) {
   const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
@@ -981,8 +973,6 @@ function saveState() {
   } catch (_) {}
 }
 
-// --- SESSION MANAGEMENT ---
-
 function startSession(email) {
   try {
     sessionStorage.setItem(SESSION_KEY, "true");
@@ -1004,8 +994,6 @@ function hasActiveSession() {
     return false;
   }
 }
-
-// --- UI HELPERS ---
 
 function showToast(msg) {
   const el = document.getElementById("toastMsg");
@@ -1515,37 +1503,21 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   state = defaultState(email);
   state.user.name = name;
   state.user.email = email;
-  state.loggedIn = true;
-  startSession(email);
-  
+  state.loggedIn = false; // Don't log them in automatically
   saveState();
   
+  // Clear register fields
+  document.getElementById("regName").value = "";
+  document.getElementById("regEmail").value = "";
   document.getElementById("regPassword").value = "";
   document.getElementById("regConfirm").value = "";
 
-  runStepLoader(() => {
-    document.getElementById("auth").classList.add("hidden");
-    document.getElementById("application").classList.remove("hidden");
-    openPage("home");
-  });
+  // Redirect to Login with email filled
+  alert("Registration successful! Please login with your new account.");
+  switchAuthTab('login');
+  document.getElementById("loginEmail").value = email;
+  document.getElementById("loginPassword").focus();
 });
-
-function guestLogin() {
-  // In a real app, guest login might not be allowed, but here we create a temporary
-  // unique account so they can view the dashboard.
-  const guestEmail = "guest_" + Date.now() + "@bawereal.local";
-  state = defaultState(guestEmail);
-  state.user.name = "Guest User";
-  state.loggedIn = true;
-  startSession(guestEmail);
-  saveState();
-  
-  runStepLoader(() => {
-    document.getElementById("auth").classList.add("hidden");
-    document.getElementById("application").classList.remove("hidden");
-    openPage("home");
-  });
-}
 
 document.getElementById("resetBtn").addEventListener("click", () => {
   const email = document.getElementById("forgotEmail").value.trim();
