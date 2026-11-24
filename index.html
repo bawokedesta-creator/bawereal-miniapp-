@@ -39,9 +39,23 @@ textarea{resize:vertical;min-height:75px}
 .btn.small{width:auto;padding:6px 10px;font-size:11.5px}
 .btn:disabled{opacity:.6;cursor:not-allowed}
 .link{color:var(--primary);cursor:pointer;font-size:13px}
-.auth-wrap{max-width:420px;margin:25px auto;padding:16px}
+.auth-wrap{max-width:650px;margin:25px auto;padding:16px}
 .auth-wrap .card{padding:20px}
 .logo{text-align:center;font-size:24px;font-weight:bold;color:var(--primary);margin-bottom:12px}
+
+/* New Auth Tabs Styling */
+.auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f4f5fb; padding: 5px; border-radius: 12px; }
+.auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; color: var(--muted); border: none; background: transparent; }
+.auth-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+@media(min-width: 600px){
+  .auth-forms-container { display: flex; gap: 15px; align-items: flex-start; }
+  .auth-forms-container .auth-form-col { flex: 1; }
+}
+@media(max-width: 599px){
+  .auth-forms-container { display: block; }
+}
+
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .action{background:white;padding:13px 8px;border-radius:12px;text-align:center;cursor:pointer;border:1px solid #eee;font-size:13px}
 .action .emoji{font-size:21px;display:block;margin-bottom:5px}
@@ -153,6 +167,7 @@ small{color:var(--muted);font-size:11.5px}
 
 <div id="toastMsg" class="toast-msg hidden"></div>
 
+<!-- UPDATED AUTH SECTION -->
 <section id="auth" class="auth-wrap">
   <div class="auth-lang-bar">
     <div class="lang-switch">
@@ -163,36 +178,48 @@ small{color:var(--muted);font-size:11.5px}
 
   <div class="logo">BaweReal</div>
 
-  <div class="card" id="loginBox">
-    <h2 data-i18n="welcomeBack">Welcome Back</h2>
-    <p class="muted" data-i18n="loginSubtitle">Login to your account</p><br>
-    <input id="loginEmail" type="email" placeholder="Email address">
-    <input id="loginPassword" type="password" placeholder="Password">
-    <button class="btn" id="loginBtn" data-i18n="loginBtn">Login</button><br><br>
-    <p class="link" onclick="showForgot()" data-i18n="forgotPassword">Forgot Password?</p><br>
-    <p class="muted"><span data-i18n="noAccount">Don't have an account?</span>
-      <span class="link" onclick="showRegister()" data-i18n="createAccount">Create Account</span>
-    </p>
-  </div>
+  <div class="card">
+    <!-- Tabs for Mobile -->
+    <div class="auth-tabs" id="authTabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')" id="tabLoginBtn">Login</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')" id="tabRegisterBtn">Register</button>
+    </div>
 
-  <div class="card hidden" id="registerBox">
-    <h2 data-i18n="createAccount">Create Account</h2><br>
-    <input id="regName" placeholder="Full name">
-    <input id="regEmail" type="email" placeholder="Email address">
-    <input id="regPassword" type="password" placeholder="Password">
-    <input id="regConfirm" type="password" placeholder="Confirm password">
-    <button class="btn" id="registerBtn" data-i18n="registerBtn">Register</button><br><br>
-    <p class="muted"><span data-i18n="haveAccount">Already have an account?</span>
-      <span class="link" onclick="showLogin()" data-i18n="loginBtn">Login</span>
-    </p>
-  </div>
+    <!-- Forms side by side on desktop, toggled on mobile -->
+    <div class="auth-forms-container">
+      <!-- Login Form -->
+      <div class="auth-form-col" id="loginBox">
+        <h3 style="margin-bottom:10px;" data-i18n="welcomeBack">Welcome Back</h3>
+        <p class="muted" style="margin-bottom:10px;" data-i18n="loginSubtitle">Login to your account</p>
+        <input id="loginEmail" type="email" placeholder="Email address">
+        <input id="loginPassword" type="password" placeholder="Password">
+        <button class="btn" id="loginBtn" data-i18n="loginBtn">Login</button><br><br>
+        <p class="link" onclick="showForgot()" data-i18n="forgotPassword">Forgot Password?</p>
+        <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+          <button class="btn secondary" onclick="guestLogin()" style="font-size: 12px;">👤 Continue as Guest</button>
+        </div>
+      </div>
 
-  <div class="card hidden" id="forgotBox">
-    <h2 data-i18n="resetPassword">Reset Password</h2>
-    <p class="muted" data-i18n="resetHint">Enter your registered email address.</p><br>
-    <input id="forgotEmail" type="email" placeholder="Email address">
-    <button class="btn" id="resetBtn" data-i18n="sendResetLink">Send Reset Link</button><br><br>
-    <p class="link" onclick="showLogin()" data-i18n="backToLogin">Back to Login</p>
+      <!-- Register Form -->
+      <div class="auth-form-col hidden" id="registerBox">
+        <h3 style="margin-bottom:10px;" data-i18n="createAccount">Create Account</h3>
+        <p class="muted" style="margin-bottom:10px;">Start your journey</p>
+        <input id="regName" placeholder="Full name">
+        <input id="regEmail" type="email" placeholder="Email address">
+        <input id="regPassword" type="password" placeholder="Password">
+        <input id="regConfirm" type="password" placeholder="Confirm password">
+        <button class="btn" id="registerBtn" data-i18n="registerBtn">Register</button>
+      </div>
+    </div>
+
+    <!-- Forgot Password Form (Hidden by default) -->
+    <div class="hidden" id="forgotBox" style="margin-top: 20px;">
+      <h3 data-i18n="resetPassword" style="margin-bottom:10px;">Reset Password</h3>
+      <p class="muted" data-i18n="resetHint" style="margin-bottom:10px;">Enter your registered email address.</p>
+      <input id="forgotEmail" type="email" placeholder="Email address">
+      <button class="btn" id="resetBtn" data-i18n="sendResetLink">Send Reset Link</button><br><br>
+      <p class="link" onclick="showLogin()" data-i18n="backToLogin">Back to Login</p>
+    </div>
   </div>
 </section>
 
@@ -780,7 +807,7 @@ const TRANSLATIONS = {
   }
 };
 
-const STORAGE_KEY_PREFIX = "bawereal_user_v3_"; // Changed to unique per user
+const STORAGE_KEY_PREFIX = "bawereal_user_v3_"; 
 const SESSION_KEY = "bawereal_session_v3";
 const SESSION_EMAIL_KEY = "bawereal_session_email_v3";
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -792,11 +819,9 @@ let currentLang = "en";
 let currentPage = "home";
 let toastTimer = null;
 
-// Helper to generate safe storage key from email
 function getStorageKey(email) {
   if (!email) return STORAGE_KEY_PREFIX + "guest";
   const cleanEmail = email.trim().toLowerCase();
-  // Simple hash to avoid weird characters in email breaking localStorage keys
   let hash = 0;
   for (let i = 0; i < cleanEmail.length; i++) {
     hash = ((hash << 5) - hash) + cleanEmail.charCodeAt(i);
@@ -858,7 +883,6 @@ function getVerifiedBalance() {
   return Number(state.lockedBalance);
 }
 
-// Load state specifically for a user email
 function loadStateForEmail(email) {
   try {
     const key = getStorageKey(email);
@@ -931,11 +955,8 @@ function saveState() {
     state.lang = currentLang;
     state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
     rebuildHistoryArray();
-    
-    // Save to unique key based on email
     const key = getStorageKey(state.user.email);
     localStorage.setItem(key, JSON.stringify(state));
-    
   } catch (_) {}
 }
 
@@ -1038,16 +1059,60 @@ function applyLang(lang) {
   }
 }
 
-function showLogin() {
-  document.getElementById("loginBox").classList.remove("hidden");
-  document.getElementById("registerBox").classList.add("hidden");
+// New Auth Switcher logic
+function switchAuthTab(tab) {
   document.getElementById("forgotBox").classList.add("hidden");
+  const loginBox = document.getElementById("loginBox");
+  const registerBox = document.getElementById("registerBox");
+  const tabLogin = document.getElementById("tabLoginBtn");
+  const tabRegister = document.getElementById("tabRegisterBtn");
+  
+  if (window.innerWidth > 599) {
+    // Desktop: Show both
+    loginBox.classList.remove("hidden");
+    registerBox.classList.remove("hidden");
+    tabLogin.classList.add("active");
+    tabRegister.classList.remove("active");
+  } else {
+    // Mobile: Toggle
+    if (tab === 'login') {
+      loginBox.classList.remove("hidden");
+      registerBox.classList.add("hidden");
+      tabLogin.classList.add("active");
+      tabRegister.classList.remove("active");
+    } else {
+      loginBox.classList.add("hidden");
+      registerBox.classList.remove("hidden");
+      tabLogin.classList.remove("active");
+      tabRegister.classList.add("active");
+    }
+  }
+}
+
+// Handle window resize to reset tabs
+window.addEventListener('resize', () => {
+  if(!document.getElementById("forgotBox").classList.contains("hidden")) return;
+  if (window.innerWidth > 599) {
+    document.getElementById("loginBox").classList.remove("hidden");
+    document.getElementById("registerBox").classList.remove("hidden");
+  } else {
+    // Default to whichever tab has active class
+    if(document.getElementById("tabLoginBtn").classList.contains("active")) {
+      switchAuthTab('login');
+    } else {
+      switchAuthTab('register');
+    }
+  }
+});
+
+function showLogin() {
+  document.getElementById("forgotBox").classList.add("hidden");
+  switchAuthTab('login');
 }
 
 function showRegister() {
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("registerBox").classList.remove("hidden");
   document.getElementById("forgotBox").classList.add("hidden");
+  switchAuthTab('register');
 }
 
 function showForgot() {
@@ -1407,7 +1472,6 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   if (!name || !email || !pass) return alert("Please fill out all required fields.");
   if (pass !== conf) return alert("Passwords do not match.");
 
-  // Create brand new state for this email
   state = defaultState(email);
   state.user.name = name;
   state.user.email = email;
@@ -1422,6 +1486,22 @@ document.getElementById("registerBtn").addEventListener("click", () => {
     openPage("home");
   });
 });
+
+// Guest Login Function
+function guestLogin() {
+  const guestEmail = "guest_" + Date.now() + "@bawereal.local";
+  state = defaultState(guestEmail);
+  state.user.name = "Guest User";
+  state.loggedIn = true;
+  startSession(guestEmail);
+  saveState();
+  
+  runStepLoader(() => {
+    document.getElementById("auth").classList.add("hidden");
+    document.getElementById("application").classList.remove("hidden");
+    openPage("home");
+  });
+}
 
 document.getElementById("resetBtn").addEventListener("click", () => {
   alert("Password reset instructions sent if the email is registered.");
@@ -1622,6 +1702,7 @@ setInterval(updateTask24Timer, 1000);
 
 // Initialize
 applyLang(currentLang);
+switchAuthTab('login');
 
 if (hasActiveSession()) {
   const savedEmail = sessionStorage.getItem(SESSION_EMAIL_KEY);
