@@ -947,6 +947,8 @@ const TRANSLATIONS = {
 
 const STORAGE_KEY = "bawereal_state_v2";
 const USERS_KEY = "bawereal_users_v2";
+const SESSION_KEY = "bawereal_session_v2";
+const SESSION_EMAIL_KEY = "bawereal_session_email_v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VIP_DURATION_MS = 10 * DAY_MS;
 const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
@@ -973,8 +975,8 @@ function defaultState() {
     loggedIn: false,
     lang: "en",
     user: {
-      name: "Bawoke Desta",
-      email: "user@bawereal.local",
+      name: "",
+      email: "",
       uid,
       referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
       referralCount: 0,
@@ -984,7 +986,7 @@ function defaultState() {
       status: "Active",
       vipLevel: 0,
       activeVip: null,
-      registeredAt: new Date().toLocaleString()
+      registeredAt: ""
     },
     lockedBalance: initialBalance,
     balanceSig: computeBalanceChecksum(initialBalance, uid),
@@ -1146,6 +1148,28 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     recordUserInRegistry(state.user, state.lockedBalance);
   } catch (_) {}
+}
+
+function startSession(email) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, "true");
+    sessionStorage.setItem(SESSION_EMAIL_KEY, email || "");
+  } catch (_) {}
+}
+
+function endSession() {
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_EMAIL_KEY);
+  } catch (_) {}
+}
+
+function hasActiveSession() {
+  try {
+    return sessionStorage.getItem(SESSION_KEY) === "true";
+  } catch (_) {
+    return false;
+  }
 }
 
 function showToast(msg) {
@@ -1547,16 +1571,19 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
 
 document.getElementById("loginBtn").addEventListener("click", () => {
   const email = document.getElementById("loginEmail").value.trim();
-  if (email) {
-    state.user.email = email;
-    if (!state.user.name) {
-      state.user.name = email.split("@")[0];
-    }
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) {
+    return alert("Please enter email and password.");
+  }
+  state.user.email = email;
+  if (!state.user.name) {
+    state.user.name = email.split("@")[0];
   }
   if (!state.user.registeredAt) {
     state.user.registeredAt = new Date().toLocaleString();
   }
   state.loggedIn = true;
+  startSession(email);
   saveState();
   runStepLoader(() => {
     document.getElementById("auth").classList.add("hidden");
@@ -1589,6 +1616,7 @@ document.getElementById("registerBtn").addEventListener("click", () => {
   state.investments = [];
   state.history = [];
   state.loggedIn = true;
+  startSession(email);
 
   saveState();
   runStepLoader(() => {
@@ -1605,9 +1633,13 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   state.loggedIn = false;
+  endSession();
   saveState();
   document.getElementById("application").classList.add("hidden");
   document.getElementById("auth").classList.remove("hidden");
+  document.getElementById("loginEmail").value = "";
+  document.getElementById("loginPassword").value = "";
+  showLogin();
 });
 
 document.getElementById("homeCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
@@ -1785,10 +1817,16 @@ renderVipCards();
 renderAll();
 setInterval(updateTask24Timer, 1000);
 
-if (state.loggedIn) {
+if (hasActiveSession() && state.user.email) {
   document.getElementById("auth").classList.add("hidden");
   document.getElementById("application").classList.remove("hidden");
   openPage("home");
+} else {
+  state.loggedIn = false;
+  saveState();
+  document.getElementById("auth").classList.remove("hidden");
+  document.getElementById("application").classList.add("hidden");
+  showLogin();
 }
 </script>
 </body>
