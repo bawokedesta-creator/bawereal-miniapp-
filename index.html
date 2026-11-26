@@ -1,362 +1,223 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenVest Investment</title>
-
 <style>
-:root {
---green:#087b43;
---dark:#064d2c;
---light:#e9f7ee;
---white:#fff;
---bg:#f3f8f4;
---text:#183b29;
---muted:#718477;
---red:#dc4444;
+.auth-tabs {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
 }
-
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-
-header{
-background:var(--dark);color:white;padding:17px 5%;
-display:flex;align-items:center;justify-content:space-between
+.auth-tabs button {
+  padding:13px 5px;
+  border:0;
+  border-radius:9px;
+  background:#e9f7ee;
+  color:#07532f;
+  font-weight:bold;
 }
-.logo{font-size:25px;font-weight:bold}
-.header-right{display:flex;gap:12px;align-items:center}
-.lang-btn{background:white;color:var(--dark);padding:10px 14px;border:0;border-radius:8px;font-weight:bold}
-.refresh-btn{background:#ffffff20;color:white;border:1px solid #ffffff50;border-radius:8px;padding:9px 12px}
-
-.container{max-width:1150px;margin:30px auto;padding:0 16px}
-.auth-wrapper{max-width:950px;margin:55px auto;padding:0 15px}
-.auth-heading{text-align:center;margin-bottom:28px}
-.auth-heading h1{color:var(--green);font-size:32px;margin-bottom:10px}
-
-.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.auth-card{background:white;padding:30px;border-radius:16px;box-shadow:0 5px 25px #0000000b;border-top:4px solid var(--green)}
-.auth-card h2{margin-bottom:20px;color:var(--dark)}
-
-input,select{
-width:100%;padding:13px;border:1px solid #dce8df;
-border-radius:8px;margin:8px 0;outline-color:var(--green);background:white
+.auth-tabs button.active {
+  background:#087b43;
+  color:white;
 }
-.primary{background:var(--green);color:white;width:100%;padding:14px;border:0;border-radius:8px;font-weight:bold;margin-top:12px}
-.primary:hover{background:var(--dark)}
-.message{margin-top:12px;font-size:13px;line-height:1.5}
-.error{color:var(--red)}
-.success{color:var(--green)}
-.small{font-size:13px;color:var(--muted);line-height:1.6;margin-top:12px}
-
-.dashboard-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
-.dashboard-top h2{font-size:25px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:17px;margin:24px 0}
-.card{background:white;padding:23px;border-radius:13px;box-shadow:0 3px 15px #00000008}
-.card h3{font-size:14px;color:var(--muted);margin-bottom:13px}
-.amount{color:var(--green);font-size:27px;font-weight:bold;overflow-wrap:anywhere}
-
-.rate-box{background:var(--light);border-radius:9px;padding:12px;margin-top:15px;font-size:13px;line-height:1.8}
-.rate-value{color:var(--dark);font-weight:bold}
-.rate-status{font-size:11px;color:var(--muted)}
-
-.nav{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}
-.nav button{padding:12px 16px;border:0;border-radius:8px;background:white;color:var(--dark);font-weight:bold}
-.nav button.active,.nav button:hover{background:var(--green);color:white}
-
-.panel{background:white;padding:25px;border-radius:13px;margin:15px 0;box-shadow:0 3px 15px #00000008}
-.panel h2{margin-bottom:18px}
-.panel p{line-height:1.7}
-
-.notice{background:#fff5db;color:#775817;padding:14px;border-radius:8px;margin:15px 0;font-size:13px;line-height:1.7}
-.green-notice{background:var(--light);color:var(--dark);padding:15px;border-radius:9px;margin:12px 0;line-height:1.7;overflow-wrap:anywhere}
-.account{background:#f5faf6;padding:15px;border:1px solid #dcebe0;border-radius:9px;margin:12px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
-.account strong{color:var(--green)}
-.copy-btn{padding:8px 12px;background:var(--green);color:white;border:0;border-radius:6px;font-size:12px}
-
-.packages{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
-.package{background:white;border:1px solid #dcebe0;border-radius:12px;padding:22px}
-.package h3{color:var(--green);margin-bottom:12px}
-.package p{color:var(--muted);margin:9px 0;font-size:14px}
-.package button{width:100%;background:var(--green);color:white;padding:12px;border:0;border-radius:8px;margin-top:12px}
-
-.fee-box{background:var(--light);padding:16px;border-radius:9px;line-height:2;margin:15px 0}
-.fee-box strong{color:var(--green)}
-table{width:100%;border-collapse:collapse;min-width:450px}
-th,td{text-align:left;padding:13px;border-bottom:1px solid #e8eee9;font-size:13px}
-.table-wrap{overflow-x:auto}
-footer{text-align:center;padding:30px;color:var(--muted);font-size:13px}
-
-@media(max-width:650px){
-.auth-grid{grid-template-columns:1fr}
-.auth-wrapper{margin:30px auto}
-.auth-card{padding:22px}
-.logo{font-size:20px}
-.container{margin:20px auto}
-.dashboard-top h2{font-size:21px}
-.nav button{flex:1 1 28%;padding:12px 7px;font-size:12px}
-.account{flex-wrap:wrap}
+.auth-card {
+  background:white;
+  padding:22px;
+  border-radius:15px;
+  border-top:4px solid #087b43;
 }
 </style>
-</head>
-
-<body>
-
-<header>
-<div class="logo">🌱 GreenVest</div>
-<div class="header-right">
-<button class="refresh-btn hidden" id="headerRefresh" onclick="refreshRate()">↻</button>
-<button class="lang-btn" onclick="toggleLanguage()" id="languageBtn">አማ</button>
-</div>
-</header>
-
-<!-- REGISTER AND LOGIN -->
 
 <div id="authScreen" class="auth-wrapper">
 
-<div class="auth-heading">
-<h1>🌱 GreenVest</h1>
-<p>Welcome to your investment platform</p>
-</div>
+  <div class="auth-heading">
+    <h1>🌱 GreenVest</h1>
+    <p>Welcome to GreenVest</p>
+  </div>
 
-<div class="auth-grid">
+  <div class="auth-tabs">
+    <button id="loginTab" class="active"
+      onclick="showAuth('login')">LOGIN</button>
 
-<div class="auth-card">
-<h2>Create Account</h2>
-<form id="registerForm">
+    <button id="registerTab"
+      onclick="showAuth('register')">REGISTER</button>
+  </div>
 
-<input id="regName" required placeholder="Full Name">
-<input id="regEmail" type="email" required placeholder="Email Address">
-<input id="regPhone" type="tel" placeholder="Phone Number">
-<input id="regPassword" type="password" required minlength="8" placeholder="Create Password (8+ characters)">
-<input id="regConfirm" type="password" required minlength="8" placeholder="Confirm Password">
-<input id="regReferral" placeholder="Referral Code (Optional)">
+  <!-- LOGIN -->
+  <div id="loginBox" class="auth-card">
+    <h2>Login Account</h2>
 
-<button type="submit" class="primary">REGISTER NOW</button>
-<p id="registerMessage" class="message"></p>
-</form>
-</div>
+    <form id="loginForm">
+      <input id="loginEmail" type="email"
+        placeholder="Email Address" required>
 
-<div class="auth-card">
-<h2>Login Account</h2>
-<form id="loginForm">
+      <input id="loginPassword" type="password"
+        placeholder="Password" required>
 
-<input id="loginEmail" type="email" required placeholder="Email Address">
-<input id="loginPassword" type="password" required placeholder="Password">
+      <button class="primary" type="submit">LOGIN</button>
 
-<button type="submit" class="primary">LOGIN</button>
-<p id="loginMessage" class="message"></p>
-</form>
+      <p id="loginMessage" class="message"></p>
+    </form>
+  </div>
 
-<p class="small">Create your account on the left, then login here using your registered email and password.</p>
-</div>
+  <!-- REGISTER -->
+  <div id="registerBox" class="auth-card hidden">
+    <h2>Create Account</h2>
 
-</div>
-</div>
+    <form id="registerForm">
 
-<!-- DASHBOARD -->
+      <input id="regName" type="text"
+        placeholder="Full Name" required>
 
-<main id="dashboard" class="container hidden">
+      <input id="regEmail" type="email"
+        placeholder="Email Address" required>
 
-<div class="dashboard-top">
-<h2 id="welcomeText">Welcome to GreenVest 👋</h2>
-</div>
+      <input id="regPassword" type="password"
+        placeholder="New Password (8 characters minimum)"
+        minlength="8" required>
 
-<div class="cards">
+      <input id="regConfirm" type="password"
+        placeholder="Confirm Password"
+        minlength="8" required>
 
-<div class="card">
-<h3>TOTAL BALANCE</h3>
-<div class="amount" id="totalBalance">$0.00</div>
+      <button class="primary" type="submit">
+        CREATE ACCOUNT
+      </button>
 
-<div class="rate-box">
-<div>የብር ዋጋ = <span class="rate-value" id="birrBalance">ETB 0.00</span></div>
-<div>Exchange Rate = <span class="rate-value" id="exchangeRate">Loading...</span></div>
-<div class="rate-status" id="rateStatus">Waiting for exchange rate...</div>
-<button class="refresh-btn" style="background:var(--green);margin-top:8px" onclick="refreshRate()">↻ Refresh Rate</button>
-</div>
-</div>
+      <p id="registerMessage" class="message"></p>
 
-<div class="card">
-<h3>TOTAL DEPOSIT</h3>
-<div class="amount" id="totalDeposit">$0.00</div>
-</div>
-
-<div class="card">
-<h3>TOTAL INVESTMENT</h3>
-<div class="amount" id="totalInvestment">$0.00</div>
-</div>
-
-<div class="card">
-<h3>TOTAL WITHDRAWAL</h3>
-<div class="amount" id="totalWithdrawal">$0.00</div>
-</div>
+    </form>
+  </div>
 
 </div>
 
-<div class="nav">
-<button class="active" onclick="showPage('home',this)">Dashboard</button>
-<button onclick="showPage('deposit',this)">Deposit</button>
-<button onclick="showPage('withdraw',this)">Withdrawal</button>
-<button onclick="showPage('packages',this)">Packages</button>
-<button onclick="showPage('referral',this)">Referral</button>
-<button onclick="showPage('history',this)">History</button>
-<button onclick="logout()">Logout</button>
-</div>
+<script>
 
-<section id="home" class="page">
-<div class="panel">
-<h2>Dashboard Overview</h2>
-<p>Welcome to your GreenVest account. Manage your deposits, withdrawals and packages here.</p>
-</div>
-</section>
+// CHANGE BETWEEN LOGIN AND REGISTER
 
-<!-- DEPOSIT -->
+function showAuth(type) {
 
-<section id="deposit" class="page hidden">
-<div class="panel">
-<h2>Deposit Funds</h2>
+  const login = type === "login";
 
-<div class="green-notice">
-<strong>Payment Accounts</strong>
+  document.getElementById("loginBox")
+    .classList.toggle("hidden",!login);
 
-<div class="account">
-<div><strong>Telebirr</strong><p>0964488470</p></div>
-<button class="copy-btn" onclick="copyText('0964488470')">Copy</button>
-</div>
+  document.getElementById("registerBox")
+    .classList.toggle("hidden",login);
 
-<div class="account">
-<div><strong>CBE Bank</strong><p>1000298833585</p></div>
-<button class="copy-btn" onclick="copyText('1000298833585')">Copy</button>
-</div>
+  document.getElementById("loginTab")
+    .classList.toggle("active",login);
 
-<div class="account">
-<div><strong>Bank of Abyssinia</strong><p>166455979</p></div>
-<button class="copy-btn" onclick="copyText('166455979')">Copy</button>
-</div>
-</div>
+  document.getElementById("registerTab")
+    .classList.toggle("active",!login);
+}
 
-<form id="depositForm">
-<label>Deposit Amount (USD)</label>
-<input type="number" id="depositAmount" min="1" step="0.01" required placeholder="Enter amount">
 
-<label>Select Payment Method</label>
-<select id="depositMethod">
-<option value="Telebirr">Telebirr</option>
-<option value="CBE">CBE Bank</option>
-<option value="Abyssinia">Bank of Abyssinia</option>
-</select>
+// REGISTER ACCOUNT
 
-<input id="depositReference" required placeholder="Transaction ID / Payment Reference">
-<button class="primary" type="submit">SUBMIT DEPOSIT REQUEST</button>
-</form>
+document.getElementById("registerForm")
+.addEventListener("submit",function(e){
 
-<div class="notice">Deposits remain pending until payment is verified. This demo does not automatically transfer money.</div>
-<p id="depositMessage" class="message"></p>
-</div>
-</section>
+  e.preventDefault();
 
-<!-- WITHDRAWAL -->
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim().toLowerCase();
+  const password = document.getElementById("regPassword").value;
+  const confirm = document.getElementById("regConfirm").value;
 
-<section id="withdraw" class="page hidden">
-<div class="panel">
-<h2>Withdraw Funds</h2>
-<p>Available Balance: <strong id="availableBalance">$0.00</strong></p>
+  const message = document.getElementById("registerMessage");
 
-<form id="withdrawForm">
-<label>Withdrawal Amount (USD)</label>
-<input type="number" id="withdrawAmount" min="1" step="0.01" required placeholder="Enter amount" oninput="calculateFee()">
+  if(password.length < 8){
+    message.textContent = "Password must be at least 8 characters.";
+    message.className = "message error";
+    return;
+  }
 
-<label>Your Receiving Account</label>
-<select id="withdrawMethod">
-<option value="Telebirr">Telebirr</option>
-<option value="CBE">CBE Bank</option>
-<option value="Abyssinia">Bank of Abyssinia</option>
-</select>
+  if(password !== confirm){
+    message.textContent = "Passwords do not match!";
+    message.className = "message error";
+    return;
+  }
 
-<input id="withdrawAccount" required placeholder="Enter your receiving account number">
+  const users = JSON.parse(
+    localStorage.getItem("gv_users") || "{}"
+  );
 
-<div class="fee-box">
-<div>Withdrawal Amount: <strong id="feeAmount">$0.00</strong></div>
-<div>Withdrawal Fee (5%): <strong id="feeValue">$0.00</strong></div>
-<div>NET PAY: <strong id="netPay">$0.00</strong></div>
-</div>
+  if(users[email]){
+    message.textContent = "Email already registered. Please login.";
+    message.className = "message error";
+    return;
+  }
 
-<button type="submit" class="primary">SUBMIT WITHDRAWAL REQUEST</button>
-</form>
+  users[email] = {
+    name:name,
+    email:email,
+    password:password,
+    balance:0,
+    deposited:0,
+    invested:0,
+    withdrawn:0,
+    code:"GV-"+Math.random().toString(36).slice(2,10).toUpperCase(),
+    transactions:[],
+    packages:[]
+  };
 
-<p id="withdrawMessage" class="message"></p>
-</div>
-</section>
+  localStorage.setItem("gv_users",JSON.stringify(users));
 
-<!-- PACKAGES -->
+  message.textContent = "Registration Successful! Returning to Login...";
+  message.className = "message success";
 
-<section id="packages" class="page hidden">
-<h2>Investment Packages</h2>
+  document.getElementById("loginEmail").value = email;
 
-<div class="packages">
-<div class="package">
-<h3>STARTER</h3>
-<h2>$50</h2>
-<p>Starter package</p>
-<button onclick="selectPackage('Starter',50)">SELECT PACKAGE</button>
-</div>
+  document.getElementById("registerForm").reset();
 
-<div class="package">
-<h3>GROWTH</h3>
-<h2>$200</h2>
-<p>Growth package</p>
-<button onclick="selectPackage('Growth',200)">SELECT PACKAGE</button>
-</div>
+  setTimeout(function(){
 
-<div class="package">
-<h3>PREMIUM</h3>
-<h2>$500</h2>
-<p>Premium package</p>
-<button onclick="selectPackage('Premium',500)">SELECT PACKAGE</button>
-</div>
-</div>
+    showAuth("login");
 
-<div class="notice">These are demo package prices, not promises of investment returns or profits.</div>
-</section>
+    document.getElementById("loginMessage").textContent =
+      "Account created successfully! Please login.";
 
-<!-- REFERRAL -->
+    document.getElementById("loginMessage").className =
+      "message success";
 
-<section id="referral" class="page hidden">
-<div class="panel">
-<h2>Referral Program</h2>
-<p>Your personal referral code:</p>
+  },1200);
 
-<div class="green-notice">
-<h2 id="referralCode">GV-DEMO</h2>
-<button class="copy-btn" onclick="copyReferral()">COPY CODE</button>
-</div>
-<p class="small">Referral tracking and rewards require a secure backend.</p>
-</div>
-</section>
+});
 
-<!-- HISTORY -->
 
-<section id="history" class="page hidden">
-<div class="panel">
-<h2>Transaction History</h2>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Type</th><th>Amount</th><th>Fee</th><th>Net Pay</th><th>Method</th><th>Status</th>
-</tr>
-</thead>
-<tbody id="historyRows"></tbody>
-</table>
-</div>
-<p id="emptyHistory" class="small">No transactions yet.</p>
-</div>
-</section>
+// LOGIN ACCOUNT
 
-</main>
+document.getElementById("loginForm")
+.addEventListener("submit",function(e){
 
-<footer>© 2026 GreenVest | Investment Platform</footer>
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail")
+    .value.trim().toLowerCase();
+
+  const password = document.getElementById("loginPassword").value;
+
+  const users = JSON.parse(
+    localStorage.getItem("gv_users") || "{}"
+  );
+
+  const message = document.getElementById("loginMessage");
+
+  if(!users[email]){
+    message.textContent = "Account not found. Please register first.";
+    message.className = "message error";
+    return;
+  }
+
+  if(users[email].password !== password){
+    message.textContent = "Incorrect password. Try again.";
+    message.className = "message error";
+    return;
+  }
+
+  localStorage.setItem("gv_session",email);
+
+  openDashboard();
+
+});
+
+</script>
