@@ -15,64 +15,37 @@
       background-color: #090d16;
       color: #f8fafc;
       padding: 14px;
-      max-width: 680px;
+      max-width: 640px;
       margin: 0 auto;
       min-height: 100vh;
     }
 
-    /* Header with Right-Corner En / አማ Switcher */
+    /* Header */
     .admin-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #111827;
       border: 1px solid #1f2937;
-      padding: 13px 15px;
+      padding: 14px 16px;
       border-radius: 14px;
       margin-bottom: 14px;
-      gap: 10px;
     }
     .admin-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 800;
       color: #38bdf8;
     }
     .admin-sub {
-      font-size: 0.74rem;
+      font-size: 0.75rem;
       color: #94a3b8;
       margin-top: 2px;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .lang-box {
-      display: flex;
-      background: #0b1120;
-      border-radius: 8px;
-      padding: 2px;
-      border: 1px solid #334155;
-    }
-    .lang-btn {
-      background: transparent;
-      color: #94a3b8;
-      border: none;
-      padding: 5px 9px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .lang-btn.active {
-      background: #0284c7;
-      color: #ffffff;
     }
     .sync-btn {
       background: #1e293b;
       color: #38bdf8;
       border: 1px solid #334155;
-      padding: 6px 11px;
+      padding: 7px 12px;
       border-radius: 8px;
       font-size: 0.8rem;
       font-weight: 700;
@@ -85,7 +58,7 @@
       border: 1px solid #1f2937;
       border-radius: 14px;
       padding: 20px;
-      margin-top: 18px;
+      margin-top: 20px;
     }
     #admin-gate h2 {
       font-size: 1.05rem;
@@ -102,11 +75,11 @@
       color: #cbd5e1;
       margin-bottom: 5px;
     }
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
       padding: 9px 11px;
       border-radius: 8px;
-      border: 1px solid #374155;
+      border: 1px solid #374151;
       background: #0b1120;
       color: #f8fafc;
       font-size: 0.88rem;
@@ -125,9 +98,9 @@
       background: #16a34a;
       color: #ffffff;
       border: none;
-      padding: 6px 9px;
-      border-radius: 6px;
-      font-size: 0.74rem;
+      padding: 7px 11px;
+      border-radius: 7px;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -135,9 +108,9 @@
       background: #dc2626;
       color: #ffffff;
       border: none;
-      padding: 6px 9px;
-      border-radius: 6px;
-      font-size: 0.74rem;
+      padding: 7px 11px;
+      border-radius: 7px;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -145,9 +118,9 @@
       background: #d97706;
       color: #ffffff;
       border: none;
-      padding: 6px 9px;
-      border-radius: 6px;
-      font-size: 0.74rem;
+      padding: 7px 11px;
+      border-radius: 7px;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -175,107 +148,108 @@
       margin-bottom: 4px;
     }
     .stat-card strong {
-      font-size: 1.12rem;
+      font-size: 1.15rem;
       color: #38bdf8;
     }
 
-    /* Consolidated Per-User Activity Block & Table */
-    .user-activity-block {
+    /* Section Tabs */
+    .admin-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .admin-tab-btn {
+      background: #111827;
+      color: #cbd5e1;
+      border: 1px solid #1f2937;
+      padding: 9px 6px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .admin-tab-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    /* Cards & Lists */
+    .section-box {
+      display: none;
       background: #111827;
       border: 1px solid #1f2937;
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    .user-block-header {
+    .section-box.active {
+      display: block;
+    }
+    .section-box h3 {
+      font-size: 0.98rem;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+    .req-card {
+      background: #0b1120;
+      border: 1px solid #1f2937;
+      border-radius: 11px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .req-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
+      margin-bottom: 6px;
       gap: 8px;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #1f2937;
+      flex-wrap: wrap;
     }
-    .user-block-title {
-      font-size: 0.96rem;
-      font-weight: 800;
-      color: #38bdf8;
-    }
-    .user-block-bal {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: #4ade80;
-    }
-    .user-submeta {
-      font-size: 0.76rem;
-      color: #94a3b8;
-      margin-bottom: 10px;
-    }
-
-    .activity-table-wrap {
-      width: 100%;
-      overflow-x: auto;
-      border-radius: 10px;
-      border: 1px solid #1f2937;
-      background: #0b1120;
-    }
-    .activity-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
-      min-width: 520px;
-    }
-    .activity-table th {
-      background: #162033;
-      color: #cbd5e1;
-      text-align: left;
-      padding: 8px 9px;
-      border-bottom: 1px solid #1f2937;
+    .req-user {
       font-weight: 700;
+      color: #f8fafc;
+      font-size: 0.9rem;
     }
-    .activity-table td {
-      padding: 8px 9px;
-      border-bottom: 1px solid #131c2e;
-      color: #e2e8f0;
-      vertical-align: middle;
-    }
-    .activity-table tr:last-child td {
-      border-bottom: none;
-    }
-
     .status-pill {
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 999px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      display: inline-block;
     }
     .status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .status-approved { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
     .status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
     .status-reviewed { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
-    .action-btns-inline {
+    .req-details {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .req-actions {
       display: flex;
-      gap: 5px;
+      gap: 7px;
       flex-wrap: wrap;
     }
 
+    /* User Balance Adjuster */
     .adjust-row {
       display: flex;
       gap: 6px;
-      margin-top: 10px;
+      margin-top: 8px;
       flex-wrap: wrap;
     }
     .adjust-row input {
       flex: 1;
-      min-width: 120px;
+      min-width: 110px;
       padding: 7px 9px;
       border-radius: 7px;
       border: 1px solid #374151;
-      background: #0b1120;
+      background: #111827;
       color: #ffffff;
       font-size: 0.82rem;
     }
@@ -322,136 +296,94 @@
       font-size: 0.84rem;
       color: #94a3b8;
       text-align: center;
-      padding: 16px 0;
+      padding: 14px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- TOP HEADER WITH RIGHT-CORNER LANGUAGE CHOICE (En / አማ) -->
   <div class="admin-header">
     <div>
-      <div class="admin-title" data-i18n="adminTitle">EthioInvest Admin</div>
-      <div class="admin-sub" data-i18n="adminSub">Per-User Activity Table • Approve / Reject / Review</div>
+      <div class="admin-title">EthioInvest Admin</div>
+      <div class="admin-sub">Deposit • Withdrawal • Referral • User Balances</div>
     </div>
-    <div class="header-right">
-      <button class="sync-btn" onclick="syncAllData()" data-i18n="syncBtn">↻ Sync</button>
-      <div class="lang-box">
-        <button class="lang-btn" id="btnEnAdmin" onclick="setAdminLanguage('en')">En</button>
-        <button class="lang-btn active" id="btnAmAdmin" onclick="setAdminLanguage('am')">አማ</button>
-      </div>
-    </div>
+    <button class="sync-btn" onclick="syncAllData()">↻ Sync</button>
   </div>
 
   <!-- ADMIN ACCESS GATE -->
   <div id="admin-gate">
-    <h2 data-i18n="gateTitle">አስተዳዳሪ መግቢያ (Admin Access)</h2>
+    <h2>Admin Access (አስተዳዳሪ መግቢያ)</h2>
     <div class="form-group">
-      <label data-i18n="pinLabel">Admin PIN / Passcode (Default: 1234)</label>
-      <input type="password" id="adminPassInput" placeholder="1234" />
+      <label>Admin PIN / Passcode (Default: 1234)</label>
+      <input type="password" id="adminPassInput" placeholder="Enter Admin PIN" />
     </div>
-    <button class="btn-blue" style="width: 100%;" onclick="unlockAdmin()" data-i18n="openPanelBtn">Open Admin Dashboard</button>
+    <button class="btn-blue" style="width: 100%;" onclick="unlockAdmin()">Open Admin Dashboard</button>
   </div>
 
   <!-- MAIN ADMIN DASHBOARD -->
   <div id="admin-panel">
     <div class="stats-grid">
       <div class="stat-card">
-        <span data-i18n="statUsers">ጠቅላላ ተጠቃሚዎች (Total Users)</span>
+        <span>Total Users</span>
         <strong id="statUsersCount">0</strong>
       </div>
       <div class="stat-card">
-        <span data-i18n="statBalances">ጠቅላላ የተጠቃሚ ሂሳብ</span>
+        <span>Total User Balances</span>
         <strong id="statTotalBalance">0.00 ETB</strong>
       </div>
       <div class="stat-card">
-        <span data-i18n="statPendingDep">Pending Deposits</span>
+        <span>Pending Deposits</span>
         <strong id="statPendingDeposits">0</strong>
       </div>
       <div class="stat-card">
-        <span data-i18n="statPendingWith">Pending Withdrawals</span>
+        <span>Pending Withdrawals</span>
         <strong id="statPendingWithdrawals">0</strong>
       </div>
     </div>
 
-    <!-- CONSOLIDATED PER-USER ACTIVITY TABLES -->
-    <div id="consolidatedUsersContainer"></div>
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" onclick="switchAdminTab('deposits', this)">Deposits</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('withdrawals', this)">Withdrawals</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('referrals', this)">Referrals</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('users', this)">Users</button>
+    </div>
+
+    <!-- 1. DEPOSITS CONTROL -->
+    <div id="tab-deposits" class="section-box active">
+      <h3>Deposit Requests (ገንዘብ ማስገቢያ ጥያቄዎች)</h3>
+      <div id="depositsList"></div>
+    </div>
+
+    <!-- 2. WITHDRAWALS CONTROL -->
+    <div id="tab-withdrawals" class="section-box">
+      <h3>Withdrawal Requests (ገንዘብ ማውጫ ጥያቄዎች)</h3>
+      <div id="withdrawalsList"></div>
+    </div>
+
+    <!-- 3. REFERRALS CONTROL -->
+    <div id="tab-referrals" class="section-box">
+      <h3>Referral Bonus Requests (ሪፈራል ቦነስ ጥያቄዎች)</h3>
+      <div id="referralsList"></div>
+    </div>
+
+    <!-- 4. USERS BALANCE CONTROL -->
+    <div id="tab-users" class="section-box">
+      <h3>Registered Users & Balance Control</h3>
+      <div id="usersList"></div>
+    </div>
   </div>
 
   <!-- REVIEW MODAL -->
   <div id="review-modal">
     <div class="modal-card">
-      <h4 data-i18n="reviewTitle">Review Activity Details</h4>
-      <div id="reviewModalBody" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;"></div>
-      <button class="btn-blue" style="width: 100%; margin-top: 12px;" onclick="closeReviewModal()" data-i18n="closeBtn">Close</button>
+      <h4>Review Request Details</h4>
+      <div id="reviewModalBody" class="req-details"></div>
+      <button class="btn-blue" style="width: 100%; margin-top: 10px;" onclick="closeReviewModal()">Close Review</button>
     </div>
   </div>
 
   <script>
     const ADMIN_PIN = "1234";
-    let adminLang = "am";
-
-    const i18n = {
-      am: {
-        adminTitle: "EthioInvest Admin",
-        adminSub: "የእያንዳንዱ User እንቅስቃሴ በአንድ ሰንጠረዥ • Approve / Reject / Review",
-        syncBtn: "↻ አድስ",
-        gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)",
-        pinLabel: "የአድሚን ፒን (Default: 1234)",
-        openPanelBtn: "አድሚን ፓነል ክፈት",
-        statUsers: "ጠቅላላ ተጠቃሚዎች",
-        statBalances: "ጠቅላላ የተጠቃሚ ሂሳብ",
-        statPendingDep: "በመጠባበቅ ላይ ያሉ Deposits",
-        statPendingWith: "በመጠባበቅ ላይ ያሉ Withdrawals",
-        colType: "አይነት",
-        colDetail: "ዝርዝር / ቀን-ሰዓት",
-        colAmount: "መጠን",
-        colStatus: "ሁኔታ",
-        colAction: "ቁጥጥር",
-        noUserActivity: "ለዚህ ተጠቃሚ እስካሁን የተመዘገበ Deposit / Withdrawal / Referral የለም።",
-        noUsersAtAll: "እስካሁን የተመዘገበ ተጠቃሚ የለም።",
-        addBtn: "+ ጨምር",
-        deductBtn: "- ቀንስ",
-        reviewTitle: "የእንቅስቃሴ ዝርዝር (Review)",
-        closeBtn: "ዝጋ"
-      },
-      en: {
-        adminTitle: "EthioInvest Admin",
-        adminSub: "Consolidated Per-User Table • Approve / Reject / Review",
-        syncBtn: "↻ Sync",
-        gateTitle: "Admin Access",
-        pinLabel: "Admin PIN / Passcode (Default: 1234)",
-        openPanelBtn: "Open Admin Dashboard",
-        statUsers: "Total Users",
-        statBalances: "Total User Balances",
-        statPendingDep: "Pending Deposits",
-        statPendingWith: "Pending Withdrawals",
-        colType: "Type",
-        colDetail: "Details / Time",
-        colAmount: "Amount",
-        colStatus: "Status",
-        colAction: "Action",
-        noUserActivity: "No Deposit, Withdrawal, or Referral activity for this user yet.",
-        noUsersAtAll: "No registered users yet.",
-        addBtn: "+ Add",
-        deductBtn: "- Deduct",
-        reviewTitle: "Review Activity Details",
-        closeBtn: "Close"
-      }
-    };
-
-    function setAdminLanguage(lang) {
-      adminLang = lang;
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (i18n[lang][key]) el.innerText = i18n[lang][key];
-      });
-      document.getElementById("btnEnAdmin").classList.toggle("active", lang === "en");
-      document.getElementById("btnAmAdmin").classList.toggle("active", lang === "am");
-      if (document.getElementById("admin-panel").style.display === "block") {
-        syncAllData();
-      }
-    }
 
     function unlockAdmin() {
       const pin = document.getElementById("adminPassInput").value.trim();
@@ -484,72 +416,12 @@
       localStorage.setItem("ethio_admin_requests", JSON.stringify(reqs));
     }
 
-    function renderBadge(status) {
-      const cls =
-        status === "approved"
-          ? "status-approved"
-          : status === "rejected"
-          ? "status-rejected"
-          : status === "reviewed"
-          ? "status-reviewed"
-          : "status-pending";
-      return `<span class="status-pill ${cls}">${status}</span>`;
-    }
+    function switchAdminTab(tabName, btnEl) {
+      document.querySelectorAll(".admin-tab-btn").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
 
-    // Collects all Deposit, Withdrawal, and Referral items for a single user in chronological order
-    function getUserConsolidatedActivities(username, reqs) {
-      const items = [];
-
-      (reqs.deposits || [])
-        .filter(d => d.username === username)
-        .forEach(d => {
-          items.push({
-            id: d.id,
-            kind: "deposit",
-            kindLabel: "Deposit",
-            detail: `${d.method || ""} • ${d.screenshotName || "No file"} • ${d.time || ""}`,
-            amount: Number(d.amount || 0),
-            status: d.status || "pending",
-            raw: d
-          });
-        });
-
-      (reqs.withdrawals || [])
-        .filter(w => w.username === username)
-        .forEach(w => {
-          items.push({
-            id: w.id,
-            kind: "withdrawal",
-            kindLabel: "Withdrawal",
-            detail: `${w.method || ""} (${w.account || ""}) | Net: ${Number(w.netPay || 0).toFixed(2)} • ${w.time || ""}`,
-            amount: Number(w.amount || 0),
-            status: w.status || "pending",
-            raw: w
-          });
-        });
-
-      (reqs.referrals || [])
-        .filter(r => r.username === username)
-        .forEach(r => {
-          items.push({
-            id: r.id,
-            kind: "referral",
-            kindLabel: "Referral",
-            detail: `${r.refLink || "Bonus"} • ${r.time || ""}`,
-            amount: Number(r.amount || 100),
-            status: r.status || "pending",
-            raw: r
-          });
-        });
-
-      // Sort newest first using timestamp in id if available
-      items.sort((a, b) => {
-        const ta = parseInt((a.id || "").split("_")[1] || "0", 10);
-        const tb = parseInt((b.id || "").split("_")[1] || "0", 10);
-        return tb - ta;
-      });
-
-      return items;
+      document.querySelectorAll(".section-box").forEach(box => box.classList.remove("active"));
+      document.getElementById("tab-" + tabName).classList.add("active");
     }
 
     function syncAllData() {
@@ -562,8 +434,8 @@
         totalBal += Number(users[u].balance || 0);
       });
 
-      const pendingDep = (reqs.deposits || []).filter(d => d.status === "pending" || d.status === "reviewed").length;
-      const pendingWith = (reqs.withdrawals || []).filter(w => w.status === "pending" || w.status === "reviewed").length;
+      const pendingDep = reqs.deposits.filter(d => d.status === "pending" || d.status === "reviewed").length;
+      const pendingWith = reqs.withdrawals.filter(w => w.status === "pending" || w.status === "reviewed").length;
 
       document.getElementById("statUsersCount").innerText = userNames.length;
       document.getElementById("statTotalBalance").innerText =
@@ -571,15 +443,246 @@
       document.getElementById("statPendingDeposits").innerText = pendingDep;
       document.getElementById("statPendingWithdrawals").innerText = pendingWith;
 
-      renderConsolidatedUsers(users, reqs);
+      renderDeposits(reqs.deposits);
+      renderWithdrawals(reqs.withdrawals);
+      renderReferrals(reqs.referrals);
+      renderUsers(users);
     }
 
-    function renderConsolidatedUsers(users, reqs) {
-      const container = document.getElementById("consolidatedUsersContainer");
-      const usernames = Object.keys(users);
+    function renderBadge(status) {
+      const cls =
+        status === "approved"
+          ? "status-approved"
+          : status === "rejected"
+          ? "status-rejected"
+          : status === "reviewed"
+          ? "status-reviewed"
+          : "status-pending";
+      return `<span class="status-pill ${cls}">${status}</span>`;
+    }
 
+    // DEPOSITS: Approve adds amount to user balance; Reject removes if previously approved
+    function renderDeposits(list) {
+      const container = document.getElementById("depositsList");
+      if (!list.length) {
+        container.innerHTML = `<div class="empty-msg">No deposit requests yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = list
+        .map(
+          item => `
+          <div class="req-card">
+            <div class="req-top">
+              <span class="req-user">👤 ${item.username} • ${Number(item.amount).toFixed(2)} ETB</span>
+              ${renderBadge(item.status)}
+            </div>
+            <div class="req-details">
+              <div>Method: <strong>${item.method}</strong></div>
+              <div>Screenshot: <strong>${item.screenshotName || "None"}</strong></div>
+              <div>Time: ${item.time || ""}</div>
+            </div>
+            <div class="req-actions">
+              <button class="btn-green" onclick="decideDeposit('${item.id}', 'approve')">Approve (+)</button>
+              <button class="btn-red" onclick="decideDeposit('${item.id}', 'reject')">Reject (-)</button>
+              <button class="btn-amber" onclick="reviewItem('deposit', '${item.id}')">Review</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function decideDeposit(id, action) {
+      const users = readUsers();
+      const reqs = readAdminRequests();
+      const item = reqs.deposits.find(d => d.id === id);
+      if (!item || !users[item.username]) return;
+
+      const amt = Number(item.amount || 0);
+
+      if (action === "approve") {
+        if (!item.appliedToBalance) {
+          users[item.username].balance = Number(users[item.username].balance || 0) + amt;
+          users[item.username].history.unshift({
+            title: `Admin Approved Deposit (${item.method})`,
+            amount: amt,
+            type: "plus",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          });
+          item.appliedToBalance = true;
+        }
+        item.status = "approved";
+      } else if (action === "reject") {
+        if (item.appliedToBalance) {
+          users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
+          users[item.username].history.unshift({
+            title: `Admin Rejected Deposit (${item.method})`,
+            amount: amt,
+            type: "minus",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          });
+          item.appliedToBalance = false;
+        }
+        item.status = "rejected";
+      }
+
+      writeUsers(users);
+      writeAdminRequests(reqs);
+      syncAllData();
+    }
+
+    // WITHDRAWALS: Approve confirms deduction; Reject refunds amount back to user balance
+    function renderWithdrawals(list) {
+      const container = document.getElementById("withdrawalsList");
+      if (!list.length) {
+        container.innerHTML = `<div class="empty-msg">No withdrawal requests yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = list
+        .map(
+          item => `
+          <div class="req-card">
+            <div class="req-top">
+              <span class="req-user">👤 ${item.username} • ${Number(item.amount).toFixed(2)} ETB</span>
+              ${renderBadge(item.status)}
+            </div>
+            <div class="req-details">
+              <div>Method: <strong>${item.method}</strong> (${item.account})</div>
+              <div>5% Fee: -${Number(item.fee || 0).toFixed(2)} ETB | <strong style="color:#4ade80;">Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB</strong></div>
+              <div>Time: ${item.time || ""}</div>
+            </div>
+            <div class="req-actions">
+              <button class="btn-green" onclick="decideWithdrawal('${item.id}', 'approve')">Approve</button>
+              <button class="btn-red" onclick="decideWithdrawal('${item.id}', 'reject')">Reject (Refund)</button>
+              <button class="btn-amber" onclick="reviewItem('withdrawal', '${item.id}')">Review</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function decideWithdrawal(id, action) {
+      const users = readUsers();
+      const reqs = readAdminRequests();
+      const item = reqs.withdrawals.find(w => w.id === id);
+      if (!item || !users[item.username]) return;
+
+      const amt = Number(item.amount || 0);
+
+      if (action === "approve") {
+        // Deduct from user balance if not already deducted at submission
+        if (!item.deductedFromBalance) {
+          users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
+          item.deductedFromBalance = true;
+        }
+        users[item.username].history.unshift({
+          title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB`,
+          amount: amt,
+          type: "minus",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        });
+        item.status = "approved";
+      } else if (action === "reject") {
+        // Refund back to user balance if it was deducted
+        if (item.deductedFromBalance) {
+          users[item.username].balance = Number(users[item.username].balance || 0) + amt;
+          users[item.username].history.unshift({
+            title: `Admin Rejected Withdraw (Refunded ${item.method})`,
+            amount: amt,
+            type: "plus",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          });
+          item.deductedFromBalance = false;
+        }
+        item.status = "rejected";
+      }
+
+      writeUsers(users);
+      writeAdminRequests(reqs);
+      syncAllData();
+    }
+
+    // REFERRALS: Approve adds bonus to balance & refBonus; Reject removes if previously added
+    function renderReferrals(list) {
+      const container = document.getElementById("referralsList");
+      if (!list.length) {
+        container.innerHTML = `<div class="empty-msg">No referral requests yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = list
+        .map(
+          item => `
+          <div class="req-card">
+            <div class="req-top">
+              <span class="req-user">👤 ${item.username} • +${Number(item.amount || 100).toFixed(2)} ETB</span>
+              ${renderBadge(item.status)}
+            </div>
+            <div class="req-details">
+              <div>Referral Link: ${item.refLink || ""}</div>
+              <div>Time: ${item.time || ""}</div>
+            </div>
+            <div class="req-actions">
+              <button class="btn-green" onclick="decideReferral('${item.id}', 'approve')">Approve (+)</button>
+              <button class="btn-red" onclick="decideReferral('${item.id}', 'reject')">Reject (-)</button>
+              <button class="btn-amber" onclick="reviewItem('referral', '${item.id}')">Review</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function decideReferral(id, action) {
+      const users = readUsers();
+      const reqs = readAdminRequests();
+      const item = reqs.referrals.find(r => r.id === id);
+      if (!item || !users[item.username]) return;
+
+      const bonus = Number(item.amount || 100);
+
+      if (action === "approve") {
+        if (!item.appliedToBalance) {
+          users[item.username].balance = Number(users[item.username].balance || 0) + bonus;
+          users[item.username].refBonus = Number(users[item.username].refBonus || 0) + bonus;
+          users[item.username].history.unshift({
+            title: `Admin Approved Referral Bonus`,
+            amount: bonus,
+            type: "plus",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          });
+          item.appliedToBalance = true;
+        }
+        item.status = "approved";
+      } else if (action === "reject") {
+        if (item.appliedToBalance) {
+          users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - bonus);
+          users[item.username].refBonus = Math.max(0, Number(users[item.username].refBonus || 0) - bonus);
+          users[item.username].history.unshift({
+            title: `Admin Rejected Referral Bonus`,
+            amount: bonus,
+            type: "minus",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          });
+          item.appliedToBalance = false;
+        }
+        item.status = "rejected";
+      }
+
+      writeUsers(users);
+      writeAdminRequests(reqs);
+      syncAllData();
+    }
+
+    // USERS: Direct add (+), subtract (-), or set exact balance
+    function renderUsers(users) {
+      const container = document.getElementById("usersList");
+      const usernames = Object.keys(users);
       if (!usernames.length) {
-        container.innerHTML = `<div class="user-activity-block"><div class="empty-msg">${i18n[adminLang].noUsersAtAll}</div></div>`;
+        container.innerHTML = `<div class="empty-msg">No registered users yet.</div>`;
         return;
       }
 
@@ -587,175 +690,24 @@
         .map(u => {
           const rec = users[u];
           const safeId = encodeURIComponent(u);
-          const activities = getUserConsolidatedActivities(u, reqs);
-
-          let tableHtml = "";
-          if (!activities.length) {
-            tableHtml = `<div class="empty-msg">${i18n[adminLang].noUserActivity}</div>`;
-          } else {
-            const rows = activities
-              .map(
-                act => `
-                <tr>
-                  <td><strong>${act.kindLabel}</strong></td>
-                  <td>${act.detail}</td>
-                  <td><strong>${act.amount.toFixed(2)} ETB</strong></td>
-                  <td>${renderBadge(act.status)}</td>
-                  <td>
-                    <div class="action-btns-inline">
-                      <button class="btn-green" onclick="decideActivity('${act.kind}', '${act.id}', 'approve')">Approve</button>
-                      <button class="btn-red" onclick="decideActivity('${act.kind}', '${act.id}', 'reject')">Reject</button>
-                      <button class="btn-amber" onclick="reviewActivity('${act.kind}', '${act.id}')">Review</button>
-                    </div>
-                  </td>
-                </tr>
-              `
-              )
-              .join("");
-
-            tableHtml = `
-              <div class="activity-table-wrap">
-                <table class="activity-table">
-                  <thead>
-                    <tr>
-                      <th>${i18n[adminLang].colType}</th>
-                      <th>${i18n[adminLang].colDetail}</th>
-                      <th>${i18n[adminLang].colAmount}</th>
-                      <th>${i18n[adminLang].colStatus}</th>
-                      <th>${i18n[adminLang].colAction}</th>
-                    </tr>
-                  </thead>
-                  <tbody>${rows}</tbody>
-                </table>
-              </div>
-            `;
-          }
-
           return `
-            <div class="user-activity-block">
-              <div class="user-block-header">
-                <span class="user-block-title">👤 ${u}</span>
-                <span class="user-block-bal">${Number(rec.balance || 0).toFixed(2)} ETB</span>
+            <div class="req-card">
+              <div class="req-top">
+                <span class="req-user">👤 ${u}</span>
+                <strong style="color:#4ade80;">${Number(rec.balance || 0).toFixed(2)} ETB</strong>
               </div>
-              <div class="user-submeta">
-                Invested: ${Number(rec.invested || 0).toFixed(2)} ETB • Referral Bonus: ${Number(rec.refBonus || 0).toFixed(2)} ETB • Total Activities: ${activities.length}
+              <div class="req-details">
+                Invested: ${Number(rec.invested || 0).toFixed(2)} ETB • Referral Bonus: ${Number(rec.refBonus || 0).toFixed(2)} ETB
               </div>
-
-              ${tableHtml}
-
               <div class="adjust-row">
-                <input type="number" id="adj-amt-${safeId}" placeholder="ETB" />
-                <button class="btn-green" onclick="adjustUserBalance('${u}', '${safeId}', 'add')">${i18n[adminLang].addBtn}</button>
-                <button class="btn-red" onclick="adjustUserBalance('${u}', '${safeId}', 'sub')">${i18n[adminLang].deductBtn}</button>
+                <input type="number" id="adj-amt-${safeId}" placeholder="Amount (ETB)" />
+                <button class="btn-green" onclick="adjustUserBalance('${u}', '${safeId}', 'add')">+ Add</button>
+                <button class="btn-red" onclick="adjustUserBalance('${u}', '${safeId}', 'sub')">- Deduct</button>
               </div>
             </div>
           `;
         })
         .join("");
-    }
-
-    function decideActivity(kind, id, action) {
-      const users = readUsers();
-      const reqs = readAdminRequests();
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-      if (kind === "deposit") {
-        const item = (reqs.deposits || []).find(d => d.id === id);
-        if (!item || !users[item.username]) return;
-        const amt = Number(item.amount || 0);
-
-        if (action === "approve") {
-          if (!item.appliedToBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({
-              title: `Admin Approved Deposit (${item.method})`,
-              amount: amt,
-              type: "plus",
-              time: timeStr
-            });
-            item.appliedToBalance = true;
-          }
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.appliedToBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
-            users[item.username].history.unshift({
-              title: `Admin Rejected Deposit (${item.method})`,
-              amount: amt,
-              type: "minus",
-              time: timeStr
-            });
-            item.appliedToBalance = false;
-          }
-          item.status = "rejected";
-        }
-      } else if (kind === "withdrawal") {
-        const item = (reqs.withdrawals || []).find(w => w.id === id);
-        if (!item || !users[item.username]) return;
-        const amt = Number(item.amount || 0);
-
-        if (action === "approve") {
-          if (!item.deductedFromBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
-            item.deductedFromBalance = true;
-          }
-          users[item.username].history.unshift({
-            title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB`,
-            amount: amt,
-            type: "minus",
-            time: timeStr
-          });
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.deductedFromBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({
-              title: `Admin Rejected Withdraw (Refunded ${item.method})`,
-              amount: amt,
-              type: "plus",
-              time: timeStr
-            });
-            item.deductedFromBalance = false;
-          }
-          item.status = "rejected";
-        }
-      } else if (kind === "referral") {
-        const item = (reqs.referrals || []).find(r => r.id === id);
-        if (!item || !users[item.username]) return;
-        const bonus = Number(item.amount || 100);
-
-        if (action === "approve") {
-          if (!item.appliedToBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + bonus;
-            users[item.username].refBonus = Number(users[item.username].refBonus || 0) + bonus;
-            users[item.username].history.unshift({
-              title: "Admin Approved Referral Bonus",
-              amount: bonus,
-              type: "plus",
-              time: timeStr
-            });
-            item.appliedToBalance = true;
-          }
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.appliedToBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - bonus);
-            users[item.username].refBonus = Math.max(0, Number(users[item.username].refBonus || 0) - bonus);
-            users[item.username].history.unshift({
-              title: "Admin Rejected Referral Bonus",
-              amount: bonus,
-              type: "minus",
-              time: timeStr
-            });
-            item.appliedToBalance = false;
-          }
-          item.status = "rejected";
-        }
-      }
-
-      writeUsers(users);
-      writeAdminRequests(reqs);
-      syncAllData();
     }
 
     function adjustUserBalance(username, safeId, mode) {
@@ -768,23 +720,22 @@
 
       const users = readUsers();
       if (!users[username]) return;
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
       if (mode === "add") {
         users[username].balance = Number(users[username].balance || 0) + val;
         users[username].history.unshift({
-          title: "Admin Added Balance",
+          title: `Admin Added Balance`,
           amount: val,
           type: "plus",
-          time: timeStr
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         });
       } else {
         users[username].balance = Math.max(0, Number(users[username].balance || 0) - val);
         users[username].history.unshift({
-          title: "Admin Deducted Balance",
+          title: `Admin Deducted Balance`,
           amount: val,
           type: "minus",
-          time: timeStr
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         });
       }
 
@@ -793,14 +744,10 @@
       syncAllData();
     }
 
-    function reviewActivity(kind, id) {
+    // REVIEW MODAL (marks item as reviewed & shows screenshot if available)
+    function reviewItem(type, id) {
       const reqs = readAdminRequests();
-      const arr =
-        kind === "deposit"
-          ? reqs.deposits || []
-          : kind === "withdrawal"
-          ? reqs.withdrawals || []
-          : reqs.referrals || [];
+      const arr = type === "deposit" ? reqs.deposits : type === "withdrawal" ? reqs.withdrawals : reqs.referrals;
       const item = arr.find(x => x.id === id);
       if (!item) return;
 
@@ -810,17 +757,16 @@
       }
 
       let html = `
-        <div><strong>Type:</strong> ${kind.toUpperCase()}</div>
+        <div><strong>Type:</strong> ${type.toUpperCase()}</div>
         <div><strong>User:</strong> ${item.username}</div>
         <div><strong>Amount:</strong> ${Number(item.amount || 0).toFixed(2)} ETB</div>
         <div><strong>Status:</strong> ${item.status}</div>
-        <div><strong>Time:</strong> ${item.time || ""}</div>
       `;
 
       if (item.method) html += `<div><strong>Method:</strong> ${item.method}</div>`;
       if (item.account) html += `<div><strong>User Account:</strong> ${item.account}</div>`;
       if (typeof item.netPay !== "undefined") {
-        html += `<div><strong>Net Pay (5% fee):</strong> ${Number(item.netPay).toFixed(2)} ETB</div>`;
+        html += `<div><strong>Net Pay (after 5% fee):</strong> ${Number(item.netPay).toFixed(2)} ETB</div>`;
       }
       if (item.refLink) html += `<div><strong>Referral Link:</strong> ${item.refLink}</div>`;
       if (item.screenshotDataUrl) {
@@ -836,6 +782,7 @@
       document.getElementById("review-modal").classList.remove("active");
     }
 
+    // Auto-refresh every 5 seconds while admin panel is open
     setInterval(() => {
       if (document.getElementById("admin-panel").style.display === "block") {
         syncAllData();
