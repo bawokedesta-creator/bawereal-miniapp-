@@ -884,6 +884,7 @@
     let currentUser = null;
     let exchangeRate = 163.44;
     let selectedReceiptName = "";
+    let selectedReceiptDataUrl = "";
     let isLoggingIn = false;
 
     const i18n = {
@@ -976,6 +977,17 @@
         loadingMsg: "Loading..."
       }
     };
+
+    function readAdminRequests() {
+      return JSON.parse(
+        localStorage.getItem("ethio_admin_requests") ||
+          JSON.stringify({ deposits: [], withdrawals: [], referrals: [] })
+      );
+    }
+
+    function writeAdminRequests(reqs) {
+      localStorage.setItem("ethio_admin_requests", JSON.stringify(reqs));
+    }
 
     function switchAuthMode(mode) {
       const isReg = mode === "register";
@@ -1091,7 +1103,6 @@
       );
     }
 
-    // Plays 25% -> 50% -> 75% -> 100% over at least 2000ms (2s) before opening dashboard
     function runLoginLoadingScreen(onComplete) {
       if (isLoggingIn) return;
       isLoggingIn = true;
@@ -1103,7 +1114,7 @@
 
       screen.classList.add("active");
       const steps = [25, 50, 75, 100];
-      const stepDelay = 550; // 4 * 550ms = 2200ms (>= 2 seconds)
+      const stepDelay = 550;
 
       steps.forEach((pct, idx) => {
         setTimeout(() => {
@@ -1201,6 +1212,7 @@
 
       if (!file) {
         selectedReceiptName = "";
+        selectedReceiptDataUrl = "";
         nameSpan.innerText = i18n[currentLang].noFileSelected;
         previewImg.style.display = "none";
         return;
@@ -1211,12 +1223,14 @@
 
       const reader = new FileReader();
       reader.onload = function (e) {
+        selectedReceiptDataUrl = e.target.result;
         previewImg.src = e.target.result;
         previewImg.style.display = "block";
       };
       reader.readAsDataURL(file);
     }
 
+    // Sends deposit request to admin.html for Review / Approve / Reject
     function submitDeposit() {
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
@@ -1226,14 +1240,27 @@
         return;
       }
 
+      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const reqs = readAdminRequests();
+      reqs.deposits.unshift({
+        id: "dep_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        username: currentUser,
+        method: method,
+        amount: amount,
+        screenshotName: selectedReceiptName || "No file",
+        screenshotDataUrl: selectedReceiptDataUrl || "",
+        status: "pending",
+        appliedToBalance: false,
+        time: timeStr
+      });
+      writeAdminRequests(reqs);
+
       const data = getUserRecord();
-      const filePart = selectedReceiptName ? ` • Screenshot: ${selectedReceiptName}` : "";
-      data.balance += amount;
       data.history.unshift({
-        title: `Deposit (${method})${filePart}`,
+        title: `Deposit Request Pending Admin (${method})`,
         amount: amount,
         type: "plus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        time: timeStr
       });
       saveUserRecord(data);
       loadUserData();
@@ -1241,10 +1268,15 @@
       document.getElementById("depAmount").value = "";
       document.getElementById("depReceiptInput").value = "";
       selectedReceiptName = "";
+      selectedReceiptDataUrl = "";
       document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
       document.getElementById("receiptPreview").style.display = "none";
 
-      alert(currentLang === "am" ? "ተቀማጭ ገንዘብ በተሳካ ሁኔታ ተመዝግቧል!" : "Deposit added successfully!");
+      alert(
+        currentLang === "am"
+          ? "የተቀማጭ ገንዘብ ጥያቄ ወደ Admin ተልኳል! Admin ሲያጸድቀው (Approve) ሂሳብዎ ይጨምራል።"
+          : "Deposit request sent to Admin! Balance updates once approved in Admin."
+      );
     }
 
     function calculateNetPay() {
@@ -1264,6 +1296,7 @@
       document.getElementById("calcNetPay").innerText = netPay.toFixed(2) + " ETB";
     }
 
+    // Sends withdrawal request to admin.html; refunds automatically if Admin rejects
     function submitWithdrawal() {
       const method = document.getElementById("withMethod").value;
       const userAcc = document.getElementById("withUserAccount").value.trim();
@@ -1281,23 +1314,39 @@
 
       const fee = amount * 0.05;
       const netPay = amount - fee;
+      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
       data.balance -= amount;
       data.history.unshift({
-        title: `Withdraw (${method}: ${userAcc}) | Net Pay = ${netPay.toFixed(2)} ETB`,
+        title: `Withdraw Pending Admin (${method}: ${userAcc}) | Net Pay = ${netPay.toFixed(2)} ETB`,
         amount: amount,
         type: "minus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        time: timeStr
       });
       saveUserRecord(data);
       loadUserData();
+
+      const reqs = readAdminRequests();
+      reqs.withdrawals.unshift({
+        id: "with_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        username: currentUser,
+        method: method,
+        account: userAcc,
+        amount: amount,
+        fee: fee,
+        netPay: netPay,
+        status: "pending",
+        deductedFromBalance: true,
+        time: timeStr
+      });
+      writeAdminRequests(reqs);
 
       document.getElementById("withAmount").value = "";
       calculateNetPay();
       alert(
         currentLang === "am"
-          ? `የወጪ ጥያቄ ተልኳል! 5% ተቀንሶ የተጣራ ክፍያ (Net Pay) = ${netPay.toFixed(2)} ETB`
-          : `Withdrawal submitted! After 5% fee, Net Pay = ${netPay.toFixed(2)} ETB`
+          ? `የወጪ ጥያቄ ወደ Admin ተልኳል! 5% ተቀንሶ Net Pay = ${netPay.toFixed(2)} ETB`
+          : `Withdrawal request sent to Admin! After 5% fee, Net Pay = ${netPay.toFixed(2)} ETB`
       );
     }
 
@@ -1329,18 +1378,39 @@
       );
     }
 
+    // Sends referral bonus request (+100 ETB) to admin.html for Approve / Reject / Review
     function simulateReferralBonus() {
+      const bonus = 100;
+      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const refLink = `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
+
+      const reqs = readAdminRequests();
+      reqs.referrals.unshift({
+        id: "ref_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        username: currentUser,
+        amount: bonus,
+        refLink: refLink,
+        status: "pending",
+        appliedToBalance: false,
+        time: timeStr
+      });
+      writeAdminRequests(reqs);
+
       const data = getUserRecord();
-      data.balance += 100;
-      data.refBonus += 100;
       data.history.unshift({
-        title: "Referral Bonus",
-        amount: 100,
+        title: `Referral Bonus Request (+100 ETB) - Pending Admin`,
+        amount: bonus,
         type: "plus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        time: timeStr
       });
       saveUserRecord(data);
       loadUserData();
+
+      alert(
+        currentLang === "am"
+          ? "የሪፈራል ቦነስ ጥያቄ ወደ Admin ተልኳል! Admin ሲያጸድቀው ወደ ሂሳብዎ ይጨምራል።"
+          : "Referral bonus request sent to Admin! Added once approved in Admin."
+      );
     }
 
     function renderHistory(list) {
@@ -1358,7 +1428,7 @@
               <small style="color:#64748b;">${item.time}</small>
             </div>
             <span class="${item.type === "plus" ? "tx-plus" : "tx-minus"}">
-              ${item.type === "plus" ? "+" : "-"}${item.amount.toFixed(2)} ETB
+              ${item.type === "plus" ? "+" : "-"}${Number(item.amount).toFixed(2)} ETB
             </span>
           </div>
         `
@@ -1383,6 +1453,13 @@
       const link = document.getElementById("refLinkText").innerText;
       copyReplaceSign(btnEl, link);
     }
+
+    // Sync user dashboard when Admin approves/rejects/adjusts balances
+    setInterval(() => {
+      if (currentUser && document.getElementById("dashboard-section").style.display === "block") {
+        loadUserData();
+      }
+    }, 4000);
 
     fetchRealExchangeRate();
     const savedActive = localStorage.getItem("ethio_active_user");
