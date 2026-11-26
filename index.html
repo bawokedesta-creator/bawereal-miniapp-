@@ -187,6 +187,55 @@
       color: #f8fafc;
       font-size: 0.88rem;
     }
+
+    /* Login Privacy Box */
+    .privacy-login-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 11px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+    .privacy-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .privacy-badge-on {
+      background: rgba(74, 222, 128, 0.16);
+      color: #4ade80;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+    .privacy-link-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+    }
+    .privacy-detail-panel {
+      display: none;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #1e293b;
+      color: #94a3b8;
+      font-size: 0.74rem;
+    }
+    .privacy-detail-panel.open {
+      display: block;
+    }
+
     .btn-primary {
       width: 100%;
       background: #0284c7;
@@ -398,13 +447,18 @@
       font-weight: 700;
     }
 
-    /* Wide Screenshot Box with "Add payment screenshot" header and "Add file" inside */
+    /* Wide Screenshot Box with "Add payment screenshot *" header and "Add file" inside */
     .screenshot-section-title {
       display: block;
       font-size: 0.82rem;
       font-weight: 700;
       color: #e2e8f0;
       margin-bottom: 6px;
+    }
+    .req-star {
+      color: #f87171;
+      font-weight: 900;
+      margin-left: 3px;
     }
     .wide-screenshot-box {
       width: 100%;
@@ -573,7 +627,7 @@
         <button class="btn-success" onclick="registerUser()" data-i18n="regBtn">ተመዝገብ</button>
       </div>
 
-      <!-- Login Form -->
+      <!-- Login Form with Privacy Active -->
       <div id="login-form" class="auth-form">
         <div class="form-group">
           <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
@@ -583,6 +637,21 @@
           <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
           <input type="password" id="loginPass" placeholder="******" />
         </div>
+
+        <div class="privacy-login-box">
+          <div class="privacy-header-row">
+            <span>🔒 <strong data-i18n="privacyTitle">Privacy</strong> <span class="privacy-badge-on">ON</span></span>
+            <button type="button" class="privacy-link-btn" onclick="togglePrivacyDetails()" data-i18n="privacyViewBtn">Details</button>
+          </div>
+          <div data-i18n="privacySummary">
+            የመለያዎ እና የክፍያ መረጃዎች በግላዊነት የተጠበቁ ናቸው። በመግባትዎ የግላዊነት መመሪያውን ይቀበላሉ።
+          </div>
+          <div id="privacyDetailPanel" class="privacy-detail-panel" data-i18n="privacyDetailsText">
+            • የተጠቃሚ መረጃ እና የክፍያ screenshot ለማረጋገጫ ብቻ ይውላሉ።<br />
+            • የወጪ ክፍያ 5% የአገልግሎት ክፍያ አለው።
+          </div>
+        </div>
+
         <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">ግባ</button>
       </div>
     </div>
@@ -727,12 +796,15 @@
         <input type="number" id="depAmount" placeholder="1000" />
       </div>
 
+      <!-- Required Add payment screenshot * -->
       <div class="form-group">
-        <span class="screenshot-section-title" data-i18n="addPaymentScreenshotTitle">Add payment screenshot</span>
+        <span class="screenshot-section-title">
+          <span data-i18n="addPaymentScreenshotTitle">Add payment screenshot</span><span class="req-star">*</span>
+        </span>
         <div class="wide-screenshot-box">
           <label for="depReceiptInput" class="add-file-trigger" data-i18n="addFileBtn">Add file</label>
           <input type="file" id="depReceiptInput" accept="image/*" style="display: none;" onchange="handleReceiptFile(this)" />
-          <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">Screenshot ፋይል አልተመረጠም</span>
+          <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">Screenshot ፋይል አልተመረጠም (*)</span>
           <img id="receiptPreview" class="receipt-preview" alt="Payment Screenshot" />
         </div>
       </div>
@@ -894,6 +966,10 @@
         phoneLabel: "ስልክ / የተጠቃሚ ስም",
         passLabel: "የይለፍ ቃል (Password)",
         confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
+        privacyTitle: "Privacy",
+        privacyViewBtn: "ዝርዝር",
+        privacySummary: "የመለያዎ እና የክፍያ መረጃዎች በግላዊነት የተጠበቁ ናቸው። በመግባትዎ የግላዊነት መመሪያውን ይቀበላሉ።",
+        privacyDetailsText: "• የተጠቃሚ መረጃ እና የክፍያ screenshot ለማረጋገጫ ብቻ ይውላሉ።\n• የወጪ ክፍያ 5% የአገልግሎት ክፍያ አለው።",
         regBtn: "ተመዝገብ",
         loginBtn: "ግባ",
         logoutBtn: "ውጣ (Logout)",
@@ -912,7 +988,7 @@
         amountLabel: "የገንዘብ መጠን (ETB)",
         addPaymentScreenshotTitle: "Add payment screenshot",
         addFileBtn: "Add file",
-        noFileSelected: "Screenshot ፋይል አልተመረጠም",
+        noFileSelected: "Screenshot ፋይል አልተመረጠም (*)",
         confirmDepBtn: "ገንዘብ ማስገባቱን አረጋግጥ",
         withHeader: "ገንዘብ ማውጫ (Withdrawal)",
         withInstruction: "የመክፈያ አካውንቶች እና የ5% የአገልግሎት ክፍያ ስሌት፦",
@@ -938,6 +1014,10 @@
         phoneLabel: "Phone / Username",
         passLabel: "Password",
         confirmPassLabel: "Confirm Password",
+        privacyTitle: "Privacy",
+        privacyViewBtn: "Details",
+        privacySummary: "Your account and payment data are protected with Privacy ON. Logging in accepts our privacy policy.",
+        privacyDetailsText: "• User details and payment screenshots are used for verification only.\n• Withdrawals carry a 5% service fee.",
         regBtn: "Create Account",
         loginBtn: "Login",
         logoutBtn: "Logout",
@@ -951,12 +1031,12 @@
         tabReferral: "Referral",
         tabHistory: "History",
         depHeader: "Deposit ETB",
-        depInstruction: "Transfer to one of the official accounts below, then submit the amount and payment screenshot.",
+        depInstruction: "Transfer to one of the official accounts below, then submit the amount and required payment screenshot.",
         selectMethodLabel: "Select Payment Account",
         amountLabel: "Deposit Amount (ETB)",
         addPaymentScreenshotTitle: "Add payment screenshot",
         addFileBtn: "Add file",
-        noFileSelected: "No screenshot file selected",
+        noFileSelected: "No screenshot file selected (*)",
         confirmDepBtn: "Confirm Deposit",
         withHeader: "Request Withdrawal",
         withInstruction: "Official payment gateways & automatic 5% withdrawal fee calculation:",
@@ -977,6 +1057,10 @@
         loadingMsg: "Loading..."
       }
     };
+
+    function togglePrivacyDetails() {
+      document.getElementById("privacyDetailPanel").classList.toggle("open");
+    }
 
     function readAdminRequests() {
       return JSON.parse(
@@ -1230,13 +1314,21 @@
       reader.readAsDataURL(file);
     }
 
-    // Sends deposit request to admin.html for Review / Approve / Reject
+    // Payment screenshot (*) is mandatory before submitting deposit
     function submitDeposit() {
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
 
       if (isNaN(amount) || amount <= 0) {
         alert(currentLang === "am" ? "እባክዎ ትክክለኛ የገንዘብ መጠን ያስገቡ።" : "Please enter a valid deposit amount.");
+        return;
+      }
+      if (!selectedReceiptName || !selectedReceiptDataUrl) {
+        alert(
+          currentLang === "am"
+            ? "Add payment screenshot (*) ግዴታ ነው! እባክዎ መጀመሪያ Screenshot ፋይል ያስገቡ።"
+            : "Add payment screenshot (*) is required! Please attach a payment screenshot first."
+        );
         return;
       }
 
@@ -1247,8 +1339,8 @@
         username: currentUser,
         method: method,
         amount: amount,
-        screenshotName: selectedReceiptName || "No file",
-        screenshotDataUrl: selectedReceiptDataUrl || "",
+        screenshotName: selectedReceiptName,
+        screenshotDataUrl: selectedReceiptDataUrl,
         status: "pending",
         appliedToBalance: false,
         time: timeStr
@@ -1257,7 +1349,7 @@
 
       const data = getUserRecord();
       data.history.unshift({
-        title: `Deposit Request Pending Admin (${method})`,
+        title: `Deposit Request Pending Admin (${method}) • ${selectedReceiptName}`,
         amount: amount,
         type: "plus",
         time: timeStr
@@ -1296,7 +1388,6 @@
       document.getElementById("calcNetPay").innerText = netPay.toFixed(2) + " ETB";
     }
 
-    // Sends withdrawal request to admin.html; refunds automatically if Admin rejects
     function submitWithdrawal() {
       const method = document.getElementById("withMethod").value;
       const userAcc = document.getElementById("withUserAccount").value.trim();
@@ -1378,7 +1469,6 @@
       );
     }
 
-    // Sends referral bonus request (+100 ETB) to admin.html for Approve / Reject / Review
     function simulateReferralBonus() {
       const bonus = 100;
       const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -1454,7 +1544,6 @@
       copyReplaceSign(btnEl, link);
     }
 
-    // Sync user dashboard when Admin approves/rejects/adjusts balances
     setInterval(() => {
       if (currentUser && document.getElementById("dashboard-section").style.display === "block") {
         loadUserData();
