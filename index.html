@@ -15,9 +15,62 @@
       background-color: #0b1120;
       color: #f8fafc;
       padding: 14px;
-      max-width: 520px;
+      max-width: 500px;
       margin: 0 auto;
       min-height: 100vh;
+    }
+
+    /* Login Loading Screen (25% -> 50% -> 75% -> 100%, at least 2 seconds) */
+    #login-loading-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 17, 32, 0.96);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    #login-loading-screen.active {
+      display: flex;
+    }
+    .loader-card {
+      width: 100%;
+      max-width: 340px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+    .loader-percent {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+    .loader-bar-track {
+      width: 100%;
+      height: 12px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      margin-bottom: 12px;
+    }
+    .loader-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #4ade80);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .loader-status {
+      font-size: 0.86rem;
+      color: #cbd5e1;
+      font-weight: 600;
     }
 
     /* Top Bar */
@@ -79,55 +132,70 @@
       transform: rotate(360deg);
     }
 
-    /* Auth Section: Side-by-Side Register & Login */
-    .auth-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .auth-card {
+    /* Single-Page Auth with Register (Left) & Login (Right) Switcher */
+    .auth-box {
       background: #1e293b;
-      padding: 14px 11px;
+      padding: 18px 15px;
       border-radius: 14px;
       border: 1px solid #334155;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      margin-top: 10px;
     }
-    .auth-card h2 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-      color: #38bdf8;
-      text-align: center;
+    .auth-switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #0f172a;
+      padding: 5px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .auth-switch-btn {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .auth-switch-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+    }
+    .auth-form {
+      display: none;
+    }
+    .auth-form.active {
+      display: block;
     }
     .form-group {
-      margin-bottom: 9px;
+      margin-bottom: 11px;
     }
     .form-group label {
       display: block;
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
       margin-bottom: 4px;
     }
     .form-group input, .form-group select {
       width: 100%;
-      padding: 8px 9px;
+      padding: 9px 10px;
       border-radius: 8px;
       border: 1px solid #475569;
       background: #0f172a;
       color: #f8fafc;
-      font-size: 0.82rem;
+      font-size: 0.88rem;
     }
     .btn-primary {
       width: 100%;
       background: #0284c7;
       color: #ffffff;
       border: none;
-      padding: 9px;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       cursor: pointer;
       margin-top: 4px;
     }
@@ -136,10 +204,10 @@
       background: #16a34a;
       color: #ffffff;
       border: none;
-      padding: 9px;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       cursor: pointer;
       margin-top: 4px;
     }
@@ -179,7 +247,7 @@
       background: linear-gradient(135deg, #0284c7, #1e40af);
       padding: 18px;
       border-radius: 16px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25);
     }
     .wallet-label {
@@ -199,7 +267,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       border: 1px solid rgba(255, 255, 255, 0.15);
     }
     .exchange-left {
@@ -210,29 +278,51 @@
       font-size: 0.7rem;
       color: #cbd5e1;
     }
-
-    /* Navigation Tabs */
-    .nav-tabs {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-      margin-bottom: 16px;
+    .wallet-meta {
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+      opacity: 0.96;
     }
-    .tab-btn {
+
+    /* Centered Menu Table for Deposit, Withdrawal, Package, Referral, History */
+    .center-menu-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .menu-table {
+      width: 100%;
+      max-width: 380px;
+      border-collapse: collapse;
       background: #1e293b;
-      color: #cbd5e1;
+      border-radius: 12px;
+      overflow: hidden;
       border: 1px solid #334155;
-      padding: 9px 4px;
-      border-radius: 9px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      cursor: pointer;
+      margin: 0 auto;
+    }
+    .menu-table td {
+      border: 1px solid #334155;
+      padding: 0;
       text-align: center;
     }
-    .tab-btn.active {
+    .menu-cell-btn {
+      width: 100%;
+      background: transparent;
+      color: #e2e8f0;
+      border: none;
+      padding: 11px 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+    }
+    .menu-cell-btn.active {
       background: #0284c7;
       color: #ffffff;
-      border-color: #38bdf8;
     }
 
     /* Panels */
@@ -251,9 +341,10 @@
       font-size: 1rem;
       color: #38bdf8;
       margin-bottom: 12px;
+      text-align: center;
     }
 
-    /* Bank Accounts Box */
+    /* Bank Accounts Box with Ethiopian Telebirr & CBE Logos */
     .bank-card {
       background: #0f172a;
       border: 1px solid #334155;
@@ -263,6 +354,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
+    }
+    .bank-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bank-logo-svg {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      flex-shrink: 0;
     }
     .bank-info strong {
       display: block;
@@ -275,14 +378,71 @@
       color: #f8fafc;
       letter-spacing: 0.5px;
     }
-    .copy-btn {
+    .copy-sign-btn {
       background: #334155;
       color: #ffffff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
+      border: 1px solid #475569;
+      padding: 6px 11px;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      line-height: 1.2;
       cursor: pointer;
+      min-width: 60px;
+      text-align: center;
+    }
+    .copy-sign-btn.is-copied {
+      background: rgba(22, 163, 74, 0.25);
+      border-color: #4ade80;
+      color: #4ade80;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    /* Wide Screenshot Box with "Add payment screenshot" header and "Add file" inside */
+    .screenshot-section-title {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+    }
+    .wide-screenshot-box {
+      width: 100%;
+      min-height: 125px;
+      background: #0f172a;
+      border: 1.5px dashed #38bdf8;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .add-file-trigger {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .file-name-text {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      word-break: break-all;
+    }
+    .receipt-preview {
+      max-width: 100%;
+      max-height: 160px;
+      border-radius: 8px;
+      display: none;
+      border: 1px solid #334155;
+      margin-top: 4px;
     }
 
     /* Fee & Net Pay Calculation Box */
@@ -311,26 +471,40 @@
       margin-top: 4px;
     }
 
-    /* Packages */
+    /* Packages up to 200,000 ETB */
     .pkg-item {
       background: #0f172a;
       border: 1px solid #334155;
-      border-radius: 10px;
+      border-radius: 11px;
       padding: 12px;
       margin-bottom: 10px;
     }
     .pkg-head {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
       font-weight: 700;
+      font-size: 0.92rem;
     }
     .pkg-badge {
       background: rgba(74, 222, 128, 0.15);
       color: #4ade80;
       padding: 2px 8px;
       border-radius: 6px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
+    }
+    .pkg-meta {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+    .owner-cut-tag {
+      font-size: 0.74rem;
+      color: #fbbf24;
+      margin-bottom: 9px;
+      font-weight: 600;
     }
 
     /* History */
@@ -347,20 +521,20 @@
     }
     .tx-plus { color: #4ade80; font-weight: 700; }
     .tx-minus { color: #f87171; font-weight: 700; }
-
-    /* Bottom Footer of Dashboard */
-    .dashboard-footer {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 8px;
-      margin-top: 18px;
-      padding-top: 12px;
-      border-top: 1px solid #1e293b;
-    }
   </style>
 </head>
 <body>
+
+  <!-- LOGIN LOADING SCREEN: 25% -> 50% -> 75% -> 100% (MIN 2 SECONDS) -->
+  <div id="login-loading-screen" aria-live="polite">
+    <div class="loader-card">
+      <div class="loader-percent" id="loaderPercentText">25%</div>
+      <div class="loader-bar-track">
+        <div class="loader-bar-fill" id="loaderBarFill" style="width: 25%;"></div>
+      </div>
+      <div class="loader-status" id="loaderStatusText">Loading account...</div>
+    </div>
+  </div>
 
   <!-- TOP HEADER WITH RIGHT-CORNER LANGUAGE CHOICE & REFRESH -->
   <div class="top-bar">
@@ -374,41 +548,40 @@
     </div>
   </div>
 
-  <!-- AUTH SECTION: SIDE BY SIDE REGISTER & LOGIN -->
+  <!-- SINGLE-PAGE AUTH: REGISTER (LEFT) & LOGIN (RIGHT) -->
   <div id="auth-section">
-    <div class="auth-wrapper">
-      <!-- Left: Register -->
-      <div class="auth-card">
-        <div>
-          <h2 data-i18n="regTitle">ይመዝገቡ (Register)</h2>
-          <div class="form-group">
-            <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
-            <input type="text" id="regUser" placeholder="09..." />
-          </div>
-          <div class="form-group">
-            <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
-            <input type="password" id="regPass" placeholder="******" />
-          </div>
-          <div class="form-group">
-            <label data-i18n="confirmPassLabel">የይለፍ ቃል ያረጋግጡ</label>
-            <input type="password" id="regConfirm" placeholder="******" />
-          </div>
+    <div class="auth-box">
+      <div class="auth-switcher">
+        <button class="auth-switch-btn active" id="switchRegBtn" onclick="switchAuthMode('register')" data-i18n="regTab">Register</button>
+        <button class="auth-switch-btn" id="switchLoginBtn" onclick="switchAuthMode('login')" data-i18n="loginTab">Login</button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="auth-form active">
+        <div class="form-group">
+          <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
+          <input type="text" id="regUser" placeholder="09..." />
+        </div>
+        <div class="form-group">
+          <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+          <input type="password" id="regPass" placeholder="******" />
+        </div>
+        <div class="form-group">
+          <label data-i18n="confirmPassLabel">የይለፍ ቃል ያረጋግጡ</label>
+          <input type="password" id="regConfirm" placeholder="******" />
         </div>
         <button class="btn-success" onclick="registerUser()" data-i18n="regBtn">ተመዝገብ</button>
       </div>
 
-      <!-- Right: Login -->
-      <div class="auth-card">
-        <div>
-          <h2 data-i18n="loginTitle">ይግቡ (Login)</h2>
-          <div class="form-group">
-            <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
-            <input type="text" id="loginUser" placeholder="09..." />
-          </div>
-          <div class="form-group">
-            <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
-            <input type="password" id="loginPass" placeholder="******" />
-          </div>
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form">
+        <div class="form-group">
+          <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
+          <input type="text" id="loginUser" placeholder="09..." />
+        </div>
+        <div class="form-group">
+          <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+          <input type="password" id="loginPass" placeholder="******" />
         </div>
         <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">ግባ</button>
       </div>
@@ -424,62 +597,120 @@
       <button class="logout-btn" onclick="logoutUser()" data-i18n="logoutBtn">ውጣ (Logout)</button>
     </div>
 
-    <!-- Total Balance & Hourly Exchange Rate -->
+    <!-- Total Balance & Hourly Real Exchange Rate -->
     <div class="wallet-card">
       <div class="wallet-label" data-i18n="totalBalLabel">ጠቅላላ ቀሪ ሂሳብ (Total Balance)</div>
       <div class="balance" id="balanceDisplay">0.00 ETB</div>
 
-      <!-- Exchange Rate positioned on the left below Total Balance -->
       <div class="exchange-rate-box">
-        <div class="exchange-left" id="exchangeRateText">የብር ዋጋ (1 USD) = 126.50 ETB</div>
+        <div class="exchange-left" id="exchangeRateText">የብር ዋጋ (1 USD) = 163.44 ETB</div>
         <div class="exchange-time" id="rateUpdatedTime">Updated: --:--</div>
       </div>
 
-      <div style="font-size: 0.82rem; display: flex; justify-content: space-between; opacity: 0.95;">
+      <div class="wallet-meta">
         <span><span data-i18n="activeInvLabel">ንቁ ኢንቨስትመንት:</span> <strong id="investedDisplay">0.00 ETB</strong></span>
         <span><span data-i18n="refEarnLabel">ሪፈራል ቦነስ:</span> <strong id="refBonusDisplay">0.00 ETB</strong></span>
+        <span><span data-i18n="ownerShareLabel">Owner Share (20%):</span> <strong id="ownerMarginDisplay">0.00 ETB</strong></span>
       </div>
     </div>
 
-    <!-- 5 Navigation Tabs: Deposit, Withdrawal, Package, Referral, History -->
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('deposit', this)" data-i18n="tabDeposit">Deposit</button>
-      <button class="tab-btn" onclick="switchTab('withdrawal', this)" data-i18n="tabWithdraw">Withdrawal</button>
-      <button class="tab-btn" onclick="switchTab('package', this)" data-i18n="tabPackage">Package</button>
-      <button class="tab-btn" onclick="switchTab('referral', this)" data-i18n="tabReferral">Referral</button>
-      <button class="tab-btn" onclick="switchTab('history', this)" data-i18n="tabHistory">History</button>
+    <!-- CENTERED MENU TABLE: DEPOSIT, WITHDRAWAL, PACKAGE, REFERRAL, HISTORY -->
+    <div class="center-menu-wrapper">
+      <table class="menu-table" aria-label="Dashboard Menu">
+        <tbody>
+          <tr>
+            <td>
+              <button class="menu-cell-btn active" id="menu-deposit" onclick="switchTab('deposit', this)" data-i18n="tabDeposit">Deposit</button>
+            </td>
+            <td>
+              <button class="menu-cell-btn" id="menu-withdrawal" onclick="switchTab('withdrawal', this)" data-i18n="tabWithdraw">Withdrawal</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button class="menu-cell-btn" id="menu-package" onclick="switchTab('package', this)" data-i18n="tabPackage">Package</button>
+            </td>
+            <td>
+              <button class="menu-cell-btn" id="menu-referral" onclick="switchTab('referral', this)" data-i18n="tabReferral">Referral</button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <button class="menu-cell-btn" id="menu-history" onclick="switchTab('history', this)" data-i18n="tabHistory">History</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- 1. DEPOSIT PANEL -->
     <div id="panel-deposit" class="panel active">
       <h3 data-i18n="depHeader">ገንዘብ ማስገቢያ (Deposit ETB)</h3>
-      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;" data-i18n="depInstruction">
-        ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የግብይት መለያ (Transaction ID) ያስገቡ።
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; text-align: center;" data-i18n="depInstruction">
+        ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የክፍያ Screenshot ያስገቡ።
       </p>
 
-      <!-- Admin Payment Accounts -->
+      <!-- Telebirr Logo -->
       <div class="bank-card">
-        <div class="bank-info">
-          <strong>Telebirr (ቴሌብር)</strong>
-          <span>0964488470</span>
+        <div class="bank-left">
+          <svg class="bank-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" rx="14" fill="#ffffff"/>
+            <path d="M58 18c-3 0-5 2.5-5.5 6l-2.5 15H24c-4.5 0-4.5 7.5 0 7.5h24.5L40 88c-.8 4.8 6 6 7 1.2l8.5-42.7h34c4.5 0 4.5-7.5 0-7.5H57l2.5-13.5c.7-3.8-1.2-7.5-1.5-7.5z" fill="#0072bc"/>
+            <path d="M57 54c-13.5 0-23 9.5-23 23 0 14 10.5 24 24.5 24 12.5 0 21-8 21-18.5 0-8-6.2-14-14-14-6.5 0-11.5 4.8-11.5 10.5 0 4.8 3.5 8.5 8 8.5" fill="none" stroke="#0072bc" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="bank-info">
+            <strong>Telebirr (ቴሌብር)</strong>
+            <span>0964488470</span>
+          </div>
         </div>
-        <button class="copy-btn" onclick="copyText('0964488470')">Copy</button>
+        <button class="copy-sign-btn" onclick="copyReplaceSign(this, '0964488470')" title="Copy">⧉</button>
       </div>
 
+      <!-- CBE Logo -->
       <div class="bank-card">
-        <div class="bank-info">
-          <strong>CBE Bank (ንግድ ባንክ)</strong>
-          <span>1000298833585</span>
+        <div class="bank-left">
+          <svg class="bank-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="cbeGoldSeal" cx="40%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#f7e2a4"/>
+                <stop offset="48%" stop-color="#c9953a"/>
+                <stop offset="100%" stop-color="#6e460e"/>
+              </radialGradient>
+            </defs>
+            <rect width="120" height="120" rx="14" fill="#ffffff"/>
+            <ellipse cx="60" cy="60" rx="46" ry="26" transform="rotate(-25 60 60)" fill="none" stroke="#c79338" stroke-width="1.4"/>
+            <ellipse cx="60" cy="60" rx="46" ry="26" transform="rotate(35 60 60)" fill="none" stroke="#c79338" stroke-width="1.4"/>
+            <ellipse cx="60" cy="60" rx="46" ry="26" transform="rotate(95 60 60)" fill="none" stroke="#c79338" stroke-width="1.4"/>
+            <circle cx="60" cy="60" r="31" fill="url(#cbeGoldSeal)" stroke="#7c5014" stroke-width="2.2"/>
+            <circle cx="60" cy="60" r="24" fill="none" stroke="#fff3c4" stroke-width="1.2"/>
+            <text x="60" y="66" text-anchor="middle" fill="#3a2104" font-size="19" font-weight="900" letter-spacing="1">CBE</text>
+          </svg>
+          <div class="bank-info">
+            <strong>CBE Bank (ንግድ ባንክ)</strong>
+            <span>1000298833585</span>
+          </div>
         </div>
-        <button class="copy-btn" onclick="copyText('1000298833585')">Copy</button>
+        <button class="copy-sign-btn" onclick="copyReplaceSign(this, '1000298833585')" title="Copy">⧉</button>
       </div>
 
+      <!-- Bank of Abyssinia Logo -->
       <div class="bank-card">
-        <div class="bank-info">
-          <strong>Bank of Abyssinia (አቢሲኒያ ባንክ)</strong>
-          <span>166455979</span>
+        <div class="bank-left">
+          <svg class="bank-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="120" height="120" rx="14" fill="#ffffff"/>
+            <polygon points="60,14 73,34 60,54 47,34" fill="#e6a82e"/>
+            <polygon points="60,106 73,86 60,66 47,86" fill="#e6a82e"/>
+            <polygon points="18,38 39,38 50,57 29,57" fill="#e6a82e"/>
+            <polygon points="102,82 81,82 70,63 91,63" fill="#e6a82e"/>
+            <polygon points="18,82 29,63 50,63 39,82" fill="#e6a82e"/>
+            <polygon points="102,38 91,57 70,57 81,38" fill="#e6a82e"/>
+          </svg>
+          <div class="bank-info">
+            <strong>Bank of Abyssinia (አቢሲኒያ ባንክ)</strong>
+            <span>166455979</span>
+          </div>
         </div>
-        <button class="copy-btn" onclick="copyText('166455979')">Copy</button>
+        <button class="copy-sign-btn" onclick="copyReplaceSign(this, '166455979')" title="Copy">⧉</button>
       </div>
 
       <div class="form-group" style="margin-top: 12px;">
@@ -487,7 +718,7 @@
         <select id="depMethod">
           <option value="Telebirr (0964488470)">Telebirr - 0964488470</option>
           <option value="CBE (1000298833585)">CBE - 1000298833585</option>
-          <option value="Abyssinia (166455979)">Abyssinia - 166455979</option>
+          <option value="Bank of Abyssinia (166455979)">Bank of Abyssinia - 166455979</option>
         </select>
       </div>
 
@@ -497,8 +728,13 @@
       </div>
 
       <div class="form-group">
-        <label data-i18n="txRefLabel">የግብይት መለያ (Transaction ID / Ref)</label>
-        <input type="text" id="depRef" placeholder="ለምሳሌ: FT24..." />
+        <span class="screenshot-section-title" data-i18n="addPaymentScreenshotTitle">Add payment screenshot</span>
+        <div class="wide-screenshot-box">
+          <label for="depReceiptInput" class="add-file-trigger" data-i18n="addFileBtn">Add file</label>
+          <input type="file" id="depReceiptInput" accept="image/*" style="display: none;" onchange="handleReceiptFile(this)" />
+          <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">Screenshot ፋይል አልተመረጠም</span>
+          <img id="receiptPreview" class="receipt-preview" alt="Payment Screenshot" />
+        </div>
       </div>
 
       <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">ገንዘብ ማስገባቱን አረጋግጥ</button>
@@ -507,11 +743,10 @@
     <!-- 2. WITHDRAWAL PANEL -->
     <div id="panel-withdrawal" class="panel">
       <h3 data-i18n="withHeader">ገንዘብ ማውጫ (Withdrawal)</h3>
-      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;" data-i18n="withInstruction">
-        የመክፈያ አካውንቶች (System Accounts) እና የ5% የአገልግሎት ክፍያ ስሌት፦
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px; text-align: center;" data-i18n="withInstruction">
+        የመክፈያ አካውንቶች እና የ5% የአገልግሎት ክፍያ ስሌት፦
       </p>
 
-      <!-- Reference Accounts shown on Withdrawal as requested -->
       <div class="bank-card">
         <div class="bank-info">
           <strong>Telebirr: 0964488470 | CBE: 1000298833585</strong>
@@ -538,7 +773,6 @@
         <input type="number" id="withAmount" oninput="calculateNetPay()" placeholder="1000" />
       </div>
 
-      <!-- 5% Fee and Net Pay = Display -->
       <div class="calc-box">
         <div class="calc-row">
           <span data-i18n="reqAmtLabel">የተጠየቀ መጠን (Amount):</span>
@@ -559,40 +793,69 @@
 
     <!-- 3. PACKAGE PANEL -->
     <div id="panel-package" class="panel">
-      <h3 data-i18n="pkgHeader">የኢንቨስትመንት ፓኬጆች (Packages)</h3>
+      <h3 data-i18n="pkgHeader">የኢንቨስትመንት ፓኬጆች (እስከ 200,000 ETB)</h3>
 
       <div class="pkg-item">
         <div class="pkg-head">
-          <span>Starter Package</span>
-          <span class="pkg-badge">+10% / 7 Days</span>
+          <span>Starter Plan (1,000 ETB)</span>
+          <span class="pkg-badge">Every 1 Day × 7</span>
         </div>
-        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">1,000 ETB → 1,100 ETB</p>
-        <button class="btn-primary" onclick="buyPackage(1000, 'Starter Package')">Invest 1,000 ETB</button>
+        <div class="pkg-meta">
+          User earns +20 ETB per interval (Total +140 ETB / +14% → 1,140 ETB)
+        </div>
+        <div class="owner-cut-tag">Owner Share (20% of profit): +28.00 ETB</div>
+        <button class="btn-primary" onclick="buyPackage(1000, 'Starter Plan', 140, 'Every 1 Day (7 intervals)')">
+          Invest 1,000 ETB
+        </button>
       </div>
 
       <div class="pkg-item">
         <div class="pkg-head">
-          <span>Silver Package</span>
-          <span class="pkg-badge">+25% / 15 Days</span>
+          <span>Growth Plan (10,000 ETB)</span>
+          <span class="pkg-badge">Every 3 Days × 5</span>
         </div>
-        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">5,000 ETB → 6,250 ETB</p>
-        <button class="btn-primary" onclick="buyPackage(5000, 'Silver Package')">Invest 5,000 ETB</button>
+        <div class="pkg-meta">
+          User earns +500 ETB per interval (Total +2,500 ETB / +25% → 12,500 ETB)
+        </div>
+        <div class="owner-cut-tag">Owner Share (20% of profit): +500.00 ETB</div>
+        <button class="btn-primary" onclick="buyPackage(10000, 'Growth Plan', 2500, 'Every 3 Days (5 intervals)')">
+          Invest 10,000 ETB
+        </button>
       </div>
 
       <div class="pkg-item">
         <div class="pkg-head">
-          <span>Gold VIP Package</span>
-          <span class="pkg-badge">+50% / 30 Days</span>
+          <span>Pro Plan (50,000 ETB)</span>
+          <span class="pkg-badge">Every 5 Days × 6</span>
         </div>
-        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">10,000 ETB → 15,000 ETB</p>
-        <button class="btn-primary" onclick="buyPackage(10000, 'Gold VIP Package')">Invest 10,000 ETB</button>
+        <div class="pkg-meta">
+          User earns +2,916.67 ETB per interval (Total +17,500 ETB / +35% → 67,500 ETB)
+        </div>
+        <div class="owner-cut-tag">Owner Share (20% of profit): +3,500.00 ETB</div>
+        <button class="btn-primary" onclick="buyPackage(50000, 'Pro Plan', 17500, 'Every 5 Days (6 intervals)')">
+          Invest 50,000 ETB
+        </button>
+      </div>
+
+      <div class="pkg-item">
+        <div class="pkg-head">
+          <span>Executive Max Plan (200,000 ETB)</span>
+          <span class="pkg-badge">Every 10 Days × 6</span>
+        </div>
+        <div class="pkg-meta">
+          User earns +15,000 ETB per interval (Total +90,000 ETB / +45% → 290,000 ETB)
+        </div>
+        <div class="owner-cut-tag">Owner Share (20% of profit): +18,000.00 ETB</div>
+        <button class="btn-primary" onclick="buyPackage(200000, 'Executive Max Plan', 90000, 'Every 10 Days (6 intervals)')">
+          Invest 200,000 ETB
+        </button>
       </div>
     </div>
 
     <!-- 4. REFERRAL PANEL -->
     <div id="panel-referral" class="panel">
       <h3 data-i18n="refHeader">ሰዎችን ይጋብዙ (Referral)</h3>
-      <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 10px;" data-i18n="refDesc">
+      <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 10px; text-align: center;" data-i18n="refDesc">
         ጓደኞችዎን በዚህ ሊንክ ሲጋብዙ 100 ETB ቦነስ ያገኛሉ።
       </p>
       <div class="bank-card">
@@ -600,7 +863,7 @@
           <strong data-i18n="yourRefLink">የእርስዎ ሪፈራል ሊንክ</strong>
           <span id="refLinkText" style="font-size: 0.78rem;">https://ethioinvest.app/?ref=user</span>
         </div>
-        <button class="copy-btn" onclick="copyReferral()">Copy</button>
+        <button class="copy-sign-btn" onclick="copyReferralReplaceSign(this)" title="Copy">⧉</button>
       </div>
       <button class="btn-success" onclick="simulateReferralBonus()" style="margin-top: 8px;" data-i18n="claimRefBtn">
         + ሪፈራል ቦነስ ሞክር (+100 ETB)
@@ -611,16 +874,7 @@
     <div id="panel-history" class="panel">
       <h3 data-i18n="histHeader">የሂሳብ እንቅስቃሴ ታሪክ (History)</h3>
       <div id="historyList">
-        <p style="font-size: 0.82rem; color: #94a3b8;" data-i18n="noHistory">እስካሁን ምንም እንቅስቃሴ የለም።</p>
-      </div>
-    </div>
-
-    <!-- BOTTOM RIGHT OF DASHBOARD: En / አማ & REFRESH BUTTON -->
-    <div class="dashboard-footer">
-      <button class="refresh-btn" id="bottomRefreshBtn" onclick="refreshApp()" title="Refresh">↻</button>
-      <div class="lang-box">
-        <button class="lang-btn" id="btnEnBottom" onclick="setLanguage('en')">En</button>
-        <button class="lang-btn active" id="btnAmBottom" onclick="setLanguage('am')">አማ</button>
+        <p style="font-size: 0.82rem; color: #94a3b8; text-align: center;" data-i18n="noHistory">እስካሁን ምንም እንቅስቃሴ የለም።</p>
       </div>
     </div>
   </div>
@@ -628,13 +882,14 @@
   <script>
     let currentLang = "am";
     let currentUser = null;
-    let exchangeRate = 126.50;
+    let exchangeRate = 163.44;
+    let selectedReceiptName = "";
+    let isLoggingIn = false;
 
-    // Translations Dictionary
     const i18n = {
       am: {
-        regTitle: "ይመዝገቡ (Register)",
-        loginTitle: "ይግቡ (Login)",
+        regTab: "Register",
+        loginTab: "Login",
         phoneLabel: "ስልክ / የተጠቃሚ ስም",
         passLabel: "የይለፍ ቃል (Password)",
         confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
@@ -644,16 +899,19 @@
         totalBalLabel: "ጠቅላላ ቀሪ ሂሳብ (Total Balance)",
         activeInvLabel: "ንቁ ኢንቨስትመንት:",
         refEarnLabel: "ሪፈራል ቦነስ:",
+        ownerShareLabel: "Owner Share (20%):",
         tabDeposit: "Deposit",
         tabWithdraw: "Withdrawal",
         tabPackage: "Package",
         tabReferral: "Referral",
         tabHistory: "History",
         depHeader: "ገንዘብ ማስገቢያ (Deposit ETB)",
-        depInstruction: "ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የግብይት መለያ (Transaction ID) ያስገቡ።",
+        depInstruction: "ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የክፍያ Screenshot ያስገቡ።",
         selectMethodLabel: "የከፈሉበትን መንገድ ይምረጡ",
         amountLabel: "የገንዘብ መጠን (ETB)",
-        txRefLabel: "የግብይት መለያ (Transaction ID / Ref)",
+        addPaymentScreenshotTitle: "Add payment screenshot",
+        addFileBtn: "Add file",
+        noFileSelected: "Screenshot ፋይል አልተመረጠም",
         confirmDepBtn: "ገንዘብ ማስገባቱን አረጋግጥ",
         withHeader: "ገንዘብ ማውጫ (Withdrawal)",
         withInstruction: "የመክፈያ አካውንቶች እና የ5% የአገልግሎት ክፍያ ስሌት፦",
@@ -663,18 +921,19 @@
         reqAmtLabel: "የተጠየቀ መጠን (Amount):",
         feeLabel: "የአገልግሎት ክፍያ (Fee 5%):",
         confirmWithBtn: "ወጪ ጥያቄ ላክ",
-        pkgHeader: "የኢንቨስትመንት ፓኬጆች (Packages)",
+        pkgHeader: "የኢንቨስትመንት ፓኬጆች (እስከ 200,000 ETB)",
         refHeader: "ሰዎችን ይጋብዙ (Referral)",
         refDesc: "ጓደኞችዎን በዚህ ሊንክ ሲጋብዙ 100 ETB ቦነስ ያገኛሉ።",
         yourRefLink: "የእርስዎ ሪፈራል ሊንክ",
         claimRefBtn: "+ ሪፈራል ቦነስ ሞክር (+100 ETB)",
         histHeader: "የሂሳብ እንቅስቃሴ ታሪክ (History)",
         noHistory: "እስካሁን ምንም እንቅስቃሴ የለም።",
-        ratePrefix: "የብር ዋጋ (1 USD) ="
+        ratePrefix: "የብር ዋጋ (1 USD) =",
+        loadingMsg: "በመጫን ላይ..."
       },
       en: {
-        regTitle: "Register",
-        loginTitle: "Login",
+        regTab: "Register",
+        loginTab: "Login",
         phoneLabel: "Phone / Username",
         passLabel: "Password",
         confirmPassLabel: "Confirm Password",
@@ -684,16 +943,19 @@
         totalBalLabel: "Total Balance",
         activeInvLabel: "Active Investment:",
         refEarnLabel: "Referral Bonus:",
+        ownerShareLabel: "Owner Share (20%):",
         tabDeposit: "Deposit",
         tabWithdraw: "Withdrawal",
         tabPackage: "Package",
         tabReferral: "Referral",
         tabHistory: "History",
         depHeader: "Deposit ETB",
-        depInstruction: "Transfer to one of the official accounts below, then submit the amount and Transaction ID.",
+        depInstruction: "Transfer to one of the official accounts below, then submit the amount and payment screenshot.",
         selectMethodLabel: "Select Payment Account",
         amountLabel: "Deposit Amount (ETB)",
-        txRefLabel: "Transaction ID / Reference",
+        addPaymentScreenshotTitle: "Add payment screenshot",
+        addFileBtn: "Add file",
+        noFileSelected: "No screenshot file selected",
         confirmDepBtn: "Confirm Deposit",
         withHeader: "Request Withdrawal",
         withInstruction: "Official payment gateways & automatic 5% withdrawal fee calculation:",
@@ -703,53 +965,60 @@
         reqAmtLabel: "Requested Amount:",
         feeLabel: "Withdrawal Fee (5%):",
         confirmWithBtn: "Submit Withdrawal",
-        pkgHeader: "Investment Packages",
+        pkgHeader: "Investment Packages (Up to 200,000 ETB)",
         refHeader: "Invite & Earn (Referral)",
         refDesc: "Share your referral link and earn 100 ETB bonus per invite.",
         yourRefLink: "Your Referral Link",
         claimRefBtn: "+ Simulate Referral Bonus (+100 ETB)",
         histHeader: "Transaction History",
         noHistory: "No transactions yet.",
-        ratePrefix: "ETB Rate (1 USD) ="
+        ratePrefix: "ETB Rate (1 USD) =",
+        loadingMsg: "Loading..."
       }
     };
 
-    // Language Switcher
+    function switchAuthMode(mode) {
+      const isReg = mode === "register";
+      document.getElementById("switchRegBtn").classList.toggle("active", isReg);
+      document.getElementById("switchLoginBtn").classList.toggle("active", !isReg);
+      document.getElementById("register-form").classList.toggle("active", isReg);
+      document.getElementById("login-form").classList.toggle("active", !isReg);
+      document.getElementById("authMessage").style.display = "none";
+    }
+
     function setLanguage(lang) {
       currentLang = lang;
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         if (i18n[lang][key]) el.innerText = i18n[lang][key];
       });
-
       document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
       document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
-      document.getElementById("btnEnBottom").classList.toggle("active", lang === "en");
-      document.getElementById("btnAmBottom").classList.toggle("active", lang === "am");
-
       renderExchangeRate();
     }
 
-    // Hourly Exchange Rate Updater (ETB per 1 USD)
-    function updateHourlyExchangeRate(forceFluctuation = false) {
-      const now = new Date();
-      const currentHourKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}`;
-      const savedHour = localStorage.getItem("etb_rate_hour");
-      let savedRate = parseFloat(localStorage.getItem("etb_rate_value"));
-
-      if (!savedRate || savedHour !== currentHourKey || forceFluctuation) {
-        // Hourly realistic ETB rate update
-        const base = savedRate || 126.50;
-        const delta = (Math.random() * 0.40 - 0.15); // slight hourly movement
-        exchangeRate = parseFloat((base + delta).toFixed(2));
-        localStorage.setItem("etb_rate_hour", currentHourKey);
-        localStorage.setItem("etb_rate_value", exchangeRate.toString());
-      } else {
-        exchangeRate = savedRate;
+    async function fetchRealExchangeRate() {
+      const saved = parseFloat(localStorage.getItem("etb_real_rate"));
+      if (saved && !isNaN(saved)) {
+        exchangeRate = saved;
       }
 
-      const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      document.getElementById("rateUpdatedTime").innerText = `Updated: ${timeStr}`;
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/USD");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.rates && data.rates.ETB) {
+            exchangeRate = parseFloat(Number(data.rates.ETB).toFixed(2));
+            localStorage.setItem("etb_real_rate", exchangeRate.toString());
+            localStorage.setItem("etb_real_rate_time", Date.now().toString());
+          }
+        }
+      } catch (err) {
+        // Keep saved or reference rate if offline
+      }
+
+      const nowStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("rateUpdatedTime").innerText = `Updated: ${nowStr}`;
       renderExchangeRate();
     }
 
@@ -758,30 +1027,20 @@
       document.getElementById("exchangeRateText").innerText = `${prefix} ${exchangeRate.toFixed(2)} ETB`;
     }
 
-    // Check every 60 seconds if a new hour has started so it updates automatically every hour
     setInterval(() => {
-      updateHourlyExchangeRate(false);
-    }, 60000);
+      fetchRealExchangeRate();
+    }, 3600000);
 
-    // Working Refresh Sign
     function refreshApp() {
-      const topBtn = document.getElementById("topRefreshBtn");
-      const botBtn = document.getElementById("bottomRefreshBtn");
-      topBtn.classList.add("spinning");
-      botBtn.classList.add("spinning");
-
-      updateHourlyExchangeRate(true);
+      const btn = document.getElementById("topRefreshBtn");
+      btn.classList.add("spinning");
+      fetchRealExchangeRate();
       if (currentUser) {
         loadUserData();
       }
-
-      setTimeout(() => {
-        topBtn.classList.remove("spinning");
-        botBtn.classList.remove("spinning");
-      }, 450);
+      setTimeout(() => btn.classList.remove("spinning"), 450);
     }
 
-    // Show Auth Feedback
     function showAuthMsg(text, isError) {
       const box = document.getElementById("authMessage");
       box.innerText = text;
@@ -789,7 +1048,6 @@
       box.style.display = "block";
     }
 
-    // Register Functionality
     function registerUser() {
       const username = document.getElementById("regUser").value.trim();
       const pass = document.getElementById("regPass").value;
@@ -815,24 +1073,57 @@
         balance: 0,
         invested: 0,
         refBonus: 0,
+        ownerMargin: 0,
         history: []
       };
       localStorage.setItem("ethio_users", JSON.stringify(users));
 
-      // Auto-fill login username so user can immediately log in
       document.getElementById("loginUser").value = username;
       document.getElementById("regPass").value = "";
       document.getElementById("regConfirm").value = "";
 
+      switchAuthMode("login");
       showAuthMsg(
         currentLang === "am"
-          ? "ምዝገባው ተሳክቷል! አሁን በቀኝ በኩል Login ያድርጉ።"
-          : "Registered successfully! Now log in on the right side.",
+          ? "ምዝገባው ተሳክቷል! አሁን የይለፍ ቃልዎን አስገብተው ይግቡ።"
+          : "Registered! Enter your password to log in.",
         false
       );
     }
 
-    // Login Functionality
+    // Plays 25% -> 50% -> 75% -> 100% over at least 2000ms (2s) before opening dashboard
+    function runLoginLoadingScreen(onComplete) {
+      if (isLoggingIn) return;
+      isLoggingIn = true;
+
+      const screen = document.getElementById("login-loading-screen");
+      const pctEl = document.getElementById("loaderPercentText");
+      const fillEl = document.getElementById("loaderBarFill");
+      const statusEl = document.getElementById("loaderStatusText");
+
+      screen.classList.add("active");
+      const steps = [25, 50, 75, 100];
+      const stepDelay = 550; // 4 * 550ms = 2200ms (>= 2 seconds)
+
+      steps.forEach((pct, idx) => {
+        setTimeout(() => {
+          pctEl.innerText = `${pct}%`;
+          fillEl.style.width = `${pct}%`;
+          statusEl.innerText = `${i18n[currentLang].loadingMsg} ${pct}%`;
+
+          if (pct === 100) {
+            setTimeout(() => {
+              screen.classList.remove("active");
+              pctEl.innerText = "25%";
+              fillEl.style.width = "25%";
+              isLoggingIn = false;
+              onComplete();
+            }, 250);
+          }
+        }, idx * stepDelay);
+      });
+    }
+
     function loginUser() {
       const username = document.getElementById("loginUser").value.trim();
       const pass = document.getElementById("loginPass").value;
@@ -849,9 +1140,12 @@
       currentUser = username;
       localStorage.setItem("ethio_active_user", username);
       document.getElementById("authMessage").style.display = "none";
-      document.getElementById("auth-section").style.display = "none";
-      document.getElementById("dashboard-section").style.display = "block";
-      loadUserData();
+
+      runLoginLoadingScreen(() => {
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("dashboard-section").style.display = "block";
+        loadUserData();
+      });
     }
 
     function logoutUser() {
@@ -884,6 +1178,8 @@
         data.invested.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
       document.getElementById("refBonusDisplay").innerText =
         data.refBonus.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
+      document.getElementById("ownerMarginDisplay").innerText =
+        (data.ownerMargin || 0).toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
       document.getElementById("refLinkText").innerText =
         `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
 
@@ -891,28 +1187,50 @@
     }
 
     function switchTab(tabName, btnEl) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".menu-cell-btn").forEach(b => b.classList.remove("active"));
       btnEl.classList.add("active");
 
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
       document.getElementById("panel-" + tabName).classList.add("active");
     }
 
-    // Deposit
+    function handleReceiptFile(inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      const nameSpan = document.getElementById("receiptFileName");
+      const previewImg = document.getElementById("receiptPreview");
+
+      if (!file) {
+        selectedReceiptName = "";
+        nameSpan.innerText = i18n[currentLang].noFileSelected;
+        previewImg.style.display = "none";
+        return;
+      }
+
+      selectedReceiptName = file.name;
+      nameSpan.innerText = file.name;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewImg.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+
     function submitDeposit() {
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
-      const ref = document.getElementById("depRef").value.trim();
 
-      if (isNaN(amount) || amount <= 0 || !ref) {
-        alert(currentLang === "am" ? "እባክዎ ትክክለኛ መጠን እና Transaction ID ያስገቡ።" : "Please enter valid amount and Transaction ID.");
+      if (isNaN(amount) || amount <= 0) {
+        alert(currentLang === "am" ? "እባክዎ ትክክለኛ የገንዘብ መጠን ያስገቡ።" : "Please enter a valid deposit amount.");
         return;
       }
 
       const data = getUserRecord();
+      const filePart = selectedReceiptName ? ` • Screenshot: ${selectedReceiptName}` : "";
       data.balance += amount;
       data.history.unshift({
-        title: `Deposit (${method}) • Ref: ${ref}`,
+        title: `Deposit (${method})${filePart}`,
         amount: amount,
         type: "plus",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -921,11 +1239,14 @@
       loadUserData();
 
       document.getElementById("depAmount").value = "";
-      document.getElementById("depRef").value = "";
+      document.getElementById("depReceiptInput").value = "";
+      selectedReceiptName = "";
+      document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
+      document.getElementById("receiptPreview").style.display = "none";
+
       alert(currentLang === "am" ? "ተቀማጭ ገንዘብ በተሳካ ሁኔታ ተመዝግቧል!" : "Deposit added successfully!");
     }
 
-    // Withdrawal 5% Fee & Net Pay = Calculation
     function calculateNetPay() {
       const raw = parseFloat(document.getElementById("withAmount").value);
       if (isNaN(raw) || raw <= 0) {
@@ -980,28 +1301,34 @@
       );
     }
 
-    // Buy Package
-    function buyPackage(cost, pkgName) {
+    function buyPackage(cost, pkgName, userProfit, intervalDesc) {
       const data = getUserRecord();
       if (data.balance < cost) {
         alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም። መጀመሪያ Deposit ያድርጉ።" : "Insufficient balance. Please deposit first.");
         return;
       }
 
+      const ownerShare = userProfit * 0.20;
+
       data.balance -= cost;
       data.invested += cost;
+      data.ownerMargin = (data.ownerMargin || 0) + ownerShare;
       data.history.unshift({
-        title: `Invested: ${pkgName}`,
+        title: `${pkgName} [${intervalDesc}] • Owner Share: +${ownerShare.toFixed(2)} ETB`,
         amount: cost,
         type: "minus",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       });
       saveUserRecord(data);
       loadUserData();
-      alert(`${pkgName} activated!`);
+
+      alert(
+        currentLang === "am"
+          ? `${pkgName} ተጀምሯል! የOwner 20% ድርሻ = ${ownerShare.toFixed(2)} ETB`
+          : `${pkgName} activated! Owner 20% share = ${ownerShare.toFixed(2)} ETB`
+      );
     }
 
-    // Referral Bonus
     function simulateReferralBonus() {
       const data = getUserRecord();
       data.balance += 100;
@@ -1019,7 +1346,7 @@
     function renderHistory(list) {
       const container = document.getElementById("historyList");
       if (!list || list.length === 0) {
-        container.innerHTML = `<p style="font-size: 0.82rem; color: #94a3b8;">${i18n[currentLang].noHistory}</p>`;
+        container.innerHTML = `<p style="font-size: 0.82rem; color: #94a3b8; text-align: center;">${i18n[currentLang].noHistory}</p>`;
         return;
       }
       container.innerHTML = list
@@ -1039,19 +1366,25 @@
         .join("");
     }
 
-    function copyText(txt) {
-      navigator.clipboard.writeText(txt);
-      alert("Copied: " + txt);
+    function copyReplaceSign(btnEl, textToCopy) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).catch(() => {});
+      }
+      if (btnEl._copyTimer) clearTimeout(btnEl._copyTimer);
+      btnEl.innerText = "copied";
+      btnEl.classList.add("is-copied");
+      btnEl._copyTimer = setTimeout(() => {
+        btnEl.innerText = "⧉";
+        btnEl.classList.remove("is-copied");
+      }, 1400);
     }
 
-    function copyReferral() {
+    function copyReferralReplaceSign(btnEl) {
       const link = document.getElementById("refLinkText").innerText;
-      navigator.clipboard.writeText(link);
-      alert("Referral link copied!");
+      copyReplaceSign(btnEl, link);
     }
 
-    // Initialize on load
-    updateHourlyExchangeRate(false);
+    fetchRealExchangeRate();
     const savedActive = localStorage.getItem("ethio_active_user");
     if (savedActive) {
       const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
