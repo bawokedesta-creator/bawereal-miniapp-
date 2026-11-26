@@ -1,0 +1,147 @@
+
+/* REGISTER */
+
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim().toLowerCase();
+  const phone = document.getElementById("regPhone").value.trim();
+  const password = document.getElementById("regPassword").value;
+  const confirm = document.getElementById("regConfirm").value;
+  const referral = document.getElementById("regReferral").value.trim();
+
+  const message = document.getElementById("registerMessage");
+
+  if (password.length < 8) {
+    message.textContent = "Password must contain at least 8 characters.";
+    message.className = "message error";
+    return;
+  }
+
+  if (password !== confirm) {
+    message.textContent = "Passwords do not match.";
+    message.className = "message error";
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("gv_users") || "{}");
+
+  if (users[email]) {
+    message.textContent = "Account already exists. Please login.";
+    message.className = "message error";
+    return;
+  }
+
+  const user = {
+    name: name,
+    email: email,
+    phone: phone,
+    password: password,
+    referral: referral,
+    balance: 0,
+    deposited: 0,
+    invested: 0,
+    withdrawn: 0,
+    code: "GV-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
+    transactions: [],
+    packages: []
+  };
+
+  users[email] = user;
+
+  localStorage.setItem("gv_users", JSON.stringify(users));
+
+  message.textContent = "Registration successful! You can now login on the right.";
+  message.className = "message success";
+
+  document.getElementById("loginEmail").value = email;
+  document.getElementById("loginPassword").value = "";
+
+  document.getElementById("registerForm").reset();
+});
+
+
+/* LOGIN */
+
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("loginPassword").value;
+
+  const users = JSON.parse(localStorage.getItem("gv_users") || "{}");
+  const message = document.getElementById("loginMessage");
+
+  if (!users[email]) {
+    message.textContent = "Account not found. Please register first.";
+    message.className = "message error";
+    return;
+  }
+
+  if (users[email].password !== password) {
+    message.textContent = "Incorrect password. Please try again.";
+    message.className = "message error";
+    return;
+  }
+
+  localStorage.setItem("gv_session", email);
+
+  message.textContent = "Login successful!";
+  message.className = "message success";
+
+  openDashboard();
+});
+
+
+/* AUTHENTICATION CHECK */
+
+function openDashboard() {
+  const email = localStorage.getItem("gv_session");
+
+  const users = JSON.parse(localStorage.getItem("gv_users") || "{}");
+
+  if (!email || !users[email]) {
+    localStorage.removeItem("gv_session");
+    document.getElementById("authScreen").classList.remove("hidden");
+    document.getElementById("dashboard").classList.add("hidden");
+    return;
+  }
+
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("headerRefresh").classList.remove("hidden");
+
+  document.getElementById("welcomeText").textContent =
+    "Welcome, " + users[email].name + " 👋";
+
+  document.getElementById("referralCode").textContent = users[email].code;
+
+  updateDashboard();
+  renderHistory();
+  refreshRate();
+}
+
+
+/* LOGOUT */
+
+function logout() {
+  localStorage.removeItem("gv_session");
+  location.reload();
+}
+
+
+/* PREVENT DIRECT DASHBOARD ACCESS */
+
+window.addEventListener("load", function() {
+  const email = localStorage.getItem("gv_session");
+  const users = JSON.parse(localStorage.getItem("gv_users") || "{}");
+
+  if (email && users[email]) {
+    openDashboard();
+  } else {
+    localStorage.removeItem("gv_session");
+    document.getElementById("authScreen").classList.remove("hidden");
+    document.getElementById("dashboard").classList.add("hidden");
+  }
+});
