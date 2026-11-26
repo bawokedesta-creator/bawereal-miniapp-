@@ -1,223 +1,1067 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EthioInvest - ETB Investment Platform</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      padding: 14px;
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
 
-<style>
-.auth-tabs {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:20px;
-}
-.auth-tabs button {
-  padding:13px 5px;
-  border:0;
-  border-radius:9px;
-  background:#e9f7ee;
-  color:#07532f;
-  font-weight:bold;
-}
-.auth-tabs button.active {
-  background:#087b43;
-  color:white;
-}
-.auth-card {
-  background:white;
-  padding:22px;
-  border-radius:15px;
-  border-top:4px solid #087b43;
-}
-</style>
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .brand {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lang-box {
+      display: flex;
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 2px;
+      border: 1px solid #334155;
+    }
+    .lang-btn {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+    }
+    .refresh-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s ease;
+    }
+    .refresh-btn.spinning {
+      transform: rotate(360deg);
+    }
 
-<div id="authScreen" class="auth-wrapper">
+    /* Auth Section: Side-by-Side Register & Login */
+    .auth-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .auth-card {
+      background: #1e293b;
+      padding: 14px 11px;
+      border-radius: 14px;
+      border: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .auth-card h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #38bdf8;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 9px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 0.82rem;
+    }
+    .btn-primary {
+      width: 100%;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-success {
+      width: 100%;
+      background: #16a34a;
+      color: #ffffff;
+      border: none;
+      padding: 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .msg-box {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      text-align: center;
+      display: none;
+    }
+    .msg-error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+    .msg-ok { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid #22c55e; }
 
-  <div class="auth-heading">
-    <h1>🌱 GreenVest</h1>
-    <p>Welcome to GreenVest</p>
+    /* Dashboard */
+    #dashboard-section {
+      display: none;
+    }
+    .user-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+    .logout-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .wallet-card {
+      background: linear-gradient(135deg, #0284c7, #1e40af);
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25);
+    }
+    .wallet-label {
+      font-size: 0.82rem;
+      opacity: 0.9;
+    }
+    .balance {
+      font-size: 1.9rem;
+      font-weight: 800;
+      margin: 6px 0 8px;
+    }
+    .exchange-rate-box {
+      background: rgba(15, 23, 42, 0.45);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .exchange-left {
+      font-weight: 700;
+      color: #fde047;
+    }
+    .exchange-time {
+      font-size: 0.7rem;
+      color: #cbd5e1;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 9px 4px;
+      border-radius: 9px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    /* Panels */
+    .panel {
+      display: none;
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 14px;
+      border: 1px solid #334155;
+      margin-bottom: 16px;
+    }
+    .panel.active {
+      display: block;
+    }
+    .panel h3 {
+      font-size: 1rem;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+
+    /* Bank Accounts Box */
+    .bank-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bank-info strong {
+      display: block;
+      font-size: 0.85rem;
+      color: #38bdf8;
+    }
+    .bank-info span {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+    }
+    .copy-btn {
+      background: #334155;
+      color: #ffffff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    /* Fee & Net Pay Calculation Box */
+    .calc-box {
+      background: #0f172a;
+      border: 1px dashed #38bdf8;
+      padding: 11px;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 0.86rem;
+    }
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: #cbd5e1;
+    }
+    .net-pay-row {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 0.98rem;
+      color: #4ade80;
+      border-top: 1px solid #334155;
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+
+    /* Packages */
+    .pkg-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .pkg-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .pkg-badge {
+      background: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+    }
+
+    /* History */
+    .tx-item {
+      background: #0f172a;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.83rem;
+      border: 1px solid #1e293b;
+    }
+    .tx-plus { color: #4ade80; font-weight: 700; }
+    .tx-minus { color: #f87171; font-weight: 700; }
+
+    /* Bottom Footer of Dashboard */
+    .dashboard-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER WITH RIGHT-CORNER LANGUAGE CHOICE & REFRESH -->
+  <div class="top-bar">
+    <div class="brand">EthioInvest</div>
+    <div class="top-controls">
+      <button class="refresh-btn" id="topRefreshBtn" onclick="refreshApp()" title="Refresh">↻</button>
+      <div class="lang-box">
+        <button class="lang-btn" id="btnEnTop" onclick="setLanguage('en')">En</button>
+        <button class="lang-btn active" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
+      </div>
+    </div>
   </div>
 
-  <div class="auth-tabs">
-    <button id="loginTab" class="active"
-      onclick="showAuth('login')">LOGIN</button>
+  <!-- AUTH SECTION: SIDE BY SIDE REGISTER & LOGIN -->
+  <div id="auth-section">
+    <div class="auth-wrapper">
+      <!-- Left: Register -->
+      <div class="auth-card">
+        <div>
+          <h2 data-i18n="regTitle">ይመዝገቡ (Register)</h2>
+          <div class="form-group">
+            <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
+            <input type="text" id="regUser" placeholder="09..." />
+          </div>
+          <div class="form-group">
+            <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+            <input type="password" id="regPass" placeholder="******" />
+          </div>
+          <div class="form-group">
+            <label data-i18n="confirmPassLabel">የይለፍ ቃል ያረጋግጡ</label>
+            <input type="password" id="regConfirm" placeholder="******" />
+          </div>
+        </div>
+        <button class="btn-success" onclick="registerUser()" data-i18n="regBtn">ተመዝገብ</button>
+      </div>
 
-    <button id="registerTab"
-      onclick="showAuth('register')">REGISTER</button>
+      <!-- Right: Login -->
+      <div class="auth-card">
+        <div>
+          <h2 data-i18n="loginTitle">ይግቡ (Login)</h2>
+          <div class="form-group">
+            <label data-i18n="phoneLabel">ስልክ / የተጠቃሚ ስም</label>
+            <input type="text" id="loginUser" placeholder="09..." />
+          </div>
+          <div class="form-group">
+            <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+            <input type="password" id="loginPass" placeholder="******" />
+          </div>
+        </div>
+        <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">ግባ</button>
+      </div>
+    </div>
+
+    <div id="authMessage" class="msg-box"></div>
   </div>
 
-  <!-- LOGIN -->
-  <div id="loginBox" class="auth-card">
-    <h2>Login Account</h2>
+  <!-- DASHBOARD SECTION -->
+  <div id="dashboard-section">
+    <div class="user-strip">
+      <span>👤 <strong id="displayUser">User</strong></span>
+      <button class="logout-btn" onclick="logoutUser()" data-i18n="logoutBtn">ውጣ (Logout)</button>
+    </div>
 
-    <form id="loginForm">
-      <input id="loginEmail" type="email"
-        placeholder="Email Address" required>
+    <!-- Total Balance & Hourly Exchange Rate -->
+    <div class="wallet-card">
+      <div class="wallet-label" data-i18n="totalBalLabel">ጠቅላላ ቀሪ ሂሳብ (Total Balance)</div>
+      <div class="balance" id="balanceDisplay">0.00 ETB</div>
 
-      <input id="loginPassword" type="password"
-        placeholder="Password" required>
+      <!-- Exchange Rate positioned on the left below Total Balance -->
+      <div class="exchange-rate-box">
+        <div class="exchange-left" id="exchangeRateText">የብር ዋጋ (1 USD) = 126.50 ETB</div>
+        <div class="exchange-time" id="rateUpdatedTime">Updated: --:--</div>
+      </div>
 
-      <button class="primary" type="submit">LOGIN</button>
+      <div style="font-size: 0.82rem; display: flex; justify-content: space-between; opacity: 0.95;">
+        <span><span data-i18n="activeInvLabel">ንቁ ኢንቨስትመንት:</span> <strong id="investedDisplay">0.00 ETB</strong></span>
+        <span><span data-i18n="refEarnLabel">ሪፈራል ቦነስ:</span> <strong id="refBonusDisplay">0.00 ETB</strong></span>
+      </div>
+    </div>
 
-      <p id="loginMessage" class="message"></p>
-    </form>
-  </div>
+    <!-- 5 Navigation Tabs: Deposit, Withdrawal, Package, Referral, History -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('deposit', this)" data-i18n="tabDeposit">Deposit</button>
+      <button class="tab-btn" onclick="switchTab('withdrawal', this)" data-i18n="tabWithdraw">Withdrawal</button>
+      <button class="tab-btn" onclick="switchTab('package', this)" data-i18n="tabPackage">Package</button>
+      <button class="tab-btn" onclick="switchTab('referral', this)" data-i18n="tabReferral">Referral</button>
+      <button class="tab-btn" onclick="switchTab('history', this)" data-i18n="tabHistory">History</button>
+    </div>
 
-  <!-- REGISTER -->
-  <div id="registerBox" class="auth-card hidden">
-    <h2>Create Account</h2>
+    <!-- 1. DEPOSIT PANEL -->
+    <div id="panel-deposit" class="panel active">
+      <h3 data-i18n="depHeader">ገንዘብ ማስገቢያ (Deposit ETB)</h3>
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;" data-i18n="depInstruction">
+        ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የግብይት መለያ (Transaction ID) ያስገቡ።
+      </p>
 
-    <form id="registerForm">
+      <!-- Admin Payment Accounts -->
+      <div class="bank-card">
+        <div class="bank-info">
+          <strong>Telebirr (ቴሌብር)</strong>
+          <span>0964488470</span>
+        </div>
+        <button class="copy-btn" onclick="copyText('0964488470')">Copy</button>
+      </div>
 
-      <input id="regName" type="text"
-        placeholder="Full Name" required>
+      <div class="bank-card">
+        <div class="bank-info">
+          <strong>CBE Bank (ንግድ ባንክ)</strong>
+          <span>1000298833585</span>
+        </div>
+        <button class="copy-btn" onclick="copyText('1000298833585')">Copy</button>
+      </div>
 
-      <input id="regEmail" type="email"
-        placeholder="Email Address" required>
+      <div class="bank-card">
+        <div class="bank-info">
+          <strong>Bank of Abyssinia (አቢሲኒያ ባንክ)</strong>
+          <span>166455979</span>
+        </div>
+        <button class="copy-btn" onclick="copyText('166455979')">Copy</button>
+      </div>
 
-      <input id="regPassword" type="password"
-        placeholder="New Password (8 characters minimum)"
-        minlength="8" required>
+      <div class="form-group" style="margin-top: 12px;">
+        <label data-i18n="selectMethodLabel">የከፈሉበትን መንገድ ይምረጡ</label>
+        <select id="depMethod">
+          <option value="Telebirr (0964488470)">Telebirr - 0964488470</option>
+          <option value="CBE (1000298833585)">CBE - 1000298833585</option>
+          <option value="Abyssinia (166455979)">Abyssinia - 166455979</option>
+        </select>
+      </div>
 
-      <input id="regConfirm" type="password"
-        placeholder="Confirm Password"
-        minlength="8" required>
+      <div class="form-group">
+        <label data-i18n="amountLabel">የገንዘብ መጠን (ETB)</label>
+        <input type="number" id="depAmount" placeholder="1000" />
+      </div>
 
-      <button class="primary" type="submit">
-        CREATE ACCOUNT
+      <div class="form-group">
+        <label data-i18n="txRefLabel">የግብይት መለያ (Transaction ID / Ref)</label>
+        <input type="text" id="depRef" placeholder="ለምሳሌ: FT24..." />
+      </div>
+
+      <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">ገንዘብ ማስገባቱን አረጋግጥ</button>
+    </div>
+
+    <!-- 2. WITHDRAWAL PANEL -->
+    <div id="panel-withdrawal" class="panel">
+      <h3 data-i18n="withHeader">ገንዘብ ማውጫ (Withdrawal)</h3>
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;" data-i18n="withInstruction">
+        የመክፈያ አካውንቶች (System Accounts) እና የ5% የአገልግሎት ክፍያ ስሌት፦
+      </p>
+
+      <!-- Reference Accounts shown on Withdrawal as requested -->
+      <div class="bank-card">
+        <div class="bank-info">
+          <strong>Telebirr: 0964488470 | CBE: 1000298833585</strong>
+          <span style="font-size: 0.82rem; color: #cbd5e1;">Bank of Abyssinia: 166455979</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="withMethodLabel">ገንዘብ የሚቀበሉበት ባንክ / ቴሌብር</label>
+        <select id="withMethod">
+          <option value="Telebirr">Telebirr (ቴሌብር)</option>
+          <option value="CBE">CBE (የኢትዮጵያ ንግድ ባንክ)</option>
+          <option value="Bank of Abyssinia">Bank of Abyssinia (አቢሲኒያ ባንክ)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="userAccLabel">የእርስዎ አካውንት ቁጥር / ስልክ</label>
+        <input type="text" id="withUserAccount" placeholder="09... / 1000..." />
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="withAmountLabel">የሚያወጡት የብር መጠን (ETB)</label>
+        <input type="number" id="withAmount" oninput="calculateNetPay()" placeholder="1000" />
+      </div>
+
+      <!-- 5% Fee and Net Pay = Display -->
+      <div class="calc-box">
+        <div class="calc-row">
+          <span data-i18n="reqAmtLabel">የተጠየቀ መጠን (Amount):</span>
+          <span id="calcGross">0.00 ETB</span>
+        </div>
+        <div class="calc-row">
+          <span data-i18n="feeLabel">የአገልግሎት ክፍያ (Withdrawal Fee 5%):</span>
+          <span id="calcFee" style="color: #f87171;">-0.00 ETB</span>
+        </div>
+        <div class="net-pay-row">
+          <span>Net Pay =</span>
+          <span id="calcNetPay">0.00 ETB</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="submitWithdrawal()" data-i18n="confirmWithBtn">ወጪ ጥያቄ ላክ</button>
+    </div>
+
+    <!-- 3. PACKAGE PANEL -->
+    <div id="panel-package" class="panel">
+      <h3 data-i18n="pkgHeader">የኢንቨስትመንት ፓኬጆች (Packages)</h3>
+
+      <div class="pkg-item">
+        <div class="pkg-head">
+          <span>Starter Package</span>
+          <span class="pkg-badge">+10% / 7 Days</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">1,000 ETB → 1,100 ETB</p>
+        <button class="btn-primary" onclick="buyPackage(1000, 'Starter Package')">Invest 1,000 ETB</button>
+      </div>
+
+      <div class="pkg-item">
+        <div class="pkg-head">
+          <span>Silver Package</span>
+          <span class="pkg-badge">+25% / 15 Days</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">5,000 ETB → 6,250 ETB</p>
+        <button class="btn-primary" onclick="buyPackage(5000, 'Silver Package')">Invest 5,000 ETB</button>
+      </div>
+
+      <div class="pkg-item">
+        <div class="pkg-head">
+          <span>Gold VIP Package</span>
+          <span class="pkg-badge">+50% / 30 Days</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">10,000 ETB → 15,000 ETB</p>
+        <button class="btn-primary" onclick="buyPackage(10000, 'Gold VIP Package')">Invest 10,000 ETB</button>
+      </div>
+    </div>
+
+    <!-- 4. REFERRAL PANEL -->
+    <div id="panel-referral" class="panel">
+      <h3 data-i18n="refHeader">ሰዎችን ይጋብዙ (Referral)</h3>
+      <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 10px;" data-i18n="refDesc">
+        ጓደኞችዎን በዚህ ሊንክ ሲጋብዙ 100 ETB ቦነስ ያገኛሉ።
+      </p>
+      <div class="bank-card">
+        <div class="bank-info">
+          <strong data-i18n="yourRefLink">የእርስዎ ሪፈራል ሊንክ</strong>
+          <span id="refLinkText" style="font-size: 0.78rem;">https://ethioinvest.app/?ref=user</span>
+        </div>
+        <button class="copy-btn" onclick="copyReferral()">Copy</button>
+      </div>
+      <button class="btn-success" onclick="simulateReferralBonus()" style="margin-top: 8px;" data-i18n="claimRefBtn">
+        + ሪፈራል ቦነስ ሞክር (+100 ETB)
       </button>
+    </div>
 
-      <p id="registerMessage" class="message"></p>
+    <!-- 5. HISTORY PANEL -->
+    <div id="panel-history" class="panel">
+      <h3 data-i18n="histHeader">የሂሳብ እንቅስቃሴ ታሪክ (History)</h3>
+      <div id="historyList">
+        <p style="font-size: 0.82rem; color: #94a3b8;" data-i18n="noHistory">እስካሁን ምንም እንቅስቃሴ የለም።</p>
+      </div>
+    </div>
 
-    </form>
+    <!-- BOTTOM RIGHT OF DASHBOARD: En / አማ & REFRESH BUTTON -->
+    <div class="dashboard-footer">
+      <button class="refresh-btn" id="bottomRefreshBtn" onclick="refreshApp()" title="Refresh">↻</button>
+      <div class="lang-box">
+        <button class="lang-btn" id="btnEnBottom" onclick="setLanguage('en')">En</button>
+        <button class="lang-btn active" id="btnAmBottom" onclick="setLanguage('am')">አማ</button>
+      </div>
+    </div>
   </div>
 
-</div>
+  <script>
+    let currentLang = "am";
+    let currentUser = null;
+    let exchangeRate = 126.50;
 
-<script>
+    // Translations Dictionary
+    const i18n = {
+      am: {
+        regTitle: "ይመዝገቡ (Register)",
+        loginTitle: "ይግቡ (Login)",
+        phoneLabel: "ስልክ / የተጠቃሚ ስም",
+        passLabel: "የይለፍ ቃል (Password)",
+        confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
+        regBtn: "ተመዝገብ",
+        loginBtn: "ግባ",
+        logoutBtn: "ውጣ (Logout)",
+        totalBalLabel: "ጠቅላላ ቀሪ ሂሳብ (Total Balance)",
+        activeInvLabel: "ንቁ ኢንቨስትመንት:",
+        refEarnLabel: "ሪፈራል ቦነስ:",
+        tabDeposit: "Deposit",
+        tabWithdraw: "Withdrawal",
+        tabPackage: "Package",
+        tabReferral: "Referral",
+        tabHistory: "History",
+        depHeader: "ገንዘብ ማስገቢያ (Deposit ETB)",
+        depInstruction: "ከታች ባሉት የክፍያ አካውንቶች ገንዘብ ካስገቡ በኋላ መጠኑን እና የግብይት መለያ (Transaction ID) ያስገቡ።",
+        selectMethodLabel: "የከፈሉበትን መንገድ ይምረጡ",
+        amountLabel: "የገንዘብ መጠን (ETB)",
+        txRefLabel: "የግብይት መለያ (Transaction ID / Ref)",
+        confirmDepBtn: "ገንዘብ ማስገባቱን አረጋግጥ",
+        withHeader: "ገንዘብ ማውጫ (Withdrawal)",
+        withInstruction: "የመክፈያ አካውንቶች እና የ5% የአገልግሎት ክፍያ ስሌት፦",
+        withMethodLabel: "ገንዘብ የሚቀበሉበት ባንክ / ቴሌብር",
+        userAccLabel: "የእርስዎ አካውንት ቁጥር / ስልክ",
+        withAmountLabel: "የሚያወጡት የብር መጠን (ETB)",
+        reqAmtLabel: "የተጠየቀ መጠን (Amount):",
+        feeLabel: "የአገልግሎት ክፍያ (Fee 5%):",
+        confirmWithBtn: "ወጪ ጥያቄ ላክ",
+        pkgHeader: "የኢንቨስትመንት ፓኬጆች (Packages)",
+        refHeader: "ሰዎችን ይጋብዙ (Referral)",
+        refDesc: "ጓደኞችዎን በዚህ ሊንክ ሲጋብዙ 100 ETB ቦነስ ያገኛሉ።",
+        yourRefLink: "የእርስዎ ሪፈራል ሊንክ",
+        claimRefBtn: "+ ሪፈራል ቦነስ ሞክር (+100 ETB)",
+        histHeader: "የሂሳብ እንቅስቃሴ ታሪክ (History)",
+        noHistory: "እስካሁን ምንም እንቅስቃሴ የለም።",
+        ratePrefix: "የብር ዋጋ (1 USD) ="
+      },
+      en: {
+        regTitle: "Register",
+        loginTitle: "Login",
+        phoneLabel: "Phone / Username",
+        passLabel: "Password",
+        confirmPassLabel: "Confirm Password",
+        regBtn: "Create Account",
+        loginBtn: "Login",
+        logoutBtn: "Logout",
+        totalBalLabel: "Total Balance",
+        activeInvLabel: "Active Investment:",
+        refEarnLabel: "Referral Bonus:",
+        tabDeposit: "Deposit",
+        tabWithdraw: "Withdrawal",
+        tabPackage: "Package",
+        tabReferral: "Referral",
+        tabHistory: "History",
+        depHeader: "Deposit ETB",
+        depInstruction: "Transfer to one of the official accounts below, then submit the amount and Transaction ID.",
+        selectMethodLabel: "Select Payment Account",
+        amountLabel: "Deposit Amount (ETB)",
+        txRefLabel: "Transaction ID / Reference",
+        confirmDepBtn: "Confirm Deposit",
+        withHeader: "Request Withdrawal",
+        withInstruction: "Official payment gateways & automatic 5% withdrawal fee calculation:",
+        withMethodLabel: "Select Receiving Method",
+        userAccLabel: "Your Account Number / Phone",
+        withAmountLabel: "Withdrawal Amount (ETB)",
+        reqAmtLabel: "Requested Amount:",
+        feeLabel: "Withdrawal Fee (5%):",
+        confirmWithBtn: "Submit Withdrawal",
+        pkgHeader: "Investment Packages",
+        refHeader: "Invite & Earn (Referral)",
+        refDesc: "Share your referral link and earn 100 ETB bonus per invite.",
+        yourRefLink: "Your Referral Link",
+        claimRefBtn: "+ Simulate Referral Bonus (+100 ETB)",
+        histHeader: "Transaction History",
+        noHistory: "No transactions yet.",
+        ratePrefix: "ETB Rate (1 USD) ="
+      }
+    };
 
-// CHANGE BETWEEN LOGIN AND REGISTER
+    // Language Switcher
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (i18n[lang][key]) el.innerText = i18n[lang][key];
+      });
 
-function showAuth(type) {
+      document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
+      document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
+      document.getElementById("btnEnBottom").classList.toggle("active", lang === "en");
+      document.getElementById("btnAmBottom").classList.toggle("active", lang === "am");
 
-  const login = type === "login";
+      renderExchangeRate();
+    }
 
-  document.getElementById("loginBox")
-    .classList.toggle("hidden",!login);
+    // Hourly Exchange Rate Updater (ETB per 1 USD)
+    function updateHourlyExchangeRate(forceFluctuation = false) {
+      const now = new Date();
+      const currentHourKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}`;
+      const savedHour = localStorage.getItem("etb_rate_hour");
+      let savedRate = parseFloat(localStorage.getItem("etb_rate_value"));
 
-  document.getElementById("registerBox")
-    .classList.toggle("hidden",login);
+      if (!savedRate || savedHour !== currentHourKey || forceFluctuation) {
+        // Hourly realistic ETB rate update
+        const base = savedRate || 126.50;
+        const delta = (Math.random() * 0.40 - 0.15); // slight hourly movement
+        exchangeRate = parseFloat((base + delta).toFixed(2));
+        localStorage.setItem("etb_rate_hour", currentHourKey);
+        localStorage.setItem("etb_rate_value", exchangeRate.toString());
+      } else {
+        exchangeRate = savedRate;
+      }
 
-  document.getElementById("loginTab")
-    .classList.toggle("active",login);
+      const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("rateUpdatedTime").innerText = `Updated: ${timeStr}`;
+      renderExchangeRate();
+    }
 
-  document.getElementById("registerTab")
-    .classList.toggle("active",!login);
-}
+    function renderExchangeRate() {
+      const prefix = i18n[currentLang].ratePrefix;
+      document.getElementById("exchangeRateText").innerText = `${prefix} ${exchangeRate.toFixed(2)} ETB`;
+    }
 
+    // Check every 60 seconds if a new hour has started so it updates automatically every hour
+    setInterval(() => {
+      updateHourlyExchangeRate(false);
+    }, 60000);
 
-// REGISTER ACCOUNT
+    // Working Refresh Sign
+    function refreshApp() {
+      const topBtn = document.getElementById("topRefreshBtn");
+      const botBtn = document.getElementById("bottomRefreshBtn");
+      topBtn.classList.add("spinning");
+      botBtn.classList.add("spinning");
 
-document.getElementById("registerForm")
-.addEventListener("submit",function(e){
+      updateHourlyExchangeRate(true);
+      if (currentUser) {
+        loadUserData();
+      }
 
-  e.preventDefault();
+      setTimeout(() => {
+        topBtn.classList.remove("spinning");
+        botBtn.classList.remove("spinning");
+      }, 450);
+    }
 
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim().toLowerCase();
-  const password = document.getElementById("regPassword").value;
-  const confirm = document.getElementById("regConfirm").value;
+    // Show Auth Feedback
+    function showAuthMsg(text, isError) {
+      const box = document.getElementById("authMessage");
+      box.innerText = text;
+      box.className = "msg-box " + (isError ? "msg-error" : "msg-ok");
+      box.style.display = "block";
+    }
 
-  const message = document.getElementById("registerMessage");
+    // Register Functionality
+    function registerUser() {
+      const username = document.getElementById("regUser").value.trim();
+      const pass = document.getElementById("regPass").value;
+      const confirm = document.getElementById("regConfirm").value;
 
-  if(password.length < 8){
-    message.textContent = "Password must be at least 8 characters.";
-    message.className = "message error";
-    return;
-  }
+      if (!username || !pass) {
+        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ/ስም እና የይለፍ ቃል ያስገቡ!" : "Please enter username and password!", true);
+        return;
+      }
+      if (pass !== confirm) {
+        showAuthMsg(currentLang === "am" ? "የይለፍ ቃሉ አይመሳሰልም!" : "Passwords do not match!", true);
+        return;
+      }
 
-  if(password !== confirm){
-    message.textContent = "Passwords do not match!";
-    message.className = "message error";
-    return;
-  }
+      const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
+      if (users[username]) {
+        showAuthMsg(currentLang === "am" ? "ይህ መለያ ቀድሞ ተመዝግቧል!" : "User already exists!", true);
+        return;
+      }
 
-  const users = JSON.parse(
-    localStorage.getItem("gv_users") || "{}"
-  );
+      users[username] = {
+        password: pass,
+        balance: 0,
+        invested: 0,
+        refBonus: 0,
+        history: []
+      };
+      localStorage.setItem("ethio_users", JSON.stringify(users));
 
-  if(users[email]){
-    message.textContent = "Email already registered. Please login.";
-    message.className = "message error";
-    return;
-  }
+      // Auto-fill login username so user can immediately log in
+      document.getElementById("loginUser").value = username;
+      document.getElementById("regPass").value = "";
+      document.getElementById("regConfirm").value = "";
 
-  users[email] = {
-    name:name,
-    email:email,
-    password:password,
-    balance:0,
-    deposited:0,
-    invested:0,
-    withdrawn:0,
-    code:"GV-"+Math.random().toString(36).slice(2,10).toUpperCase(),
-    transactions:[],
-    packages:[]
-  };
+      showAuthMsg(
+        currentLang === "am"
+          ? "ምዝገባው ተሳክቷል! አሁን በቀኝ በኩል Login ያድርጉ።"
+          : "Registered successfully! Now log in on the right side.",
+        false
+      );
+    }
 
-  localStorage.setItem("gv_users",JSON.stringify(users));
+    // Login Functionality
+    function loginUser() {
+      const username = document.getElementById("loginUser").value.trim();
+      const pass = document.getElementById("loginPass").value;
+      const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
 
-  message.textContent = "Registration Successful! Returning to Login...";
-  message.className = "message success";
+      if (!users[username] || users[username].password !== pass) {
+        showAuthMsg(
+          currentLang === "am" ? "የተሳሳተ ስም ወይም የይለፍ ቃል!" : "Invalid username or password!",
+          true
+        );
+        return;
+      }
 
-  document.getElementById("loginEmail").value = email;
+      currentUser = username;
+      localStorage.setItem("ethio_active_user", username);
+      document.getElementById("authMessage").style.display = "none";
+      document.getElementById("auth-section").style.display = "none";
+      document.getElementById("dashboard-section").style.display = "block";
+      loadUserData();
+    }
 
-  document.getElementById("registerForm").reset();
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem("ethio_active_user");
+      document.getElementById("dashboard-section").style.display = "none";
+      document.getElementById("auth-section").style.display = "block";
+      document.getElementById("loginPass").value = "";
+    }
 
-  setTimeout(function(){
+    function getUserRecord() {
+      const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
+      return users[currentUser];
+    }
 
-    showAuth("login");
+    function saveUserRecord(record) {
+      const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
+      users[currentUser] = record;
+      localStorage.setItem("ethio_users", JSON.stringify(users));
+    }
 
-    document.getElementById("loginMessage").textContent =
-      "Account created successfully! Please login.";
+    function loadUserData() {
+      const data = getUserRecord();
+      if (!data) return;
 
-    document.getElementById("loginMessage").className =
-      "message success";
+      document.getElementById("displayUser").innerText = currentUser;
+      document.getElementById("balanceDisplay").innerText =
+        data.balance.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
+      document.getElementById("investedDisplay").innerText =
+        data.invested.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
+      document.getElementById("refBonusDisplay").innerText =
+        data.refBonus.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
+      document.getElementById("refLinkText").innerText =
+        `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
 
-  },1200);
+      renderHistory(data.history);
+    }
 
-});
+    function switchTab(tabName, btnEl) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
 
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      document.getElementById("panel-" + tabName).classList.add("active");
+    }
 
-// LOGIN ACCOUNT
+    // Deposit
+    function submitDeposit() {
+      const method = document.getElementById("depMethod").value;
+      const amount = parseFloat(document.getElementById("depAmount").value);
+      const ref = document.getElementById("depRef").value.trim();
 
-document.getElementById("loginForm")
-.addEventListener("submit",function(e){
+      if (isNaN(amount) || amount <= 0 || !ref) {
+        alert(currentLang === "am" ? "እባክዎ ትክክለኛ መጠን እና Transaction ID ያስገቡ።" : "Please enter valid amount and Transaction ID.");
+        return;
+      }
 
-  e.preventDefault();
+      const data = getUserRecord();
+      data.balance += amount;
+      data.history.unshift({
+        title: `Deposit (${method}) • Ref: ${ref}`,
+        amount: amount,
+        type: "plus",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      });
+      saveUserRecord(data);
+      loadUserData();
 
-  const email = document.getElementById("loginEmail")
-    .value.trim().toLowerCase();
+      document.getElementById("depAmount").value = "";
+      document.getElementById("depRef").value = "";
+      alert(currentLang === "am" ? "ተቀማጭ ገንዘብ በተሳካ ሁኔታ ተመዝግቧል!" : "Deposit added successfully!");
+    }
 
-  const password = document.getElementById("loginPassword").value;
+    // Withdrawal 5% Fee & Net Pay = Calculation
+    function calculateNetPay() {
+      const raw = parseFloat(document.getElementById("withAmount").value);
+      if (isNaN(raw) || raw <= 0) {
+        document.getElementById("calcGross").innerText = "0.00 ETB";
+        document.getElementById("calcFee").innerText = "-0.00 ETB";
+        document.getElementById("calcNetPay").innerText = "0.00 ETB";
+        return;
+      }
 
-  const users = JSON.parse(
-    localStorage.getItem("gv_users") || "{}"
-  );
+      const fee = raw * 0.05;
+      const netPay = raw - fee;
 
-  const message = document.getElementById("loginMessage");
+      document.getElementById("calcGross").innerText = raw.toFixed(2) + " ETB";
+      document.getElementById("calcFee").innerText = "-" + fee.toFixed(2) + " ETB";
+      document.getElementById("calcNetPay").innerText = netPay.toFixed(2) + " ETB";
+    }
 
-  if(!users[email]){
-    message.textContent = "Account not found. Please register first.";
-    message.className = "message error";
-    return;
-  }
+    function submitWithdrawal() {
+      const method = document.getElementById("withMethod").value;
+      const userAcc = document.getElementById("withUserAccount").value.trim();
+      const amount = parseFloat(document.getElementById("withAmount").value);
+      const data = getUserRecord();
 
-  if(users[email].password !== password){
-    message.textContent = "Incorrect password. Try again.";
-    message.className = "message error";
-    return;
-  }
+      if (!userAcc || isNaN(amount) || amount <= 0) {
+        alert(currentLang === "am" ? "እባክዎ አካውንት እና የብር መጠን ያስገቡ።" : "Please enter account and valid amount.");
+        return;
+      }
+      if (amount > data.balance) {
+        alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም!" : "Insufficient balance!");
+        return;
+      }
 
-  localStorage.setItem("gv_session",email);
+      const fee = amount * 0.05;
+      const netPay = amount - fee;
 
-  openDashboard();
+      data.balance -= amount;
+      data.history.unshift({
+        title: `Withdraw (${method}: ${userAcc}) | Net Pay = ${netPay.toFixed(2)} ETB`,
+        amount: amount,
+        type: "minus",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      });
+      saveUserRecord(data);
+      loadUserData();
 
-});
+      document.getElementById("withAmount").value = "";
+      calculateNetPay();
+      alert(
+        currentLang === "am"
+          ? `የወጪ ጥያቄ ተልኳል! 5% ተቀንሶ የተጣራ ክፍያ (Net Pay) = ${netPay.toFixed(2)} ETB`
+          : `Withdrawal submitted! After 5% fee, Net Pay = ${netPay.toFixed(2)} ETB`
+      );
+    }
 
-</script>
+    // Buy Package
+    function buyPackage(cost, pkgName) {
+      const data = getUserRecord();
+      if (data.balance < cost) {
+        alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም። መጀመሪያ Deposit ያድርጉ።" : "Insufficient balance. Please deposit first.");
+        return;
+      }
+
+      data.balance -= cost;
+      data.invested += cost;
+      data.history.unshift({
+        title: `Invested: ${pkgName}`,
+        amount: cost,
+        type: "minus",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      });
+      saveUserRecord(data);
+      loadUserData();
+      alert(`${pkgName} activated!`);
+    }
+
+    // Referral Bonus
+    function simulateReferralBonus() {
+      const data = getUserRecord();
+      data.balance += 100;
+      data.refBonus += 100;
+      data.history.unshift({
+        title: "Referral Bonus",
+        amount: 100,
+        type: "plus",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      });
+      saveUserRecord(data);
+      loadUserData();
+    }
+
+    function renderHistory(list) {
+      const container = document.getElementById("historyList");
+      if (!list || list.length === 0) {
+        container.innerHTML = `<p style="font-size: 0.82rem; color: #94a3b8;">${i18n[currentLang].noHistory}</p>`;
+        return;
+      }
+      container.innerHTML = list
+        .map(
+          item => `
+          <div class="tx-item">
+            <div>
+              <div>${item.title}</div>
+              <small style="color:#64748b;">${item.time}</small>
+            </div>
+            <span class="${item.type === "plus" ? "tx-plus" : "tx-minus"}">
+              ${item.type === "plus" ? "+" : "-"}${item.amount.toFixed(2)} ETB
+            </span>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert("Copied: " + txt);
+    }
+
+    function copyReferral() {
+      const link = document.getElementById("refLinkText").innerText;
+      navigator.clipboard.writeText(link);
+      alert("Referral link copied!");
+    }
+
+    // Initialize on load
+    updateHourlyExchangeRate(false);
+    const savedActive = localStorage.getItem("ethio_active_user");
+    if (savedActive) {
+      const users = JSON.parse(localStorage.getItem("ethio_users") || "{}");
+      if (users[savedActive]) {
+        currentUser = savedActive;
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("dashboard-section").style.display = "block";
+        loadUserData();
+      }
+    }
+  </script>
+</body>
+</html>
