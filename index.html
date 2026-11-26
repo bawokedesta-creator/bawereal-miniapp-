@@ -1,1513 +1,297 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BaweReal</title>
-
+<title>GreenVest | Investment Platform</title>
 <style>
-:root{
-  --primary:#635bff;
-  --dark:#17172b;
-  --bg:#f4f5fb;
-  --green:#159b69;
-  --red:#d94c59;
-  --muted:#77788a;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--dark);padding-bottom:76px;font-size:14px;line-height:1.45}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
+body{font-family:Arial,sans-serif;background:#f1f7f2;color:#173b29}
+:root{--green:#087b43;--dark:#07532f;--light:#e2f5e9}
+button,input{font:inherit}
+button{cursor:pointer;border:0}
 .hidden{display:none!important}
-header{background:var(--dark);color:white;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-header h2{font-size:18px}
-.header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.lang-switch{display:inline-flex;background:#25253e;border-radius:8px;padding:2px;gap:2px;}
-.lang-btn{border:0;background:transparent;color:#cbd5e1;padding:5px 8px;border-radius:6px;font-size:11px;font-weight:bold;}
-.lang-btn.active{background:var(--primary);color:#fff;}
-.auth-lang-bar{display:flex;justify-content:flex-end;margin-bottom:10px;}
-.container{padding:14px;max-width:650px;margin:auto}
-.card{background:white;padding:15px;border-radius:14px;margin-bottom:13px;box-shadow:0 3px 14px rgba(0,0,0,.045)}
-.card h3{margin-bottom:10px;font-size:15px}
-.muted{color:var(--muted);font-size:12px}
-input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;background:white;outline:none;font-size:13.5px}
-input:focus,select:focus,textarea:focus{border-color:var(--primary)}
-textarea{resize:vertical;min-height:75px}
-.btn{border:0;padding:11px 14px;border-radius:9px;background:var(--primary);color:white;width:100%;font-weight:bold;font-size:13.5px}
-.btn.secondary{background:#ecebff;color:var(--primary)}
-.btn.danger{background:#ffe9eb;color:var(--red)}
-.btn.small{width:auto;padding:6px 10px;font-size:11.5px}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.link{color:var(--primary);cursor:pointer;font-size:13px}
-.auth-wrap{max-width:650px;margin:25px auto;padding:16px}
-.auth-wrap .card{padding:20px}
-.logo{text-align:center;font-size:24px;font-weight:bold;color:var(--primary);margin-bottom:12px;cursor:pointer;user-select:none}
-
-.auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f4f5fb; padding: 5px; border-radius: 12px; }
-.auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; color: var(--muted); border: none; background: transparent; }
-.auth-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
-@media(min-width: 600px){
-  .auth-forms-container { display: flex; gap: 15px; align-items: flex-start; }
-  .auth-forms-container .auth-form-col { flex: 1; }
-}
-@media(max-width: 599px){
-  .auth-forms-container { display: block; }
-}
-
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.action{background:white;padding:13px 8px;border-radius:12px;text-align:center;cursor:pointer;border:1px solid #eee;font-size:13px}
-.action .emoji{font-size:21px;display:block;margin-bottom:5px}
-
-.balance{background:linear-gradient(130deg,#635bff,#302b9d);color:white;padding:18px;border-radius:15px;margin-bottom:14px;position:relative}
-.balance h1{font-size:24px;margin-top:8px}
-.balance-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.corner-refresh-btn{
-  background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:9px;padding:6px 10px;font-size:11.5px;font-weight:bold;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;
-}
-.corner-refresh-btn:hover{background:rgba(255,255,255,.28)}
-.corner-refresh-btn.spinning .refresh-icon{display:inline-block;animation:spin .65s linear}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.method{border:2px solid #eee;border-radius:11px;padding:11px 12px;margin:6px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.method.selected{border-color:var(--primary);background:#f5f4ff}
-.method strong{font-size:14px}
-.method .brand{font-size:20px;margin-right:8px}
-.method-left{display:flex;align-items:center}
-.status{display:inline-block;padding:4px 8px;border-radius:20px;background:#eee;font-size:10.5px;margin-top:5px}
-.status.pending,.status.request-recorded,.status.processing,.status.under-review,.status.review{background:#fff0ce;color:#946000}
-.status.approved,.status.completed,.status.active{background:#d9f7e9;color:#087b4c}
-.status.rejected,.status.failed,.status.cancelled,.status.expired{background:#ffe1e4;color:#bd2636}
-.item{border-bottom:1px solid #eee;padding:10px 0}
-.item:last-child{border:0}
-.item-top{display:flex;justify-content:space-between;gap:8px;font-size:13px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:7px 2px;z-index:10}
-.nav-btn{background:none;border:0;color:#777;font-size:9.5px;display:flex;flex-direction:column;align-items:center;gap:2px}
-.nav-btn span{font-size:15.5px}
-.nav-btn.active{color:var(--primary);font-weight:bold}
-.notice{padding:10px 12px;border-radius:9px;background:#f1f0ff;color:#4841a8;font-size:12px;margin:8px 0}
-.empty{text-align:center;color:var(--muted);padding:16px;font-size:12.5px}
-.page-title{margin:4px 0 13px;font-size:18px}
-small{color:var(--muted);font-size:11.5px}
-.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
-.stat{background:#f5f5fb;padding:11px;border-radius:10px}
-.stat strong{display:block;font-size:15px;margin-top:5px}
-.account-box{background:#f7f7fc;padding:12px;border-radius:10px;margin:8px 0}
-.feature-row{display:flex;gap:8px;margin:8px 0}
-.feature-row .btn{flex:1}
-.faq-item{padding:10px 0;border-bottom:1px solid #eee;font-size:13px}
-.faq-item:last-child{border:0}
-.toast-msg{
-  position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:#17172b;color:#fff;padding:8px 14px;border-radius:999px;font-size:12px;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.2);
-}
-
-#application{font-size:13.5px}
-#application h2{font-size:17px}
-#application h3{font-size:14.5px}
-#application .balance h1{font-size:23px}
-#application .action{font-size:12.5px}
-#application .action .emoji{font-size:20px}
-#application .btn{font-size:13px;padding:10px 12px}
-#application .btn.small{font-size:11px;padding:6px 9px}
-#application input,#application select,#application textarea{font-size:13px;padding:9px 11px}
-
-.task-card,.vip-card{background:white;border:1px solid #eee;border-radius:12px;padding:13px 14px;margin-bottom:10px;}
-.vip-card{border-left:4px solid #635bff;}
-.vip-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;}
-.vip-price{font-size:14px;font-weight:bold;color:var(--primary);}
-.vip-level{font-size:18px;margin-bottom:4px;}
-.vip-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:12px;color:#374151;}
-.vip-pill{background:#f4f5fb;padding:4px 8px;border-radius:7px;font-weight:bold;}
-.task-icon{font-size:19px;margin-bottom:5px;}
-.countdown-badge{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:8px;background:#f1f0ff;color:var(--primary);font-weight:bold;font-size:13px;font-variant-numeric:tabular-nums;}
-
-.live-activity{background:#17172b;color:white;padding:14px;border-radius:14px;margin-top:14px;overflow:hidden;}
-.live-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px;}
-.live-dot{width:8px;height:8px;background:#22c985;border-radius:50%;display:inline-block;margin-right:5px;animation:pulse 1.2s infinite;}
-@keyframes pulse{50%{opacity:.3}}
-.activity-window{height:150px;overflow:hidden;}
-.activity-track{animation:activityScroll 18s linear infinite;}
-.activity-window:hover .activity-track{animation-play-state:paused;}
-.activity-entry{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;margin-bottom:6px;background:#25253e;border-radius:8px;font-size:12px;}
-.activity-entry strong{color:#67e5ae;}
-@keyframes activityScroll{from{transform:translateY(0)}to{transform:translateY(-50%)}}
-
-#stepLoader{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#17172b,#302b9d,#635bff);color:white;display:flex;align-items:center;justify-content:center;padding:20px;}
-.step-box{width:100%;max-width:300px;background:rgba(23,23,43,.88);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:20px;text-align:center;}
-.step-pct{font-size:24px;font-weight:bold;margin-bottom:10px;}
-.step-track{width:100%;height:9px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;}
-.step-fill{width:25%;height:100%;background:#fff;border-radius:999px;transition:width .35s ease;}
-
-@media(max-width:600px){
-  #application{font-size:13px}
-  #application h2{font-size:16px}
-  #application h3{font-size:14px}
-  #application .balance h1{font-size:21px}
-  .nav-btn{font-size:9px}
-  .nav-btn span{font-size:15px}
-}
-
-@media(min-width:650px){
-.bottom-nav{max-width:650px;left:50%;transform:translateX(-50%);border-radius:15px 15px 0 0}
-}
-
-/* ADMIN PANEL */
-#adminPanel{position:fixed;inset:0;z-index:10000;background:var(--bg);overflow-y:auto;padding-bottom:20px}
-.admin-header{background:linear-gradient(130deg,#17172b,#302b9d);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-.admin-header h2{font-size:16px}
-.admin-tabs{display:flex;gap:4px;padding:10px;background:#fff;border-bottom:1px solid #eee;overflow-x:auto;position:sticky;top:52px;z-index:4}
-.admin-tab{flex:0 0 auto;padding:8px 12px;border-radius:8px;background:#f4f5fb;border:0;font-size:12px;font-weight:bold;color:var(--muted);cursor:pointer;white-space:nowrap}
-.admin-tab.active{background:var(--primary);color:#fff}
-.admin-body{padding:12px;max-width:800px;margin:auto}
-.admin-req{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #eee;font-size:13px}
-.admin-req .row{display:flex;justify-content:space-between;gap:8px;margin:3px 0}
-.admin-req .actions{display:flex;gap:6px;margin-top:10px}
-.admin-req .actions button{flex:1;padding:8px;border-radius:7px;border:0;font-weight:bold;font-size:12px;cursor:pointer}
-.btn-approve{background:#d9f7e9;color:#087b4c}
-.btn-reject{background:#ffe1e4;color:#bd2636}
-.admin-login{max-width:340px;margin:60px auto;background:#fff;padding:22px;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.1)}
-.admin-login h2{text-align:center;margin-bottom:16px;color:var(--primary)}
-.cfg-field{margin-bottom:10px}
-.cfg-field label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+header{background:var(--dark);color:white;padding:16px 5%;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:23px;font-weight:bold}
+.lang{background:white;color:var(--dark);padding:9px 14px;border-radius:8px;font-weight:bold}
+.container{max-width:1100px;margin:25px auto;padding:0 15px}
+.auth{max-width:420px;margin:65px auto;background:white;padding:28px;border-radius:16px;box-shadow:0 5px 25px #0001}
+h2{margin-bottom:20px}
+input{width:100%;padding:13px;margin:9px 0;border:1px solid #d5e4d9;border-radius:8px;outline-color:var(--green)}
+.primary{background:var(--green);color:white;padding:13px;border-radius:8px;width:100%;font-weight:bold;margin-top:10px}
+.link{color:var(--green);cursor:pointer;font-weight:bold}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+.nav button{background:white;padding:11px 15px;border-radius:8px;color:var(--dark);font-weight:bold}
+.nav button.active,.nav button:hover{background:var(--green);color:white}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px;margin:20px 0}
+.card{background:white;padding:20px;border-radius:13px;box-shadow:0 3px 15px #00000008}
+.card h3{font-size:14px;color:#718579;margin-bottom:12px}
+.amount{font-size:25px;font-weight:bold;color:var(--green)}
+.panel{background:white;padding:22px;border-radius:13px;margin:15px 0}
+.package{border:1px solid #dcebe0;border-radius:12px;padding:20px;background:#fff}
+.package h3{color:var(--green);margin-bottom:10px}
+.package p{margin:8px 0;color:#607368}
+.package button{background:var(--green);color:white;padding:11px;border-radius:7px;width:100%;margin-top:12px}
+.notice{background:#fff4d9;padding:13px;border-radius:8px;color:#745b19;font-size:13px;line-height:1.6;margin:12px 0}
+table{width:100%;border-collapse:collapse}
+td,th{text-align:left;padding:12px;border-bottom:1px solid #eee;font-size:14px}
+.small{color:#718579;font-size:13px;margin-top:12px}
+footer{text-align:center;padding:25px;color:#718579;font-size:13px}
 </style>
 </head>
-
 <body>
 
-<div id="stepLoader" class="hidden">
-  <div class="step-box">
-    <div class="step-pct" id="stepPct">25%</div>
-    <div class="step-track">
-      <div class="step-fill" id="stepFill"></div>
-    </div>
-  </div>
-</div>
-
-<div id="toastMsg" class="toast-msg hidden"></div>
-
-<!-- AUTH SECTION -->
-<section id="auth" class="auth-wrap">
-  <div class="auth-lang-bar">
-    <div class="lang-switch">
-      <button type="button" class="lang-btn" data-lang="am">አማ</button>
-      <button type="button" class="lang-btn active" data-lang="en">EN</button>
-    </div>
-  </div>
-
-  <div class="logo" id="mainLogo">BaweReal</div>
-
-  <div class="card">
-    <div class="auth-tabs" id="authTabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')" id="tabLoginBtn">Login</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')" id="tabRegisterBtn">Register</button>
-    </div>
-
-    <div class="auth-forms-container">
-      <div class="auth-form-col" id="loginBox">
-        <h3 style="margin-bottom:10px;" data-i18n="welcomeBack">Welcome Back</h3>
-        <p class="muted" style="margin-bottom:10px;" data-i18n="loginSubtitle">Login to your account</p>
-        <input id="loginEmail" type="email" placeholder="Email address">
-        <input id="loginPassword" type="password" placeholder="Password">
-        <button class="btn" id="loginBtn" data-i18n="loginBtn">Login</button><br><br>
-        <p class="link" onclick="showForgot()" data-i18n="forgotPassword">Forgot Password?</p>
-      </div>
-
-      <div class="auth-form-col hidden" id="registerBox">
-        <h3 style="margin-bottom:10px;" data-i18n="createAccount">Create Account</h3>
-        <p class="muted" style="margin-bottom:10px;">Start your journey</p>
-        <input id="regName" placeholder="Full name">
-        <input id="regEmail" type="email" placeholder="Email address">
-        <input id="regPassword" type="password" placeholder="Password">
-        <input id="regConfirm" type="password" placeholder="Confirm password">
-        <button class="btn" id="registerBtn" data-i18n="registerBtn">Register</button>
-      </div>
-    </div>
-
-    <div class="hidden" id="forgotBox" style="margin-top: 20px;">
-      <h3 data-i18n="resetPassword" style="margin-bottom:10px;">Reset Password</h3>
-      <p class="muted" data-i18n="resetHint" style="margin-bottom:10px;">Enter your registered email address.</p>
-      <input id="forgotEmail" type="email" placeholder="Email address">
-      <button class="btn" id="resetBtn" data-i18n="sendResetLink">Send Reset Link</button><br><br>
-      <p class="link" onclick="showLogin()" data-i18n="backToLogin">Back to Login</p>
-    </div>
-  </div>
-</section>
-
-<section id="application" class="hidden">
 <header>
-  <div>
-    <h2>BaweReal</h2>
-    <small style="color:#ddd" id="headerName">Welcome</small>
-  </div>
-  <div class="header-right">
-    <div class="lang-switch">
-      <button type="button" class="lang-btn" data-lang="am">አማ</button>
-      <button type="button" class="lang-btn active" data-lang="en">EN</button>
-    </div>
-    <button class="btn small danger" id="logoutBtn" data-i18n="logout">Logout</button>
-  </div>
+ <div class="logo">🌱 GreenVest</div>
+ <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
 </header>
 
-<main class="container">
+<!-- LOGIN -->
+<div id="auth" class="auth">
+ <h2 id="authTitle">Welcome Back</h2>
+ <div id="registerFields" class="hidden">
+  <input id="fullname" placeholder="Full Name">
+  <input id="referral" placeholder="Referral Code (Optional)">
+ </div>
+ <input id="email" type="email" placeholder="Email Address">
+ <input id="password" type="password" placeholder="Password">
+ <button class="primary" onclick="login()" id="authBtn">Login</button>
+ <p class="small" id="switchText">Don't have an account?
+ <span class="link" onclick="switchAuth()">Register</span></p>
+ <p class="small" id="authMsg"></p>
+</div>
 
-<section id="homePage">
-  <div class="balance">
-    <div class="balance-top-row">
-      <p data-i18n="currentBalance">Current Balance</p>
-      <button type="button" class="corner-refresh-btn" id="homeCornerRefreshBtn" title="Refresh Balance">
-        <span class="refresh-icon">↻</span>
-        <span data-i18n="refreshBalance">Refresh Balance</span>
-      </button>
-    </div>
-    <h1 id="balanceText">0.00 ETB</h1>
-    <small style="color:#eee" id="lastSyncText" data-i18n="verifiedBalance">Verified balance</small>
+<!-- DASHBOARD -->
+<main id="app" class="container hidden">
+ <h2 id="welcome">Welcome to your Dashboard 👋</h2>
+ <div class="cards">
+  <div class="card"><h3 data-en="Account Balance" data-am="የሂሳብ ቀሪ ሂሳብ">Account Balance</h3><div class="amount" id="balance">$0.00</div></div>
+  <div class="card"><h3 data-en="Total Investment" data-am="ጠቅላላ ኢንቨስትመንት">Total Investment</h3><div class="amount" id="invested">$0.00</div></div>
+  <div class="card"><h3 data-en="Referral Count" data-am="የጋበዝካቸው ሰዎች">Referral Count</h3><div class="amount" id="refCount">0</div></div>
+ </div>
+
+ <div class="nav">
+  <button class="active" onclick="showPage('home',this)" data-en="Dashboard" data-am="ዳሽቦርድ">Dashboard</button>
+  <button onclick="showPage('deposit',this)" data-en="Deposit" data-am="ገንዘብ አስገባ">Deposit</button>
+  <button onclick="showPage('withdraw',this)" data-en="Withdraw" data-am="ገንዘብ አውጣ">Withdraw</button>
+  <button onclick="showPage('packages',this)" data-en="Packages" data-am="ፓኬጆች">Packages</button>
+  <button onclick="showPage('referral',this)" data-en="Referral" data-am="ጋብዣ">Referral</button>
+  <button onclick="showPage('history',this)" data-en="History" data-am="ታሪክ">History</button>
+  <button onclick="logout()" data-en="Logout" data-am="ውጣ">Logout</button>
+ </div>
+
+ <section id="home" class="page">
+  <div class="panel">
+   <h2 data-en="Account Overview" data-am="የሂሳብ አጠቃላይ እይታ">Account Overview</h2>
+   <p data-en="Welcome to your GreenVest account." data-am="ወደ GreenVest መለያዎ እንኳን በደህና መጡ።">Welcome to your GreenVest account.</p>
+   <p class="small">Manage your account, review your activity and explore available packages.</p>
   </div>
+ </section>
 
-  <div class="grid">
-    <div class="action" onclick="openPage('deposit')"><span class="emoji">💳</span><strong data-i18n="deposit">Deposit</strong></div>
-    <div class="action" onclick="openPage('withdraw')"><span class="emoji">💸</span><strong data-i18n="withdrawal">Withdrawal</strong></div>
-    <div class="action" onclick="openPage('history')"><span class="emoji">📋</span><strong data-i18n="history">History</strong></div>
-    <div class="action" onclick="openPage('referral')"><span class="emoji">👥</span><strong data-i18n="referral">Referral</strong></div>
-    <div class="action" onclick="openPage('packages')"><span class="emoji">📦</span><strong data-i18n="packages">Packages</strong></div>
-    <div class="action" onclick="openPage('support')"><span class="emoji">💬</span><strong data-i18n="support">Support</strong></div>
-    <div class="action" onclick="openPage('notifications')"><span class="emoji">🔔</span><strong data-i18n="notifications">Notifications</strong></div>
-    <div class="action" onclick="openPage('faq')"><span class="emoji">❓</span><strong data-i18n="faq">Help / FAQ</strong></div>
-    <div class="action" onclick="openPage('task')"><span class="emoji">🎯</span><strong data-i18n="task">Task</strong></div>
+ <section id="deposit" class="page hidden">
+  <div class="panel">
+   <h2 data-en="Deposit Funds" data-am="ገንዘብ ማስገባት">Deposit Funds</h2>
+   <input type="number" id="depositAmount" placeholder="Amount in USD" min="1">
+   <select id="depositMethod" style="width:100%;padding:13px;border-radius:8px;border:1px solid #ddd">
+    <option>Bank Transfer</option>
+    <option>Mobile Money</option>
+    <option>Other Payment Method</option>
+   </select>
+   <input id="depositReference" placeholder="Payment Reference (Optional)">
+   <button class="primary" onclick="requestMoney('Deposit')">Submit Deposit Request</button>
+   <div class="notice">Demo only: this request does not transfer money. Real deposits require a verified payment provider.</div>
   </div>
+ </section>
 
-  <div class="card" style="margin-top:14px">
-    <h3 data-i18n="recentActivity">Recent Activity</h3>
-    <div id="recentActivity" class="empty" data-i18n="noRecentActivity">No recent activity.</div>
+ <section id="withdraw" class="page hidden">
+  <div class="panel">
+   <h2 data-en="Withdraw Funds" data-am="ገንዘብ ማውጣት">Withdraw Funds</h2>
+   <input type="number" id="withdrawAmount" placeholder="Amount in USD" min="1">
+   <input id="withdrawMethod" placeholder="Bank / Mobile Money Details">
+   <button class="primary" onclick="requestMoney('Withdrawal')">Submit Withdrawal Request</button>
+   <div class="notice">Demo only: withdrawal requests are recorded locally and are not processed.</div>
   </div>
-</section>
+ </section>
 
-<section id="depositPage" class="hidden">
-<h2 class="page-title" data-i18n="deposit">Deposit</h2>
-<div class="card">
-  <h3 data-i18n="selectPaymentMethod">Select Payment Method</h3>
-  <div class="method" id="telebirrCard" onclick="chooseMethod('Telebirr')">
-    <div class="method-left"><span class="brand">📱</span><div><strong>Telebirr</strong><p class="muted" data-i18n="mobilePayment">Mobile payment</p></div></div>
-    <strong>›</strong>
+ <section id="packages" class="page hidden">
+  <h2 data-en="Investment Packages" data-am="የኢንቨስትመንት ፓኬጆች">Investment Packages</h2>
+  <div class="cards">
+   <div class="package">
+    <h3>Starter</h3><p>Illustrative package</p><p>Starting amount: $50</p>
+    <button onclick="selectPackage('Starter',50)">Select Package</button>
+   </div>
+   <div class="package">
+    <h3>Growth</h3><p>Illustrative package</p><p>Starting amount: $200</p>
+    <button onclick="selectPackage('Growth',200)">Select Package</button>
+   </div>
+   <div class="package">
+    <h3>Premium</h3><p>Illustrative package</p><p>Starting amount: $500</p>
+    <button onclick="selectPackage('Premium',500)">Select Package</button>
+   </div>
   </div>
-  <div class="method" id="cbeCard" onclick="chooseMethod('CBE')">
-    <div class="method-left"><span class="brand">🏦</span><div><strong>CBE</strong><p class="muted">Commercial Bank of Ethiopia</p></div></div>
-    <strong>›</strong>
+  <div class="notice">These are sample package options, not actual investment offers or promises of profit. Real investments need clear risk disclosures and legal compliance.</div>
+ </section>
+
+ <section id="referral" class="page hidden">
+  <div class="panel">
+   <h2 data-en="Invite Friends" data-am="ጓደኞችን ጋብዝ">Invite Friends</h2>
+   <p>Your referral code:</p>
+   <div class="amount" id="myCode">GV-DEMO</div>
+   <button class="primary" onclick="copyCode()">Copy Referral Code</button>
+   <p class="small">Referral rewards must be configured transparently and according to applicable laws. No earnings are generated in this demo.</p>
   </div>
-  <select id="depositMethod">
-    <option value="">Choose method</option>
-    <option value="Telebirr">Telebirr</option>
-    <option value="CBE">CBE</option>
-  </select>
-  <div class="notice" data-i18n="depositNotice">Transfer the payment to the selected account and enter your transaction ID. Your request will be reviewed before your balance is updated.</div>
+ </section>
 
-  <div class="account-box" id="telebirrAccountBox">
-    <strong>Telebirr Account</strong>
-    <p id="telebirrAccountText" style="font-size:16px;margin:6px 0">0964488470</p>
-    <button class="btn secondary" id="copyTelebirrBtn" onclick="copyAccount(document.getElementById('telebirrAccountText').textContent)" data-i18n="copyTelebirr">Copy Telebirr Number</button>
+ <section id="history" class="page hidden">
+  <div class="panel">
+   <h2 data-en="Transaction History" data-am="የግብይት ታሪክ">Transaction History</h2>
+   <div style="overflow-x:auto">
+    <table>
+     <thead><tr><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+     <tbody id="historyRows"><tr><td colspan="3">No transactions yet</td></tr></tbody>
+    </table>
+   </div>
   </div>
-
-  <div class="account-box" id="cbeAccountBox">
-    <strong>CBE Account</strong>
-    <p id="cbeAccountText" style="font-size:16px;margin:6px 0">10000298833585</p>
-    <button class="btn secondary" id="copyCbeBtn" onclick="copyAccount(document.getElementById('cbeAccountText').textContent)" data-i18n="copyCbe">Copy CBE Number</button>
-  </div>
-
-  <label data-i18n="depositAmountLabel">Deposit Amount (ETB)</label>
-  <input id="depositAmount" type="number" min="300" max="10000" placeholder="Enter amount">
-  <label data-i18n="transactionIdLabel">Transaction ID</label>
-  <input id="depositTransactionId" type="text" placeholder="Enter payment transaction ID">
-  <label data-i18n="noteOptional">Note (optional)</label>
-  <textarea id="depositNote" placeholder="Additional information"></textarea>
-  <button class="btn" id="depositBtn" data-i18n="submitDeposit">Submit Deposit Request</button>
-  <p class="muted" style="margin-top:10px" data-i18n="depositDisclaimer">Submission does not mean payment has been verified. Your balance changes only after approval.</p>
-</div>
-
-<div class="live-activity">
-  <div class="live-title"><strong data-i18n="depositActivity">Deposit Activity</strong><span style="font-size:11.5px;color:#67e5ae"><span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span></span></div>
-  <div class="activity-window"><div class="activity-track" id="depositActivityTrack"></div></div>
-</div>
-
-<div class="card" style="margin-top:13px">
-  <h3 data-i18n="myDepositHistory">My Deposit History</h3>
-  <div id="depositHistory"><div class="empty">No deposit history loaded yet.</div></div>
-</div>
-</section>
-
-<section id="withdrawPage" class="hidden">
-<h2 class="page-title" data-i18n="withdrawal">Withdrawal</h2>
-<div class="card">
-  <h3 data-i18n="withdrawalRequest">Withdrawal Request</h3>
-  <p class="muted" data-i18n="enterPaymentDetails">Enter your payment details carefully.</p>
-  <label data-i18n="paymentMethodLabel">Payment Method</label>
-  <select id="withdrawMethod">
-    <option value="">Choose payment method</option>
-    <option value="Telebirr">Telebirr</option>
-    <option value="CBE">CBE</option>
-  </select>
-  <label data-i18n="accountHolderName">Account Holder Name</label>
-  <input id="withdrawName" placeholder="Full name">
-  <label data-i18n="accountNumberLabel">Account Number / Phone Number</label>
-  <input id="withdrawAccount" placeholder="Telebirr or CBE account">
-  <label data-i18n="withdrawalAmountLabel">Withdrawal Amount (ETB)</label>
-  <input id="withdrawAmount" type="number" min="100" max="5000" placeholder="Enter amount">
-  <label>Transaction Fee (0.04%)</label>
-  <input id="withdrawFee" type="text" value="0.00 ETB" readonly>
-  <label>Net Amount (ETB)</label>
-  <input id="withdrawNet" type="text" value="0.00 ETB" readonly>
-  <label data-i18n="additionalNoteOptional">Additional Note (Optional)</label>
-  <textarea id="withdrawNote" placeholder="Write additional information"></textarea>
-  <div class="notice" id="withdrawLimitsNotice" data-i18n="withdrawLimitsNotice">Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.</div>
-  <button class="btn" id="withdrawBtn" data-i18n="submitWithdrawal">Submit Withdrawal Request</button>
-</div>
-
-<div class="live-activity">
-  <div class="live-title"><strong data-i18n="withdrawalActivity">Withdrawal Activity</strong><span style="font-size:11.5px;color:#67e5ae"><span class="live-dot"></span><span data-i18n="activityDisplay">Activity Display</span></span></div>
-  <div class="activity-window"><div class="activity-track" id="withdrawActivityTrack"></div></div>
-</div>
-
-<div class="card" style="margin-top:13px">
-  <h3 data-i18n="myWithdrawalHistory">My Withdrawal History</h3>
-  <div id="withdrawHistory"><div class="empty">No withdrawal history loaded yet.</div></div>
-</div>
-</section>
-
-<section id="referralPage" class="hidden">
-<h2 class="page-title" data-i18n="referral">Referral</h2>
-<div class="card">
-  <h3 data-i18n="yourReferralCode">Your Referral Code</h3>
-  <p class="muted" data-i18n="inviteRewardInfo">Invite friends and earn 100 ETB per referral! Share your invite link or code.</p><br>
-  <h2 id="referralCode">Loading...</h2>
-  <div class="account-box" style="margin-top:12px">
-    <strong data-i18n="yourInviteLink">Your Invite Link</strong>
-    <input id="referralLinkInput" type="text" readonly>
-    <button class="btn secondary" id="copyReferralLinkBtn" data-i18n="copyInviteLink">Copy Invite Link</button>
-  </div>
-  <button class="btn" style="margin-top:8px" id="copyReferralBtn" data-i18n="copyReferralCode">Copy Referral Code</button>
-  <div class="stat-grid" style="margin-top:12px">
-    <div class="stat"><span class="muted" data-i18n="acceptedInvites">Accepted Invitations</span><strong id="referralCountText">0</strong></div>
-    <div class="stat"><span class="muted" data-i18n="referralStatusLabel">Invitation Status</span><strong id="referralMilestoneText">0 accepted</strong></div>
-  </div>
-  <div class="notice" id="referralBonusNotice">Invite bonus: <strong>100 ETB</strong> for inviting a friend.</div>
-  <div class="account-box" style="margin-top:12px">
-    <strong data-i18n="acceptInviteTitle">Accept / Record Friend's Referral Code</strong>
-    <input id="invitedByCodeInput" type="text" placeholder="e.g. BW12345678">
-    <button class="btn secondary" id="applyReferralBtn" data-i18n="applyInviteCodeBtn">Accept Invitation (+1 Count)</button>
-  </div>
-</div>
-</section>
-
-<section id="packagesPage" class="hidden">
-<h2 class="page-title" data-i18n="packages">Packages</h2>
-<div class="card">
-  <h3 data-i18n="vipPackagesTitle">VIP Packages (VIP 1 – VIP 10 • 10 Days Validity)</h3>
-  <p class="muted" data-i18n="vipStepDesc">Each VIP lasts for 10 days only. After 10 days, purchase a new VIP. Daily profit starts at 10% for 2,000 ETB, 20% for 4,000 ETB, 30% for 6,000 ETB, up to 100% for 20,000 ETB.</p>
-  <div id="activeVipStatusBox" class="notice" style="margin-top:10px">No active 10-day VIP package right now.</div>
-</div>
-<div id="packagesList"></div>
-</section>
-
-<section id="taskPage" class="hidden">
-  <h2 class="page-title" data-i18n="dailyTasks">Daily Tasks</h2>
-  <div class="card">
-    <h3 data-i18n="availableTasks">Available Tasks</h3>
-    <div class="task-card">
-      <div class="task-icon">⏱️</div>
-      <strong>24-Hour Task — <span id="task24RewardLabel">50</span> ETB</strong>
-      <p class="muted" data-i18n="task24Desc">Complete once every 24 hours. A 24-hour cooldown timer runs after completion.</p>
-      <div class="countdown-badge" id="task24Countdown">24:00:00</div>
-      <div style="margin-top:10px"><button type="button" class="btn" id="claimTask24Btn">Complete 24-Hour Task</button></div>
-      <span class="status pending" id="task24Status">Ready</span>
-    </div>
-    <div class="task-card">
-      <div class="task-icon">👥</div>
-      <strong>Referral Task — <span id="referralRewardLabel">100</span> ETB</strong>
-      <p class="muted" data-i18n="inviteRewardDesc">Earn 100 ETB when invited friends join.</p>
-      <span class="status pending">100 ETB</span>
-    </div>
-    <div class="notice" id="balanceControlNotice">Balance is verified and updated after approval.</div>
-  </div>
-</section>
-
-<section id="historyPage" class="hidden">
-<h2 class="page-title" data-i18n="transactionHistory">Transaction History</h2>
-<div class="card">
-  <select id="historyFilter">
-    <option value="all">All Requests (Deposits, Withdrawals, Investments)</option>
-    <option value="deposit">Deposits</option>
-    <option value="withdrawal">Withdrawals</option>
-    <option value="investment">Investments</option>
-  </select>
-  <div id="historyList"><div class="empty">No history loaded yet.</div></div>
-</div>
-</section>
-
-<section id="profilePage" class="hidden">
-<h2 class="page-title" data-i18n="myProfile">My Profile</h2>
-<div class="balance">
-  <div class="balance-top-row">
-    <p data-i18n="currentBalance">Current Balance</p>
-    <button type="button" class="corner-refresh-btn" id="profileCornerRefreshBtn" title="Refresh Balance"><span class="refresh-icon">↻</span><span data-i18n="refreshBalance">Refresh Balance</span></button>
-  </div>
-  <h1 id="profileBalance">0.00 ETB</h1>
-  <small style="color:#eee" data-i18n="verifiedBalance">Verified balance</small>
-</div>
-<div class="card">
-  <h3 data-i18n="depositSummary">Deposit Summary</h3>
-  <div class="stat-grid">
-    <div class="stat"><span class="muted" data-i18n="totalDeposits">Total Deposits</span><strong id="totalDeposits">0.00 ETB</strong></div>
-    <div class="stat"><span class="muted">Approved</span><strong id="approvedDeposits">0.00 ETB</strong></div>
-    <div class="stat"><span class="muted">Pending</span><strong id="pendingDeposits">0.00 ETB</strong></div>
-    <div class="stat"><span class="muted">Rejected</span><strong id="rejectedDeposits">0.00 ETB</strong></div>
-  </div>
-</div>
-<div class="card">
-  <h3 data-i18n="accountInformation">Account Information</h3>
-  <p class="muted" data-i18n="fullName">Full Name</p><p id="profileName" style="margin:4px 0 12px">-</p>
-  <p class="muted" data-i18n="emailAddress">Email Address</p><p id="profileEmail" style="margin:4px 0 12px">-</p>
-  <p class="muted" data-i18n="emailVerification">Email Verification</p><p id="emailVerificationStatus" style="margin:4px 0 8px">-</p>
-  <button class="btn secondary" id="verifyEmailBtn" data-i18n="sendVerificationEmail">Send Verification Email</button>
-  <p class="muted" style="margin-top:14px">User ID</p><p id="profileUid" style="margin:4px 0 8px;word-break:break-all">-</p>
-  <button class="btn secondary" id="copyUidBtn" data-i18n="copyUserId">Copy User ID</button>
-  <p class="muted" style="margin-top:14px" data-i18n="accountStatus">Account Status</p><p id="profileStatus" style="margin-top:4px">-</p>
-</div>
-<div class="card">
-  <h3 data-i18n="accountSecurity">Account Security</h3>
-  <p class="muted" data-i18n="securityHint">To change your password, use the secure password reset link sent to your email.</p>
-  <button class="btn secondary" id="profileResetPasswordBtn" style="margin-top:10px" data-i18n="sendResetLink">Send Password Reset Link</button>
-  <div class="notice" data-i18n="neverSharePass">Never share your password or verification code with anyone.</div>
-</div>
-</section>
-
-<section id="supportPage" class="hidden">
-<h2 class="page-title" data-i18n="support">Support</h2>
-<div class="card">
-  <h3 data-i18n="contactSupport">Contact Support</h3>
-  <textarea id="supportMessage" placeholder="Write your message..."></textarea>
-  <button class="btn" id="supportBtn" data-i18n="sendMessage">Send Message</button>
-</div>
-<div class="card">
-  <h3 data-i18n="mySupportRequests">My Support Requests</h3>
-  <div id="supportHistory"><div class="empty">No support messages yet.</div></div>
-</div>
-</section>
-
-<section id="notificationsPage" class="hidden">
-<h2 class="page-title" data-i18n="notifications">Notifications</h2>
-<div class="card">
-  <h3 data-i18n="myRequestUpdates">My Request Updates</h3>
-  <p class="muted" data-i18n="requestUpdatesDesc">Updates about your deposit, withdrawal, and investment requests.</p>
-  <div class="feature-row"><button class="btn secondary" id="refreshNotificationsBtn">↻ <span data-i18n="refresh">Refresh</span></button></div>
-  <div id="notificationsList"><div class="empty">No notifications loaded yet.</div></div>
-</div>
-</section>
-
-<section id="faqPage" class="hidden">
-<h2 class="page-title" data-i18n="faq">Help / FAQ</h2>
-<div class="card">
-  <h3 data-i18n="faqTitle">Frequently Asked Questions</h3>
-  <div class="faq-item"><strong>1. How do I deposit?</strong><p class="muted">Choose Deposit, select a payment method, transfer the amount, enter the transaction ID and submit your request.</p></div>
-  <div class="faq-item"><strong>2. When will my deposit be approved?</strong><p class="muted">Your request must be reviewed and the payment verified before the balance can be updated.</p></div>
-  <div class="faq-item"><strong>3. Why is my deposit pending?</strong><p class="muted">It means the request has been submitted but has not yet been reviewed.</p></div>
-  <div class="faq-item"><strong>4. How do I request a withdrawal?</strong><p class="muted">Open Withdrawal, enter your payment details and submit your request.</p></div>
-  <div class="faq-item"><strong>5. How do VIP packages work?</strong><p class="muted">VIP packages run from 2,000 ETB (10% daily profit) up to 20,000 ETB (100% daily profit) for 10 days only. After 10 days, purchase a new VIP.</p></div>
-  <div class="faq-item"><strong>6. How can I contact support?</strong><p class="muted">Open Support, write your message and submit it.</p></div>
-  <div class="faq-item"><strong>7. Does submitting a request update my balance immediately?</strong><p class="muted">No. Balance changes happen after review and approval.</p></div>
-</div>
-</section>
-
+ </section>
 </main>
 
-<nav class="bottom-nav">
-  <button class="nav-btn active" data-page="home" onclick="openPage('home')"><span>🏠</span><span data-i18n="navHome">Home</span></button>
-  <button class="nav-btn" data-page="deposit" onclick="openPage('deposit')"><span>💳</span><span data-i18n="deposit">Deposit</span></button>
-  <button class="nav-btn" data-page="withdraw" onclick="openPage('withdraw')"><span>💸</span><span data-i18n="navWithdraw">Withdraw</span></button>
-  <button class="nav-btn" data-page="history" onclick="openPage('history')"><span>📋</span><span data-i18n="history">History</span></button>
-  <button class="nav-btn" data-page="profile" onclick="openPage('profile')"><span>👤</span><span data-i18n="navProfile">Profile</span></button>
-</nav>
-</section>
-
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="hidden">
-  <div id="adminLoginView" class="admin-login">
-    <h2>🔐 Admin Login</h2>
-    <input id="adminPassword" type="password" placeholder="Admin password" style="margin-bottom:10px">
-    <button class="btn" onclick="adminLogin()">Enter Admin</button>
-    <button class="btn secondary" style="margin-top:8px" onclick="closeAdmin()">Cancel</button>
-  </div>
-
-  <div id="adminDashView" class="hidden">
-    <div class="admin-header">
-      <div>
-        <h2>⚙️ BaweReal Admin</h2>
-        <small style="color:#ccc" id="adminConfigInfo">Config loaded</small>
-      </div>
-      <button class="btn small danger" onclick="closeAdmin()">Exit</button>
-    </div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" data-atab="deposits" onclick="switchAdminTab('deposits')">Deposits</button>
-      <button class="admin-tab" data-atab="withdrawals" onclick="switchAdminTab('withdrawals')">Withdrawals</button>
-      <button class="admin-tab" data-atab="investments" onclick="switchAdminTab('investments')">Investments</button>
-      <button class="admin-tab" data-atab="referrals" onclick="switchAdminTab('referrals')">Referrals</button>
-      <button class="admin-tab" data-atab="balance" onclick="switchAdminTab('balance')">Balance</button>
-      <button class="admin-tab" data-atab="config" onclick="switchAdminTab('config')">Config</button>
-    </div>
-    <div class="admin-body" id="adminBody"></div>
-  </div>
-</div>
+<footer>© 2026 GreenVest. Demo platform.</footer>
 
 <script>
-const TRANSLATIONS = {
-  en: {
-    welcomeBack: "Welcome Back", loginSubtitle: "Login to your account", loginBtn: "Login",
-    forgotPassword: "Forgot Password?", noAccount: "Don't have an account?",
-    createAccount: "Create Account", registerBtn: "Register", haveAccount: "Already have an account?",
-    resetPassword: "Reset Password", resetHint: "Enter your registered email address.",
-    sendResetLink: "Send Reset Link", backToLogin: "Back to Login", logout: "Logout",
-    currentBalance: "Current Balance", verifiedBalance: "Verified balance", refreshBalance: "Refresh Balance",
-    deposit: "Deposit", withdrawal: "Withdrawal", history: "History", referral: "Referral",
-    packages: "Packages", support: "Support", notifications: "Notifications", faq: "Help / FAQ", task: "Task",
-    recentActivity: "Recent Activity", noRecentActivity: "No recent activity.",
-    depositActivity: "Deposit Activity", withdrawalActivity: "Withdrawal Activity", activityDisplay: "Activity Display",
-    selectPaymentMethod: "Select Payment Method", mobilePayment: "Mobile payment",
-    depositNotice: "Transfer the payment to the selected account and enter your transaction ID. Your request will be reviewed before your balance is updated.",
-    copyTelebirr: "Copy Telebirr Number", copyCbe: "Copy CBE Number",
-    depositAmountLabel: "Deposit Amount (ETB)", transactionIdLabel: "Transaction ID", noteOptional: "Note (optional)",
-    submitDeposit: "Submit Deposit Request",
-    depositDisclaimer: "Submission does not mean payment has been verified. Your balance changes only after approval.",
-    myDepositHistory: "My Deposit History",
-    withdrawalRequest: "Withdrawal Request", enterPaymentDetails: "Enter your payment details carefully.",
-    paymentMethodLabel: "Payment Method", accountHolderName: "Account Holder Name",
-    accountNumberLabel: "Account Number / Phone Number", withdrawalAmountLabel: "Withdrawal Amount (ETB)",
-    additionalNoteOptional: "Additional Note (Optional)",
-    withdrawLimitsNotice: "Minimum withdrawal: 100 ETB. Maximum withdrawal: 5,000 ETB. Fee is 0.04%.",
-    submitWithdrawal: "Submit Withdrawal Request", myWithdrawalHistory: "My Withdrawal History",
-    yourReferralCode: "Your Referral Code", yourInviteLink: "Your Invite Link", copyInviteLink: "Copy Invite Link",
-    acceptedInvites: "Accepted Invitations", referralStatusLabel: "Invitation Status",
-    acceptInviteTitle: "Accept / Record Friend's Referral Code",
-    inviteRewardInfo: "Invite friends and earn 100 ETB per referral! Share your invite link or code.",
-    copyReferralCode: "Copy Referral Code", applyInviteCodeBtn: "Accept Invitation (+1 Count)",
-    vipPackagesTitle: "VIP Packages (VIP 1 – VIP 10 • 10 Days Validity)",
-    vipStepDesc: "Each VIP lasts for 10 days only. After 10 days, purchase a new VIP. Daily profit starts at 10% for 2,000 ETB, 20% for 4,000 ETB, 30% for 6,000 ETB, up to 100% for 20,000 ETB.",
-    dailyTasks: "Daily Tasks", availableTasks: "Available Tasks",
-    task24Desc: "Complete once every 24 hours. A 24-hour cooldown timer runs after completion.",
-    inviteRewardDesc: "Earn 100 ETB when invited friends join.",
-    transactionHistory: "Transaction History", myProfile: "My Profile",
-    depositSummary: "Deposit Summary", totalDeposits: "Total Deposits",
-    accountInformation: "Account Information", fullName: "Full Name", emailAddress: "Email Address",
-    emailVerification: "Email Verification", sendVerificationEmail: "Send Verification Email",
-    copyUserId: "Copy User ID", accountStatus: "Account Status", accountSecurity: "Account Security",
-    securityHint: "To change your password, use the secure password reset link sent to your email.",
-    neverSharePass: "Never share your password or verification code with anyone.",
-    contactSupport: "Contact Support", sendMessage: "Send Message", mySupportRequests: "My Support Requests",
-    myRequestUpdates: "My Request Updates", requestUpdatesDesc: "Updates about your deposit, withdrawal, and investment requests.",
-    refresh: "Refresh", faqTitle: "Frequently Asked Questions",
-    navHome: "Home", navWithdraw: "Withdraw", navProfile: "Profile", buyPackage: "Buy VIP (10 Days)"
-  },
-  am: {
-    welcomeBack: "እንኳን ደህና መጡ", loginSubtitle: "ወደ መለያዎ ይግቡ", loginBtn: "ግባ",
-    forgotPassword: "የይለፍ ቃል ረሱ?", noAccount: "መለያ የለዎትም?",
-    createAccount: "መለያ ይፍጠሩ", registerBtn: "ይመዝገቡ", haveAccount: "ቀድሞ መለያ አለዎት?",
-    resetPassword: "የይለፍ ቃል ዳግም ያስጀምሩ", resetHint: "የተመዘገቡበትን ኢሜይል አድራሻ ያስገቡ።",
-    sendResetLink: "የዳግም ማስጀመሪያ ሊንክ ላክ", backToLogin: "ወደ መግቢያ ይመለሱ", logout: "ውጣ",
-    currentBalance: "ያለዎት ቀሪ ገንዘብ", verifiedBalance: "የተረጋገጠ ቀሪ ገንዘብ", refreshBalance: "ቀሪ ገንዘብ አድስ",
-    deposit: "ገንዘብ ማስገባት", withdrawal: "ገንዘብ ማውጣት", history: "ታሪክ", referral: "ግብዣ (Referral)",
-    packages: "ፓኬጆች", support: "ድጋፍ", notifications: "ማሳወቂያዎች", faq: "እገዛ / ጥያቄዎች", task: "ተግባር (Task)",
-    recentActivity: "የቅርብ ጊዜ እንቅስቃሴ", noRecentActivity: "ምንም የቅርብ ጊዜ እንቅስቃሴ የለም።",
-    depositActivity: "የተቀማጭ ገንዘብ እንቅስቃሴ", withdrawalActivity: "የማውጫ ገንዘብ እንቅስቃሴ", activityDisplay: "እንቅስቃሴ ማሳያ",
-    selectPaymentMethod: "የመክፈያ ዘዴ ይምረጡ", mobilePayment: "የሞባይል ክፍያ",
-    depositNotice: "ክፍያውን ወደ ተመረጠው አካውንት ያስተላልፉ እና የግብይት መለያ (Transaction ID) ያስገቡ። ቀሪ ገንዘብዎ ከመዘምኑ በፊት ጥያቄዎ ይገመገማል።",
-    copyTelebirr: "የቴሌብር ቁጥር ቅዳ", copyCbe: "የCBE ቁጥር ቅዳ",
-    depositAmountLabel: "የሚገባ የገንዘብ መጠን (ETB)", transactionIdLabel: "የግብይት መለያ (Transaction ID)", noteOptional: "ማስታወሻ (አማራጭ)",
-    submitDeposit: "የገንዘብ ማስገቢያ ጥያቄ ያስገቡ",
-    depositDisclaimer: "ማስገባት ክፍያው መረጋገጡን አያሳይም። ቀሪ ገንዘብዎ የሚቀየረው ከፍቃድ በኋላ ነው።",
-    myDepositHistory: "የእኔ የተቀማጭ ገንዘብ ታሪክ",
-    withdrawalRequest: "የገንዘብ ማውጫ ጥያቄ", enterPaymentDetails: "የክፍያ መረጃዎን በጥንቃቄ ያስገቡ።",
-    paymentMethodLabel: "የመክፈያ ዘዴ", accountHolderName: "የአካውንት ባለቤት ስም",
-    accountNumberLabel: "የአካውንት ቁጥር / ስልክ ቁጥር", withdrawalAmountLabel: "የሚወጣ የገንዘብ መጠን (ETB)",
-    additionalNoteOptional: "ተጨማሪ ማስታወሻ (አማራጭ)",
-    withdrawLimitsNotice: "ዝቅተኛ ማውጫ፡ 100 ETB። ከፍተኛ ማውጫ፡ 5,000 ETB። ክፍያ 0.04% ነው።",
-    submitWithdrawal: "የማውጫ ጥያቄ ያስገቡ", myWithdrawalHistory: "የእኔ የማውጫ ታሪክ",
-    yourReferralCode: "የእርስዎ የግብዣ ኮድ", yourInviteLink: "የእርስዎ የግብዣ ሊንክ (Invite Link)", copyInviteLink: "የግብዣ ሊንክ ቅዳ",
-    acceptedInvites: "ግብዣውን የተቀበሉ ሰዎች ብዛት", referralStatusLabel: "የግብዣ ሁኔታ",
-    acceptInviteTitle: "የጓደኛ የግብዣ ኮድ ይቀበሉ / ይመዝግቡ",
-    inviteRewardInfo: "ጓደኞችን ይጋብዙ! ሊንክዎን ወይም ኮድዎን ያጋሩ፤ ግብዣውን ሲቀበሉ ብዛቱ 1፣ 2፣ 3 እያለ ይቆጥራል።",
-    copyReferralCode: "የግብዣ ኮድ ቅዳ", applyInviteCodeBtn: "ግብዣ ይቀበሉ (+1 ይቁጠር)",
-    vipPackagesTitle: "የVIP ፓኬጆች (VIP 1 – VIP 10 • ለ10 ቀን ብቻ)",
-    vipStepDesc: "እያንዳንዱ VIP ለ10 ቀን ብቻ ይቆያል፤ ከ10 ቀን በኋላ አዲስ VIP መግዛት ያስፈልጋል። Daily profit በ2,000=10%፣ በ4,000=20%፣ በ6,000=30% እያለ እስከ 20,000=100% ይቀጥላል።",
-    dailyTasks: "ዕለታዊ ተግባራት", availableTasks: "ያሉ ተግባራት",
-    task24Desc: "በየ24 ሰዓቱ አንድ ጊዜ ይስሩ። ካጠናቀቁ በኋላ የ24 ሰዓት መጠበቂያ ሰዓት ይቆጥራል።",
-    inviteRewardDesc: "የተጋበዙ ሰዎች ሲቀላቀሉ የ100 ETB ግብዣ ተግባር ይመዘገባል።",
-    transactionHistory: "የግብይት ታሪክ", myProfile: "የእኔ ፕሮፋይል",
-    depositSummary: "የተቀማጭ ገንዘብ ማጠቃለያ", totalDeposits: "ጠቅላላ የተቀመጠ",
-    accountInformation: "የመለያ መረጃ", fullName: "ሙሉ ስም", emailAddress: "የኢሜይል አድራሻ",
-    emailVerification: "የኢሜይል ማረጋገጫ", sendVerificationEmail: "የማረጋገጫ ኢሜይል ላክ",
-    copyUserId: "የተጠቃሚ መለያ (User ID) ቅዳ", accountStatus: "የመለያ ሁኔታ", accountSecurity: "የመለያ ደህንነት",
-    securityHint: "የይለፍ ቃል ለመቀየር ወደ ኢሜይልዎ የተላከውን ደህንነቱ የተጠበቀ ሊንክ ይጠቀሙ።",
-    neverSharePass: "የይለፍ ቃልዎን ወይም የማረጋገጫ ኮድዎን ለማንም አያጋሩ።",
-    contactSupport: "ድጋፍን ያግኙ", sendMessage: "መልዕክት ላክ", mySupportRequests: "የእኔ የድጋፍ ጥያቄዎች",
-    myRequestUpdates: "የጥያቄ ዝመናዎች", requestUpdatesDesc: "ስለ ገንዘብ ማስገቢያ፣ ማውጫ እና ኢንቨስትመንት ጥያቄዎችዎ ዝመናዎች።",
-    refresh: "አድስ", faqTitle: "በተደጋጋሚ የሚጠየቁ ጥያቄዎች",
-    navHome: "መነሻ", navWithdraw: "ማውጣት", navProfile: "ፕሮፋይል", buyPackage: "VIP ይግዙ (ለ10 ቀን)"
+let isAm=false;
+let isRegister=false;
+let currentUser=null;
+
+function toggleLang(){
+ isAm=!isAm;
+ document.getElementById('langBtn').textContent=isAm?'EN':'አማ';
+ document.querySelectorAll('[data-en]').forEach(el=>{
+  el.textContent=isAm?el.dataset.am:el.dataset.en;
+ });
+}
+
+function switchAuth(){
+ isRegister=!isRegister;
+ document.getElementById('registerFields').classList.toggle('hidden',!isRegister);
+ document.getElementById('authTitle').textContent=isRegister?'Create Account':'Welcome Back';
+ document.getElementById('authBtn').textContent=isRegister?'Register':'Login';
+ document.getElementById('switchText').innerHTML=isRegister?
+ 'Already have an account? <span class="link" onclick="switchAuth()">Login</span>':
+ 'Don\\'t have an account? <span class="link" onclick="switchAuth()">Register</span>';
+ document.getElementById('authMsg').textContent='';
+}
+
+function getUsers(){
+ return JSON.parse(localStorage.getItem('gv_users')||'{}');
+}
+
+function login(){
+ const email=document.getElementById('email').value.trim().toLowerCase();
+ const password=document.getElementById('password').value;
+ const users=getUsers();
+ const msg=document.getElementById('authMsg');
+
+ if(!email||password.length<6){
+  msg.textContent='Enter a valid email and password (minimum 6 characters).';
+  return;
+ }
+
+ if(isRegister){
+  const name=document.getElementById('fullname').value.trim();
+  if(!name){msg.textContent='Enter your full name.';return;}
+  if(users[email]){msg.textContent='Account already exists.';return;}
+  users[email]={name, password, balance:0, invested:0, transactions:[],code:'GV-'+Math.random().toString(36).slice(2,8).toUpperCase()};
+  localStorage.setItem('gv_users',JSON.stringify(users));
+ }else{
+  if(!users[email]||users[email].password!==password){
+   msg.textContent='Incorrect email or password.';
+   return;
   }
+ }
+ currentUser=email;
+ localStorage.setItem('gv_session',email);
+ openDashboard();
+}
+
+function openDashboard(){
+ const users=getUsers();
+ currentUser=localStorage.getItem('gv_session');
+ if(!currentUser||!users[currentUser])return;
+ document.getElementById('auth').classList.add('hidden');
+ document.getElementById('app').classList.remove('hidden');
+ document.getElementById('welcome').textContent='Welcome, '+users[currentUser].name+' 👋';
+ document.getElementById('balance').textContent='$'+users[currentUser].balance.toFixed(2);
+ document.getElementById('invested').textContent='$'+users[currentUser].invested.toFixed(2);
+ document.getElementById('myCode').textContent=users[currentUser].code;
+ document.getElementById('refCount').textContent='0';
+ renderHistory();
+}
+
+function saveUser(user){
+ const users=getUsers();
+ users[currentUser]=user;
+ localStorage.setItem('gv_users',JSON.stringify(users));
+}
+
+function showPage(id,btn){
+ document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');
+}
+
+function requestMoney(type){
+ const amount=Number(document.getElementById(type==='Deposit'?'depositAmount':'withdrawAmount').value);
+ if(!amount||amount<=0){alert('Enter a valid amount');return;}
+ if(type==='Withdrawal'&&amount>getUsers()[currentUser].balance){
+  alert('Insufficient demo balance');return;
+ }
+ const user=getUsers()[currentUser];
+ user.transactions.unshift({type,amount,status:'Pending'});
+ saveUser(user);
+ renderHistory();
+ alert(type+' request saved as Pending (demo only).');
+}
+
+function selectPackage(name,amount){
+ if(!confirm('Select '+name+' package ($'+amount+')?'))return;
+ alert('You selected '+name+'. This demo does not accept or invest real funds.');
+}
+
+function renderHistory(){
+ const user=getUsers()[currentUser];
+ const rows=document.getElementById('historyRows');
+ rows.innerHTML='';
+ if(!user.transactions.length){
+  rows.innerHTML='<tr><td colspan="3">No transactions yet</td></tr>';return;
+ }
+ user.transactions.forEach(t=>{
+  const tr=document.createElement('tr');
+  [t.type,'$'+t.amount.toFixed(2),t.status].forEach(value=>{
+   const td=document.createElement('td');
+   td.textContent=value;
+   tr.appendChild(td);
+  });
+  rows.appendChild(tr);
+ });
+}
+
+function copyCode(){
+ const code=getUsers()[currentUser].code;
+ if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>alert('Copied!'));
+ else alert(code);
+}
+
+function logout(){
+ localStorage.removeItem('gv_session');
+ location.reload();
+}
+
+window.onload=()=>{
+ const session=localStorage.getItem('gv_session');
+ if(session&&getUsers()[session])openDashboard();
 };
-
-const STORAGE_KEY_PREFIX = "bawereal_user_v5_";
-const CREDS_KEY_PREFIX = "bawereal_creds_v5_";
-const CONFIG_KEY = "bawereal_config_v5";
-const SESSION_KEY = "bawereal_session_v5";
-const SESSION_EMAIL_KEY = "bawereal_session_email_v5";
-const ADMIN_MASTER_KEY = "bawereal_admin_session_v5";
-const DAY_MS = 24 * 60 * 60 * 1000;
-const VIP_DURATION_MS = 10 * DAY_MS;
-const ADMIN_SECRET = "BAWEREAL_ADMIN_LOCK_2026";
-
-// ⚠️ CHANGE THIS ADMIN PASSWORD ⚠️
-const ADMIN_PASSWORD = "BaweAdmin2026!";
-
-const DEFAULT_CONFIG = {
-  telebirrAccount: "0964488470",
-  cbeAccount: "10000298833585",
-  depositMin: 300,
-  depositMax: 10000,
-  withdrawMin: 100,
-  withdrawMax: 5000,
-  withdrawFeePct: 0.04,
-  vipPriceStep: 2000,
-  vipDailyPctStep: 10,
-  task24Reward: 50,
-  referralBonus: 100
-};
-
-let state = null;
-let currentLang = "en";
-let currentPage = "home";
-let toastTimer = null;
-
-/* ---------- CONFIG ---------- */
-function loadConfig() {
-  try {
-    const raw = localStorage.getItem(CONFIG_KEY);
-    return raw ? { ...DEFAULT_CONFIG, ...JSON.parse(raw) } : { ...DEFAULT_CONFIG };
-  } catch(_) { return { ...DEFAULT_CONFIG }; }
-}
-function saveConfig(cfg) {
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-  applyConfigToUI();
-  if (state) { renderVipCards(); renderAll(); }
-}
-
-function applyConfigToUI() {
-  const cfg = loadConfig();
-  const tText = document.getElementById("telebirrAccountText");
-  const cText = document.getElementById("cbeAccountText");
-  if (tText) tText.textContent = cfg.telebirrAccount;
-  if (cText) cText.textContent = cfg.cbeAccount;
-  const depAmt = document.getElementById("depositAmount");
-  if (depAmt) { depAmt.min = cfg.depositMin; depAmt.max = cfg.depositMax; }
-  const witAmt = document.getElementById("withdrawAmount");
-  if (witAmt) { witAmt.min = cfg.withdrawMin; witAmt.max = cfg.withdrawMax; }
-  const witNotice = document.getElementById("withdrawLimitsNotice");
-  if (witNotice) witNotice.textContent = `Minimum withdrawal: ${cfg.withdrawMin} ETB. Maximum withdrawal: ${cfg.withdrawMax} ETB. Fee is ${cfg.withdrawFeePct}%.`;
-  const t24Label = document.getElementById("task24RewardLabel");
-  if (t24Label) t24Label.textContent = cfg.task24Reward;
-  const refLabel = document.getElementById("referralRewardLabel");
-  if (refLabel) refLabel.textContent = cfg.referralBonus;
-  const adminInfo = document.getElementById("adminConfigInfo");
-  if (adminInfo) adminInfo.textContent = `Dep ${cfg.depositMin}-${cfg.depositMax} • Wit ${cfg.withdrawMin}-${cfg.withdrawMax} • Fee ${cfg.withdrawFeePct}%`;
-}
-
-/* ---------- HASH / CRYPTO ---------- */
-function simpleHash(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return hash.toString(16);
-}
-function getStorageKey(email) { return STORAGE_KEY_PREFIX + simpleHash(email.trim().toLowerCase()); }
-function saveCredentials(email, password) {
-  localStorage.setItem(CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase()), simpleHash(password));
-}
-function verifyCredentials(email, password) {
-  const stored = localStorage.getItem(CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase()));
-  if (!stored) return false;
-  return stored === simpleHash(password);
-}
-function computeBalanceChecksum(balanceVal, uidVal) {
-  const str = `${Number(balanceVal || 0).toFixed(2)}|${uidVal || ""}|${ADMIN_SECRET}`;
-  let hash = 2166136261;
-  for (let i = 0; i < str.length; i++) { hash ^= str.charCodeAt(i); hash = Math.imul(hash, 16777619); }
-  return (hash >>> 0).toString(16);
-}
-
-/* ---------- STATE ---------- */
-function defaultState(email) {
-  const uid = "USR-" + Math.random().toString(36).slice(2, 10).toUpperCase();
-  return {
-    loggedIn: false, lang: "en",
-    user: {
-      name: email ? email.split("@")[0] : "", email: email || "", uid,
-      referralCode: "BW" + Math.floor(10000000 + Math.random() * 90000000),
-      referralCount: 0, acceptedCodes: [], referralRequests: [],
-      verified: false, status: "Active", vipLevel: 0, activeVip: null,
-      registeredAt: new Date().toLocaleString()
-    },
-    lockedBalance: 0, balanceSig: computeBalanceChecksum(0, uid),
-    lastTask24Claim: 0,
-    deposits: [], withdrawals: [], investments: [], history: [],
-    supports: [], notifications: [], activities: []
-  };
-}
-function getVerifiedBalance() {
-  const expected = computeBalanceChecksum(state.lockedBalance, state.user.uid);
-  if (state.balanceSig !== expected || typeof state.lockedBalance !== "number" || Number.isNaN(state.lockedBalance)) {
-    state.lockedBalance = 0; state.balanceSig = computeBalanceChecksum(0, state.user.uid); saveState();
-  }
-  return Number(state.lockedBalance);
-}
-function loadStateForEmail(email) {
-  try {
-    const raw = localStorage.getItem(getStorageKey(email));
-    if (!raw) return defaultState(email);
-    const parsed = JSON.parse(raw);
-    const base = defaultState(email);
-    const merged = {
-      ...base, ...parsed,
-      user: { ...base.user, ...(parsed.user || {}) },
-      deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
-      withdrawals: Array.isArray(parsed.withdrawals) ? parsed.withdrawals : [],
-      investments: Array.isArray(parsed.investments) ? parsed.investments : [],
-      history: Array.isArray(parsed.history) ? parsed.history : [],
-      activities: Array.isArray(parsed.activities) ? parsed.activities : []
-    };
-    const expected = computeBalanceChecksum(merged.lockedBalance, merged.user.uid);
-    if (merged.balanceSig !== expected || typeof merged.lockedBalance !== "number" || Number.isNaN(merged.lockedBalance)) {
-      merged.lockedBalance = 0; merged.balanceSig = computeBalanceChecksum(0, merged.user.uid);
-    }
-    return merged;
-  } catch (_) { return defaultState(email); }
-}
-function rebuildHistoryArray() {
-  if (!state) return;
-  state.history = [
-    ...state.deposits.map(d => ({ id: d.id, kind: "deposit", title: `DEPOSIT (${d.method})`, amount: Number(d.amount) || 0, status: d.status || "pending", time: d.time })),
-    ...state.withdrawals.map(w => ({ id: w.id, kind: "withdrawal", title: `WITHDRAWAL (${w.method})`, amount: Number(w.amount) || 0, status: w.status || "pending", time: w.time })),
-    ...state.investments.map(i => ({ id: i.id, kind: "investment", title: `INVESTMENT (${i.packageName})`, amount: Number(i.amount) || 0, status: i.status || "pending", time: i.time }))
-  ];
-}
-function saveState() {
-  if (!state || !state.user || !state.user.email) return;
-  try {
-    state.lang = currentLang;
-    state.balanceSig = computeBalanceChecksum(state.lockedBalance, state.user.uid);
-    rebuildHistoryArray();
-    localStorage.setItem(getStorageKey(state.user.email), JSON.stringify(state));
-  } catch (_) {}
-}
-function startSession(email) {
-  try { sessionStorage.setItem(SESSION_KEY, "true"); sessionStorage.setItem(SESSION_EMAIL_KEY, email || ""); } catch (_) {}
-}
-function endSession() {
-  try { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_EMAIL_KEY); } catch (_) {}
-}
-function hasActiveSession() {
-  try { return sessionStorage.getItem(SESSION_KEY) === "true"; } catch (_) { return false; }
-}
-
-/* ---------- UI HELPERS ---------- */
-function showToast(msg) {
-  const el = document.getElementById("toastMsg");
-  if (!el) return;
-  el.textContent = msg; el.classList.remove("hidden");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add("hidden"), 2200);
-}
-function triggerBalanceRefresh(btnId) {
-  const btn = document.getElementById(btnId);
-  if (btn) { btn.classList.remove("spinning"); void btn.offsetWidth; btn.classList.add("spinning"); setTimeout(() => btn.classList.remove("spinning"), 700); }
-  if (state && state.user.email) { state = loadStateForEmail(state.user.email); renderAll(); }
-  const syncEl = document.getElementById("lastSyncText");
-  if (syncEl) syncEl.textContent = (currentLang === "am" ? "የተረጋገጠ ቀሪ ገንዘብ (የታደሰ): " : "Verified balance (synced): ") + new Date().toLocaleTimeString();
-  showToast(currentLang === "am" ? "ቀሪ ገንዘብ ታድሷል" : "Balance refreshed");
-}
-function formatETB(val) {
-  const num = Number(val) || 0;
-  return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ETB";
-}
-function runStepLoader(cb) {
-  const loader = document.getElementById("stepLoader");
-  const pct = document.getElementById("stepPct");
-  const fill = document.getElementById("stepFill");
-  const steps = [25, 50, 75, 100]; let idx = 0;
-  loader.classList.remove("hidden"); pct.textContent = "25%"; fill.style.width = "25%";
-  const timer = setInterval(() => {
-    idx++;
-    if (idx < steps.length) { pct.textContent = steps[idx] + "%"; fill.style.width = steps[idx] + "%"; }
-    else { clearInterval(timer); setTimeout(() => { loader.classList.add("hidden"); if (typeof cb === "function") cb(); }, 700); }
-  }, 800);
-}
-function applyLang(lang) {
-  currentLang = TRANSLATIONS[lang] ? lang : "en";
-  document.documentElement.lang = currentLang;
-  document.querySelectorAll(".lang-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.lang === currentLang));
-  const dict = TRANSLATIONS[currentLang];
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (dict[key]) el.textContent = dict[key];
-  });
-  if (state) { renderVipCards(); renderAll(); saveState(); }
-}
-function switchAuthTab(tab) {
-  document.getElementById("forgotBox").classList.add("hidden");
-  const loginBox = document.getElementById("loginBox");
-  const registerBox = document.getElementById("registerBox");
-  const tabLogin = document.getElementById("tabLoginBtn");
-  const tabRegister = document.getElementById("tabRegisterBtn");
-  if (window.innerWidth > 599) {
-    loginBox.classList.remove("hidden"); registerBox.classList.remove("hidden");
-    tabLogin.classList.add("active"); tabRegister.classList.remove("active");
-  } else {
-    if (tab === 'login') {
-      loginBox.classList.remove("hidden"); registerBox.classList.add("hidden");
-      tabLogin.classList.add("active"); tabRegister.classList.remove("active");
-    } else {
-      loginBox.classList.add("hidden"); registerBox.classList.remove("hidden");
-      tabLogin.classList.remove("active"); tabRegister.classList.add("active");
-    }
-  }
-}
-window.addEventListener('resize', () => {
-  if (!document.getElementById("forgotBox").classList.contains("hidden")) return;
-  if (window.innerWidth > 599) {
-    document.getElementById("loginBox").classList.remove("hidden");
-    document.getElementById("registerBox").classList.remove("hidden");
-  } else {
-    if (document.getElementById("tabLoginBtn").classList.contains("active")) switchAuthTab('login');
-    else switchAuthTab('register');
-  }
-});
-function showLogin() { document.getElementById("forgotBox").classList.add("hidden"); switchAuthTab('login'); }
-function showRegister() { document.getElementById("forgotBox").classList.add("hidden"); switchAuthTab('register'); }
-function showForgot() {
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("registerBox").classList.add("hidden");
-  document.getElementById("forgotBox").classList.remove("hidden");
-}
-function openPage(page) {
-  currentPage = page;
-  if (state && state.user.email) state = loadStateForEmail(state.user.email);
-  document.querySelectorAll("main.container > section").forEach(sec => sec.classList.toggle("hidden", sec.id !== page + "Page"));
-  document.querySelectorAll(".bottom-nav .nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.page === page));
-  renderAll();
-  applyConfigToUI();
-}
-function chooseMethod(method) {
-  document.getElementById("depositMethod").value = method;
-  document.getElementById("telebirrCard").classList.toggle("selected", method === "Telebirr");
-  document.getElementById("cbeCard").classList.toggle("selected", method === "CBE");
-}
-function copyAccount(val) {
-  if (navigator.clipboard) navigator.clipboard.writeText(val).catch(() => {});
-  showToast("Copied: " + val);
-}
-function getInviteLink() {
-  if (!state) return "";
-  const base = window.location.origin && window.location.origin !== "null"
-    ? window.location.origin + window.location.pathname : "https://bawereal.app/join";
-  return `${base}?ref=${encodeURIComponent(state.user.referralCode)}`;
-}
-function addNotification(text) {
-  if (!state) return;
-  state.notifications.unshift({ text, time: new Date().toLocaleString() });
-}
-function addActivity(text) {
-  if (!state) return;
-  state.activities.unshift({ text, time: new Date().toLocaleTimeString() });
-  state.activities = state.activities.slice(0, 15);
-}
-
-/* ---------- LIVE TICKER ---------- */
-function renderLiveTickers() {
-  const dep = [["Abebe K.","+1,500 ETB"],["Selam T.","+2,000 ETB"],["Dawit M.","+5,000 ETB"],["Hanna B.","+1,000 ETB"],["Yonas G.","+4,000 ETB"],["Tigist A.","+2,500 ETB"]];
-  const wit = [["Biniyam D.","-1,200 ETB"],["Rahel W.","-850 ETB"],["Kaleb M.","-3,000 ETB"],["Mekdes T.","-500 ETB"],["Nahom G.","-2,200 ETB"],["Eden A.","-1,600 ETB"]];
-  const dRows = dep.map(([n,a]) => `<div class="activity-entry"><span>${n} — Telebirr / CBE</span><strong>${a}</strong></div>`).join("");
-  const wRows = wit.map(([n,a]) => `<div class="activity-entry"><span>${n} — Telebirr / CBE</span><strong>${a}</strong></div>`).join("");
-  const dT = document.getElementById("depositActivityTrack"); const wT = document.getElementById("withdrawActivityTrack");
-  if (dT) dT.innerHTML = dRows + dRows;
-  if (wT) wT.innerHTML = wRows + wRows;
-}
-
-/* ---------- VIP ---------- */
-function getActiveVipInfo() {
-  if (!state || !state.user.activeVip || !state.user.activeVip.expiresAt) return null;
-  const av = state.user.activeVip;
-  const remainingMs = Number(av.expiresAt) - Date.now();
-  return { ...av, isExpired: remainingMs <= 0, daysLeft: Math.max(0, Math.ceil(remainingMs / DAY_MS)) };
-}
-function renderVipCards() {
-  if (!state) return;
-  const cfg = loadConfig();
-  const label = TRANSLATIONS[currentLang].buyPackage || "Buy VIP (10 Days)";
-  const activeVip = getActiveVipInfo();
-  const statusBox = document.getElementById("activeVipStatusBox");
-  if (statusBox) {
-    if (activeVip && !activeVip.isExpired) {
-      statusBox.textContent = currentLang === "am"
-        ? `ንቁ VIP ${activeVip.level} (${activeVip.price.toLocaleString()} ETB) — Daily ${activeVip.dailyRatePct}% • ${activeVip.daysLeft} ቀን ቀርቷል።`
-        : `Active VIP ${activeVip.level} (${activeVip.price.toLocaleString()} ETB) — Daily ${activeVip.dailyRatePct}% • ${activeVip.daysLeft} day(s) left.`;
-    } else if (activeVip && activeVip.isExpired) {
-      statusBox.textContent = currentLang === "am" ? `VIP ${activeVip.level} ጊዜው አልቋል። አዲስ VIP ይግዙ።` : `VIP ${activeVip.level} expired. Purchase a new VIP.`;
-    } else {
-      statusBox.textContent = currentLang === "am" ? "ንቁ VIP የለም።" : "No active VIP right now.";
-    }
-  }
-  let html = "";
-  for (let i = 1; i <= 10; i++) {
-    const price = i * cfg.vipPriceStep;
-    const dailyRatePct = i * cfg.vipDailyPctStep;
-    const dailyProfit = (price * dailyRatePct) / 100;
-    const isActive = activeVip && !activeVip.isExpired && activeVip.level === i;
-    html += `
-      <div class="vip-card">
-        <div class="vip-top"><div class="vip-level">👑 VIP ${i}</div><div class="vip-price">${price.toLocaleString()} ETB</div></div>
-        <div class="vip-meta">
-          <span class="vip-pill">⏳ 10 Days Only</span>
-          <span class="vip-pill">📈 Daily: ${dailyRatePct}% (${dailyProfit.toLocaleString()} ETB/day)</span>
-        </div>
-        <p class="muted" style="margin-top:6px">Valid for 10 days only.</p>
-        <div style="margin-top:10px">
-          <button type="button" class="btn ${isActive ? "secondary" : ""}" onclick="selectVip(${i}, ${price}, ${dailyRatePct}, ${dailyProfit})">
-            ${isActive ? `Active (VIP ${i} • ${activeVip.daysLeft}d)` : label}
-          </button>
-        </div>
-      </div>`;
-  }
-  document.getElementById("packagesList").innerHTML = html;
-}
-function selectVip(level, price, dailyRatePct, dailyProfit) {
-  if (!state) return;
-  const now = Date.now();
-  state.user.vipLevel = level;
-  state.user.activeVip = { level, price, dailyRatePct, dailyProfit, durationDays: 10, startedAt: now, expiresAt: now + VIP_DURATION_MS };
-  if (!Array.isArray(state.investments)) state.investments = [];
-  state.investments.unshift({
-    id: "INV-" + now, userId: state.user.uid, userName: state.user.name, userEmail: state.user.email,
-    packageName: `VIP ${level} (10 Days • ${dailyRatePct}% Daily)`,
-    level, dailyRatePct, dailyProfit, durationDays: 10, amount: price,
-    status: "pending", time: new Date(now).toLocaleString()
-  });
-  addNotification(`VIP ${level} (${price.toLocaleString()} ETB) investment recorded.`);
-  addActivity(`Investment request: VIP ${level}`);
-  saveState(); renderAll();
-  showToast(`VIP ${level} recorded`);
-}
-
-/* ---------- TASK TIMER ---------- */
-function updateTask24Timer() {
-  if (!state) return;
-  const cdEl = document.getElementById("task24Countdown");
-  const stEl = document.getElementById("task24Status");
-  const btn = document.getElementById("claimTask24Btn");
-  if (!cdEl || !stEl || !btn) return;
-  const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
-  if (remaining <= 0) {
-    cdEl.textContent = "00:00:00";
-    stEl.textContent = currentLang === "am" ? "ዝግጁ" : "Ready";
-    stEl.className = "status approved"; btn.disabled = false;
-  } else {
-    const s = Math.floor(remaining / 1000);
-    cdEl.textContent = `${String(Math.floor(s/3600)).padStart(2,"0")}:${String(Math.floor((s%3600)/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-    stEl.textContent = currentLang === "am" ? "በመጠባበቅ ላይ" : "Cooldown";
-    stEl.className = "status pending"; btn.disabled = true;
-  }
-}
-
-/* ---------- RENDER ALL ---------- */
-function renderAll() {
-  if (!state) return;
-  const cfg = loadConfig();
-  const bal = getVerifiedBalance();
-  document.getElementById("headerName").textContent = state.user.name || "Welcome";
-  document.getElementById("balanceText").textContent = formatETB(bal);
-  document.getElementById("profileBalance").textContent = formatETB(bal);
-  document.getElementById("referralCode").textContent = state.user.referralCode;
-  document.getElementById("referralLinkInput").value = getInviteLink();
-  const invCount = Number(state.user.referralCount) || 0;
-  document.getElementById("referralCountText").textContent = String(invCount);
-  document.getElementById("referralMilestoneText").textContent = currentLang === "am" ? `${invCount} ሰው` : `${invCount} accepted`;
-  const av = getActiveVipInfo();
-  const vLabel = av && !av.isExpired ? ` • VIP ${av.level} (${av.daysLeft}d left)` : "";
-  document.getElementById("profileName").textContent = state.user.name;
-  document.getElementById("profileEmail").textContent = state.user.email;
-  document.getElementById("emailVerificationStatus").textContent = state.user.verified ? "Verified" : "Unverified";
-  document.getElementById("profileUid").textContent = state.user.uid;
-  document.getElementById("profileStatus").textContent = state.user.status + vLabel;
-  const tDep = state.deposits.reduce((s,d)=>s+Number(d.amount||0),0);
-  const aDep = state.deposits.filter(d=>d.status==="approved").reduce((s,d)=>s+Number(d.amount||0),0);
-  const pDep = state.deposits.filter(d=>d.status==="pending").reduce((s,d)=>s+Number(d.amount||0),0);
-  const rDep = state.deposits.filter(d=>d.status==="rejected").reduce((s,d)=>s+Number(d.amount||0),0);
-  document.getElementById("totalDeposits").textContent = formatETB(tDep);
-  document.getElementById("approvedDeposits").textContent = formatETB(aDep);
-  document.getElementById("pendingDeposits").textContent = formatETB(pDep);
-  document.getElementById("rejectedDeposits").textContent = formatETB(rDep);
-  document.getElementById("depositHistory").innerHTML = state.deposits.length ? state.deposits.map(d => `
-    <div class="item"><div class="item-top"><strong>${d.method} • ${formatETB(d.amount)}</strong><span class="muted">${d.time}</span></div>
-    <div class="muted">TX: ${d.txId}</div><span class="status ${d.status}">${d.status}</span></div>
-  `).join("") : `<div class="empty">No deposit history.</div>`;
-  document.getElementById("withdrawHistory").innerHTML = state.withdrawals.length ? state.withdrawals.map(w => `
-    <div class="item"><div class="item-top"><strong>${w.method} • ${formatETB(w.amount)}</strong><span class="muted">${w.time}</span></div>
-    <div class="muted">Net: ${formatETB(w.net)} • ${w.account}</div><span class="status ${w.status}">${w.status}</span></div>
-  `).join("") : `<div class="empty">No withdrawal history.</div>`;
-  const filter = document.getElementById("historyFilter").value;
-  const combined = [
-    ...state.deposits.map(d => ({kind:"deposit", title:`DEPOSIT (${d.method})`, amount:d.amount, status:d.status, time:d.time})),
-    ...state.withdrawals.map(w => ({kind:"withdrawal", title:`WITHDRAWAL (${w.method})`, amount:w.amount, status:w.status, time:w.time})),
-    ...state.investments.map(i => ({kind:"investment", title:`INVESTMENT (${i.packageName})`, amount:i.amount, status:i.status, time:i.time}))
-  ].filter(i => filter === "all" || i.kind === filter);
-  document.getElementById("historyList").innerHTML = combined.length ? combined.map(c => `
-    <div class="item"><div class="item-top"><strong>${c.title}</strong><span>${formatETB(c.amount)}</span></div>
-    <div class="muted">${c.time}</div><span class="status ${c.status}">${c.status}</span></div>
-  `).join("") : `<div class="empty">No history.</div>`;
-  document.getElementById("supportHistory").innerHTML = state.supports.length ? state.supports.map(s => `
-    <div class="item"><div>${s.message}</div><span class="muted">${s.time}</span></div>
-  `).join("") : `<div class="empty">No support messages.</div>`;
-  document.getElementById("notificationsList").innerHTML = state.notifications.length ? state.notifications.map(n => `
-    <div class="item"><div>${n.text}</div><span class="muted">${n.time}</span></div>
-  `).join("") : `<div class="empty">No notifications.</div>`;
-  document.getElementById("recentActivity").innerHTML = state.activities.length
-    ? state.activities.slice(0,5).map(a => `<div class="item"><div class="item-top"><span>${a.text}</span><span class="muted">${a.time}</span></div></div>`).join("")
-    : `<div class="empty">${TRANSLATIONS[currentLang].noRecentActivity}</div>`;
-  renderVipCards();
-  updateTask24Timer();
-  applyConfigToUI();
-}
-
-/* ---------- EVENT BINDINGS ---------- */
-document.querySelectorAll(".lang-btn").forEach(btn => btn.addEventListener("click", () => applyLang(btn.dataset.lang)));
-
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  if (!email || !password) return alert("Enter email and password.");
-  if (!verifyCredentials(email, password)) return alert("Incorrect email or password.");
-  state = loadStateForEmail(email);
-  state.user.email = email;
-  if (!state.user.name) state.user.name = email.split("@")[0];
-  state.loggedIn = true;
-  startSession(email); saveState();
-  document.getElementById("loginPassword").value = "";
-  runStepLoader(() => {
-    document.getElementById("auth").classList.add("hidden");
-    document.getElementById("application").classList.remove("hidden");
-    openPage("home");
-  });
-});
-
-document.getElementById("registerBtn").addEventListener("click", () => {
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
-  const pass = document.getElementById("regPassword").value;
-  const conf = document.getElementById("regConfirm").value;
-  if (!name || !email || !pass) return alert("Fill all required fields.");
-  if (pass !== conf) return alert("Passwords do not match.");
-  if (pass.length < 6) return alert("Password must be at least 6 characters.");
-  const credsKey = CREDS_KEY_PREFIX + simpleHash(email.trim().toLowerCase());
-  if (localStorage.getItem(credsKey)) return alert("Email already registered.");
-  saveCredentials(email, pass);
-  state = defaultState(email);
-  state.user.name = name; state.user.email = email;
-  saveState();
-  document.getElementById("regName").value = "";
-  document.getElementById("regEmail").value = "";
-  document.getElementById("regPassword").value = "";
-  document.getElementById("regConfirm").value = "";
-  alert("Registration successful! Please login.");
-  switchAuthTab('login');
-  document.getElementById("loginEmail").value = email;
-  document.getElementById("loginPassword").focus();
-});
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-  const email = document.getElementById("forgotEmail").value.trim();
-  if (!email) return alert("Enter your email.");
-  alert("If this email is registered, reset instructions were sent.");
-  showLogin();
-});
-
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  if (state) { state.loggedIn = false; saveState(); }
-  endSession(); state = null;
-  document.getElementById("application").classList.add("hidden");
-  document.getElementById("auth").classList.remove("hidden");
-  document.getElementById("loginEmail").value = "";
-  document.getElementById("loginPassword").value = "";
-  showLogin();
-});
-
-document.getElementById("homeCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("homeCornerRefreshBtn"));
-document.getElementById("profileCornerRefreshBtn").addEventListener("click", () => triggerBalanceRefresh("profileCornerRefreshBtn"));
-
-document.getElementById("depositBtn").addEventListener("click", () => {
-  if (!state) return;
-  const cfg = loadConfig();
-  const method = document.getElementById("depositMethod").value;
-  const amount = Number(document.getElementById("depositAmount").value);
-  const txId = document.getElementById("depositTransactionId").value.trim();
-  const note = document.getElementById("depositNote").value.trim();
-  if (!method || !amount || amount < cfg.depositMin || amount > cfg.depositMax || !txId) {
-    return alert(`Select method, enter amount (${cfg.depositMin}-${cfg.depositMax} ETB), and TX ID.`);
-  }
-  state.deposits.unshift({
-    id: "DEP-" + Date.now(), userId: state.user.uid, userName: state.user.name, userEmail: state.user.email,
-    method, amount, txId, note, status: "pending", time: new Date().toLocaleString()
-  });
-  addNotification(`Deposit ${formatETB(amount)} submitted.`);
-  addActivity(`Deposit request: ${formatETB(amount)}`);
-  document.getElementById("depositAmount").value = "";
-  document.getElementById("depositTransactionId").value = "";
-  document.getElementById("depositNote").value = "";
-  saveState(); renderAll(); showToast("Deposit request submitted");
-});
-
-document.getElementById("withdrawAmount").addEventListener("input", e => {
-  const cfg = loadConfig();
-  const amt = Math.max(0, Number(e.target.value) || 0);
-  const fee = amt * (cfg.withdrawFeePct / 100);
-  document.getElementById("withdrawFee").value = formatETB(fee);
-  document.getElementById("withdrawNet").value = formatETB(Math.max(0, amt - fee));
-});
-
-document.getElementById("withdrawBtn").addEventListener("click", () => {
-  if (!state) return;
-  const cfg = loadConfig();
-  const method = document.getElementById("withdrawMethod").value;
-  const holder = document.getElementById("withdrawName").value.trim();
-  const account = document.getElementById("withdrawAccount").value.trim();
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  const note = document.getElementById("withdrawNote").value.trim();
-  if (!method || !holder || !account || !amount || amount < cfg.withdrawMin || amount > cfg.withdrawMax) {
-    return alert(`Complete all fields (${cfg.withdrawMin}-${cfg.withdrawMax} ETB).`);
-  }
-  const net = Math.max(0, amount - amount * (cfg.withdrawFeePct / 100));
-  state.withdrawals.unshift({
-    id: "WIT-" + Date.now(), userId: state.user.uid, userName: state.user.name || holder, userEmail: state.user.email,
-    method, holder, account, amount, net, note, status: "pending", time: new Date().toLocaleString()
-  });
-  addNotification(`Withdrawal ${formatETB(amount)} submitted.`);
-  addActivity(`Withdrawal request: ${formatETB(amount)}`);
-  saveState(); renderAll(); showToast("Withdrawal request submitted");
-});
-
-document.getElementById("copyReferralBtn").addEventListener("click", () => { if (state) copyAccount(state.user.referralCode); });
-document.getElementById("copyReferralLinkBtn").addEventListener("click", () => { if (state) copyAccount(getInviteLink()); });
-
-document.getElementById("applyReferralBtn").addEventListener("click", () => {
-  if (!state) return;
-  const cfg = loadConfig();
-  const code = document.getElementById("invitedByCodeInput").value.trim().toUpperCase();
-  if (!code) return alert("Enter referral code.");
-  if (code === state.user.referralCode) return alert("Cannot use your own code.");
-  if (state.user.acceptedCodes.includes(code)) return alert("Code already accepted.");
-  state.user.acceptedCodes.push(code);
-  state.user.referralRequests.unshift({
-    id: "REF-" + Date.now(), userId: state.user.uid, userName: state.user.name, userEmail: state.user.email,
-    code, bonus: cfg.referralBonus, status: "pending", time: new Date().toLocaleString()
-  });
-  document.getElementById("invitedByCodeInput").value = "";
-  addNotification(`Invite from ${code} submitted.`);
-  addActivity(`Invite submitted: ${code}`);
-  saveState(); renderAll(); showToast("Invitation submitted");
-});
-
-document.getElementById("claimTask24Btn").addEventListener("click", () => {
-  if (!state) return;
-  const remaining = (Number(state.lastTask24Claim) || 0) + DAY_MS - Date.now();
-  if (remaining > 0) return;
-  const cfg = loadConfig();
-  state.lastTask24Claim = Date.now();
-  state.lockedBalance = (Number(state.lockedBalance) || 0) + cfg.task24Reward;
-  addNotification(`24-Hour Task completed (${formatETB(cfg.task24Reward)}).`);
-  addActivity("24-Hour Task completed");
-  saveState(); renderAll(); showToast("24-Hour Task recorded");
-});
-
-document.getElementById("historyFilter").addEventListener("change", renderAll);
-
-document.getElementById("verifyEmailBtn").addEventListener("click", () => {
-  if (!state) return;
-  state.user.verified = true;
-  addNotification("Email marked as verified.");
-  saveState(); renderAll(); showToast("Email verified");
-});
-
-document.getElementById("copyUidBtn").addEventListener("click", () => { if (state) copyAccount(state.user.uid); });
-document.getElementById("profileResetPasswordBtn").addEventListener("click", () => { if (state) alert("Reset link sent to " + state.user.email); });
-
-document.getElementById("supportBtn").addEventListener("click", () => {
-  if (!state) return;
-  const msg = document.getElementById("supportMessage").value.trim();
-  if (!msg) return;
-  state.supports.unshift({ message: msg, time: new Date().toLocaleString() });
-  document.getElementById("supportMessage").value = "";
-  addNotification("Support message sent.");
-  saveState(); renderAll(); showToast("Support message sent");
-});
-
-document.getElementById("refreshNotificationsBtn").addEventListener("click", () => { renderAll(); showToast("Notifications refreshed"); });
-
-(function handleUrlReferralParam() {
-  try {
-    const ref = new URLSearchParams(window.location.search).get("ref");
-    if (ref) { const i = document.getElementById("invitedByCodeInput"); if (i) i.value = ref.trim().toUpperCase(); }
-  } catch(_) {}
-})();
-
-/* ============ ADMIN SYSTEM ============ */
-function getAllUsers() {
-  const users = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
-      try { const p = JSON.parse(localStorage.getItem(key)); if (p && p.user && p.user.email) users.push(p); } catch(_) {}
-    }
-  }
-  return users;
-}
-function rebuildHistoryArrayForState(st) {
-  st.history = [
-    ...(st.deposits || []).map(d => ({ id: d.id, kind: "deposit", title: `DEPOSIT (${d.method})`, amount: Number(d.amount)||0, status: d.status, time: d.time })),
-    ...(st.withdrawals || []).map(w => ({ id: w.id, kind: "withdrawal", title: `WITHDRAWAL (${w.method})`, amount: Number(w.amount)||0, status: w.status, time: w.time })),
-    ...(st.investments || []).map(i => ({ id: i.id, kind: "investment", title: `INVESTMENT (${i.packageName})`, amount: Number(i.amount)||0, status: i.status, time: i.time }))
-  ];
-}
-function openAdmin() {
-  document.getElementById("adminPanel").classList.remove("hidden");
-  if (sessionStorage.getItem(ADMIN_MASTER_KEY) === "yes") {
-    document.getElementById("adminLoginView").classList.add("hidden");
-    document.getElementById("adminDashView").classList.remove("hidden");
-    renderAdminBody("deposits");
-  } else {
-    document.getElementById("adminLoginView").classList.remove("hidden");
-    document.getElementById("adminDashView").classList.add("hidden");
-  }
-}
-function closeAdmin() { document.getElementById("adminPanel").classList.add("hidden"); }
-function adminLogin() {
-  const pw = document.getElementById("adminPassword").value;
-  if (pw === ADMIN_PASSWORD) {
-    sessionStorage.setItem(ADMIN_MASTER_KEY, "yes");
-    document.getElementById("adminPassword").value = "";
-    document.getElementById("adminLoginView").classList.add("hidden");
-    document.getElementById("adminDashView").classList.remove("hidden");
-    renderAdminBody("deposits");
-  } else { alert("Wrong admin password."); }
-}
-
-// Logo tap 5 times
-let logoTapCount = 0, logoTimer = null;
-document.addEventListener("DOMContentLoaded", () => {
-  const logo = document.getElementById("mainLogo");
-  if (logo) logo.addEventListener("click", () => {
-    logoTapCount++; clearTimeout(logoTimer);
-    logoTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
-    if (logoTapCount >= 5) { logoTapCount = 0; openAdmin(); }
-  });
-  try { if (new URLSearchParams(window.location.search).get("admin") === "1") openAdmin(); } catch(_) {}
-});
-
-function switchAdminTab(tab) {
-  document.querySelectorAll(".admin-tab").forEach(b => b.classList.toggle("active", b.dataset.atab === tab));
-  renderAdminBody(tab);
-}
-function renderAdminBody(tab) {
-  const body = document.getElementById("adminBody");
-  const users = getAllUsers();
-  if (tab === "config") return renderAdminConfig(body);
-  if (tab === "balance") return renderAdminBalance(body, users);
-  let items = [];
-  if (tab === "deposits") users.forEach(u => (u.deposits || []).forEach(d => items.push({ u, req: d, kind: "deposit" })));
-  if (tab === "withdrawals") users.forEach(u => (u.withdrawals || []).forEach(w => items.push({ u, req: w, kind: "withdrawal" })));
-  if (tab === "investments") users.forEach(u => (u.investments || []).forEach(i => items.push({ u, req: i, kind: "investment" })));
-  if (tab === "referrals") users.forEach(u => (u.user.referralRequests || []).forEach(r => items.push({ u, req: r, kind: "referral" })));
-  items.sort((a,b) => (b.req.time || "").localeCompare(a.req.time || ""));
-  if (!items.length) { body.innerHTML = `<div class="empty">No ${tab} requests found.</div>`; return; }
-  body.innerHTML = items.map(({ u, req, kind }) => {
-    let detail = "";
-    if (kind === "deposit") detail = `TX: ${req.txId} • ${req.method}`;
-    else if (kind === "withdrawal") detail = `Net: ${formatETB(req.net)} • ${req.method} • ${req.account}`;
-    else if (kind === "investment") detail = `${req.packageName}`;
-    else if (kind === "referral") detail = `Code: ${req.code} • Bonus: ${req.bonus} ETB`;
-    return `
-      <div class="admin-req">
-        <div class="row"><strong>${u.user.name || u.user.email}</strong><span class="status ${req.status||"pending"}">${req.status||"pending"}</span></div>
-        <div class="row"><span>${u.user.email}</span><span>${formatETB(req.amount || req.bonus || 0)}</span></div>
-        <div class="row muted"><span>${detail}</span></div>
-        <div class="row muted"><span>${req.time}</span><span>${req.id}</span></div>
-        ${(req.status === "pending" || !req.status) ? `
-          <div class="actions">
-            <button class="btn-approve" onclick="adminDecide('${u.user.email}','${kind}','${req.id}','approved')">✓ Approve</button>
-            <button class="btn-reject" onclick="adminDecide('${u.user.email}','${kind}','${req.id}','rejected')">✕ Reject</button>
-          </div>` : ``}
-      </div>`;
-  }).join("");
-}
-function adminDecide(email, kind, reqId, decision) {
-  const key = getStorageKey(email);
-  let st; try { st = JSON.parse(localStorage.getItem(key)); } catch(_) { return alert("User not found"); }
-  if (!st) return alert("User not found");
-  if (kind === "deposit") {
-    const d = (st.deposits || []).find(x => x.id === reqId); if (!d) return;
-    d.status = decision;
-    if (decision === "approved") st.lockedBalance = (Number(st.lockedBalance) || 0) + Number(d.amount);
-  } else if (kind === "withdrawal") {
-    const w = (st.withdrawals || []).find(x => x.id === reqId); if (!w) return;
-    w.status = decision;
-    if (decision === "approved") {
-      if ((Number(st.lockedBalance) || 0) < Number(w.amount)) {
-        if (!confirm("⚠️ Balance lower than withdrawal. Approve anyway?")) return;
-      }
-      st.lockedBalance = (Number(st.lockedBalance) || 0) - Number(w.amount);
-    }
-  } else if (kind === "investment") {
-    const i = (st.investments || []).find(x => x.id === reqId); if (!i) return;
-    i.status = decision;
-    if (decision === "rejected" && st.user.activeVip && st.user.activeVip.level === i.level) st.user.activeVip = null;
-  } else if (kind === "referral") {
-    const r = (st.user.referralRequests || []).find(x => x.id === reqId); if (!r) return;
-    r.status = decision;
-    if (decision === "approved") {
-      st.user.referralCount = (Number(st.user.referralCount) || 0) + 1;
-      st.lockedBalance = (Number(st.lockedBalance) || 0) + Number(r.bonus || 0);
-      if (!Array.isArray(st.notifications)) st.notifications = [];
-      st.notifications.unshift({ text: `Referral bonus ${r.bonus} ETB approved (${r.code}).`, time: new Date().toLocaleString() });
-    }
-  }
-  st.balanceSig = computeBalanceChecksum(st.lockedBalance, st.user.uid);
-  rebuildHistoryArrayForState(st);
-  localStorage.setItem(key, JSON.stringify(st));
-  if (state && state.user.email === email) { state = loadStateForEmail(email); renderAll(); }
-  renderAdminBody(document.querySelector(".admin-tab.active").dataset.atab);
-}
-function renderAdminBalance(body, users) {
-  let html = `<div class="admin-req"><strong>💼 User Balance Manager</strong></div>`;
-  if (!users.length) { body.innerHTML = html + `<div class="empty">No users registered.</div>`; return; }
-  html += `<div class="admin-req">
-    <select id="adminBalUser" style="margin-bottom:8px">
-      ${users.map(u => `<option value="${u.user.email}">${u.user.name} — ${u.user.email} (${formatETB(u.lockedBalance)})</option>`).join("")}
-    </select>
-    <input id="adminBalAmount" type="number" placeholder="Amount ETB" style="margin-bottom:8px">
-    <select id="adminBalAction" style="margin-bottom:8px">
-      <option value="credit">Credit (add)</option>
-      <option value="debit">Debit (subtract)</option>
-      <option value="set">Set exact</option>
-    </select>
-    <input id="adminBalNote" placeholder="Note (optional)" style="margin-bottom:8px">
-    <button class="btn" onclick="adminUpdateBalance()">Apply Balance Change</button>
-  </div>`;
-  body.innerHTML = html;
-}
-function adminUpdateBalance() {
-  const email = document.getElementById("adminBalUser").value;
-  const amt = Number(document.getElementById("adminBalAmount").value);
-  const action = document.getElementById("adminBalAction").value;
-  const note = document.getElementById("adminBalNote").value.trim();
-  if (!email || isNaN(amt) || amt <= 0) return alert("Enter valid amount.");
-  const key = getStorageKey(email);
-  let st; try { st = JSON.parse(localStorage.getItem(key)); } catch(_) { return alert("User not found"); }
-  if (!st) return alert("User not found");
-  const before = Number(st.lockedBalance) || 0;
-  let after = before;
-  if (action === "credit") after = before + amt;
-  else if (action === "debit") after = Math.max(0, before - amt);
-  else if (action === "set") after = amt;
-  st.lockedBalance = after;
-  st.balanceSig = computeBalanceChecksum(after, st.user.uid);
-  if (!Array.isArray(st.notifications)) st.notifications = [];
-  st.notifications.unshift({ text: `Balance ${action}: ${formatETB(before)} → ${formatETB(after)}${note?" ("+note+")":""}`, time: new Date().toLocaleString() });
-  localStorage.setItem(key, JSON.stringify(st));
-  if (state && state.user.email === email) { state = loadStateForEmail(email); renderAll(); }
-  alert(`Updated: ${formatETB(before)} → ${formatETB(after)}`);
-  renderAdminBody("balance");
-}
-function renderAdminConfig(body) {
-  const cfg = loadConfig();
-  body.innerHTML = `
-    <div class="admin-req">
-      <strong>⚙️ Configuration</strong>
-      <div class="cfg-field"><label>Telebirr Account</label><input id="cfg_telebirr" value="${cfg.telebirrAccount}"></div>
-      <div class="cfg-field"><label>CBE Account</label><input id="cfg_cbe" value="${cfg.cbeAccount}"></div>
-      <div class="cfg-field"><label>Deposit Min (ETB)</label><input id="cfg_depmin" type="number" value="${cfg.depositMin}"></div>
-      <div class="cfg-field"><label>Deposit Max (ETB)</label><input id="cfg_depmax" type="number" value="${cfg.depositMax}"></div>
-      <div class="cfg-field"><label>Withdraw Min (ETB)</label><input id="cfg_witmin" type="number" value="${cfg.withdrawMin}"></div>
-      <div class="cfg-field"><label>Withdraw Max (ETB)</label><input id="cfg_witmax" type="number" value="${cfg.withdrawMax}"></div>
-      <div class="cfg-field"><label>Withdraw Fee %</label><input id="cfg_fee" type="number" step="0.01" value="${cfg.withdrawFeePct}"></div>
-      <div class="cfg-field"><label>Task 24h Reward (ETB)</label><input id="cfg_task" type="number" value="${cfg.task24Reward}"></div>
-      <div class="cfg-field"><label>Referral Bonus (ETB)</label><input id="cfg_ref" type="number" value="${cfg.referralBonus}"></div>
-      <div class="cfg-field"><label>VIP Price Step (ETB)</label><input id="cfg_vipstep" type="number" value="${cfg.vipPriceStep}"></div>
-      <div class="cfg-field"><label>VIP Daily % Step</label><input id="cfg_vippct" type="number" value="${cfg.vipDailyPctStep}"></div>
-      <button class="btn" onclick="saveAdminConfig()">💾 Save Configuration</button>
-      <button class="btn secondary" style="margin-top:8px" onclick="resetAdminConfig()">↺ Reset Defaults</button>
-    </div>`;
-}
-function saveAdminConfig() {
-  saveConfig({
-    telebirrAccount: document.getElementById("cfg_telebirr").value.trim(),
-    cbeAccount: document.getElementById("cfg_cbe").value.trim(),
-    depositMin: Number(document.getElementById("cfg_depmin").value),
-    depositMax: Number(document.getElementById("cfg_depmax").value),
-    withdrawMin: Number(document.getElementById("cfg_witmin").value),
-    withdrawMax: Number(document.getElementById("cfg_witmax").value),
-    withdrawFeePct: Number(document.getElementById("cfg_fee").value),
-    task24Reward: Number(document.getElementById("cfg_task").value),
-    referralBonus: Number(document.getElementById("cfg_ref").value),
-    vipPriceStep: Number(document.getElementById("cfg_vipstep").value),
-    vipDailyPctStep: Number(document.getElementById("cfg_vippct").value)
-  });
-  alert("✅ Configuration saved.");
-  renderAdminBody("config");
-}
-function resetAdminConfig() {
-  if (!confirm("Reset all config to defaults?")) return;
-  saveConfig({ ...DEFAULT_CONFIG });
-  renderAdminBody("config");
-}
-
-window.adminLogin = adminLogin;
-window.closeAdmin = closeAdmin;
-window.switchAdminTab = switchAdminTab;
-window.adminDecide = adminDecide;
-window.adminUpdateBalance = adminUpdateBalance;
-window.saveAdminConfig = saveAdminConfig;
-window.resetAdminConfig = resetAdminConfig;
-
-/* ---------- INIT ---------- */
-renderLiveTickers();
-setInterval(updateTask24Timer, 1000);
-applyLang(currentLang);
-switchAuthTab('login');
-applyConfigToUI();
-
-if (hasActiveSession()) {
-  const savedEmail = sessionStorage.getItem(SESSION_EMAIL_KEY);
-  if (savedEmail) {
-    state = loadStateForEmail(savedEmail);
-    state.loggedIn = true;
-    document.getElementById("auth").classList.add("hidden");
-    document.getElementById("application").classList.remove("hidden");
-    openPage("home");
-  } else {
-    endSession();
-    document.getElementById("auth").classList.remove("hidden");
-    document.getElementById("application").classList.add("hidden");
-    showLogin();
-  }
-} else {
-  document.getElementById("auth").classList.remove("hidden");
-  document.getElementById("application").classList.add("hidden");
-  showLogin();
-}
 </script>
 </body>
 </html>
