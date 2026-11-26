@@ -4,294 +4,359 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenVest | Investment Platform</title>
+<title>GreenVest Investment</title>
+
 <style>
+:root {
+--green:#087b43;
+--dark:#064d2c;
+--light:#e9f7ee;
+--white:#fff;
+--bg:#f3f8f4;
+--text:#183b29;
+--muted:#718477;
+--red:#dc4444;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f1f7f2;color:#173b29}
-:root{--green:#087b43;--dark:#07532f;--light:#e2f5e9}
-button,input{font:inherit}
-button{cursor:pointer;border:0}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer}
 .hidden{display:none!important}
-header{background:var(--dark);color:white;padding:16px 5%;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:23px;font-weight:bold}
-.lang{background:white;color:var(--dark);padding:9px 14px;border-radius:8px;font-weight:bold}
-.container{max-width:1100px;margin:25px auto;padding:0 15px}
-.auth{max-width:420px;margin:65px auto;background:white;padding:28px;border-radius:16px;box-shadow:0 5px 25px #0001}
-h2{margin-bottom:20px}
-input{width:100%;padding:13px;margin:9px 0;border:1px solid #d5e4d9;border-radius:8px;outline-color:var(--green)}
-.primary{background:var(--green);color:white;padding:13px;border-radius:8px;width:100%;font-weight:bold;margin-top:10px}
-.link{color:var(--green);cursor:pointer;font-weight:bold}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
-.nav button{background:white;padding:11px 15px;border-radius:8px;color:var(--dark);font-weight:bold}
+
+header{
+background:var(--dark);color:white;padding:17px 5%;
+display:flex;align-items:center;justify-content:space-between
+}
+.logo{font-size:25px;font-weight:bold}
+.header-right{display:flex;gap:12px;align-items:center}
+.lang-btn{background:white;color:var(--dark);padding:10px 14px;border:0;border-radius:8px;font-weight:bold}
+.refresh-btn{background:#ffffff20;color:white;border:1px solid #ffffff50;border-radius:8px;padding:9px 12px}
+
+.container{max-width:1150px;margin:30px auto;padding:0 16px}
+.auth-wrapper{max-width:950px;margin:55px auto;padding:0 15px}
+.auth-heading{text-align:center;margin-bottom:28px}
+.auth-heading h1{color:var(--green);font-size:32px;margin-bottom:10px}
+
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.auth-card{background:white;padding:30px;border-radius:16px;box-shadow:0 5px 25px #0000000b;border-top:4px solid var(--green)}
+.auth-card h2{margin-bottom:20px;color:var(--dark)}
+
+input,select{
+width:100%;padding:13px;border:1px solid #dce8df;
+border-radius:8px;margin:8px 0;outline-color:var(--green);background:white
+}
+.primary{background:var(--green);color:white;width:100%;padding:14px;border:0;border-radius:8px;font-weight:bold;margin-top:12px}
+.primary:hover{background:var(--dark)}
+.message{margin-top:12px;font-size:13px;line-height:1.5}
+.error{color:var(--red)}
+.success{color:var(--green)}
+.small{font-size:13px;color:var(--muted);line-height:1.6;margin-top:12px}
+
+.dashboard-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
+.dashboard-top h2{font-size:25px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:17px;margin:24px 0}
+.card{background:white;padding:23px;border-radius:13px;box-shadow:0 3px 15px #00000008}
+.card h3{font-size:14px;color:var(--muted);margin-bottom:13px}
+.amount{color:var(--green);font-size:27px;font-weight:bold;overflow-wrap:anywhere}
+
+.rate-box{background:var(--light);border-radius:9px;padding:12px;margin-top:15px;font-size:13px;line-height:1.8}
+.rate-value{color:var(--dark);font-weight:bold}
+.rate-status{font-size:11px;color:var(--muted)}
+
+.nav{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}
+.nav button{padding:12px 16px;border:0;border-radius:8px;background:white;color:var(--dark);font-weight:bold}
 .nav button.active,.nav button:hover{background:var(--green);color:white}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px;margin:20px 0}
-.card{background:white;padding:20px;border-radius:13px;box-shadow:0 3px 15px #00000008}
-.card h3{font-size:14px;color:#718579;margin-bottom:12px}
-.amount{font-size:25px;font-weight:bold;color:var(--green)}
-.panel{background:white;padding:22px;border-radius:13px;margin:15px 0}
-.package{border:1px solid #dcebe0;border-radius:12px;padding:20px;background:#fff}
-.package h3{color:var(--green);margin-bottom:10px}
-.package p{margin:8px 0;color:#607368}
-.package button{background:var(--green);color:white;padding:11px;border-radius:7px;width:100%;margin-top:12px}
-.notice{background:#fff4d9;padding:13px;border-radius:8px;color:#745b19;font-size:13px;line-height:1.6;margin:12px 0}
-table{width:100%;border-collapse:collapse}
-td,th{text-align:left;padding:12px;border-bottom:1px solid #eee;font-size:14px}
-.small{color:#718579;font-size:13px;margin-top:12px}
-footer{text-align:center;padding:25px;color:#718579;font-size:13px}
+
+.panel{background:white;padding:25px;border-radius:13px;margin:15px 0;box-shadow:0 3px 15px #00000008}
+.panel h2{margin-bottom:18px}
+.panel p{line-height:1.7}
+
+.notice{background:#fff5db;color:#775817;padding:14px;border-radius:8px;margin:15px 0;font-size:13px;line-height:1.7}
+.green-notice{background:var(--light);color:var(--dark);padding:15px;border-radius:9px;margin:12px 0;line-height:1.7;overflow-wrap:anywhere}
+.account{background:#f5faf6;padding:15px;border:1px solid #dcebe0;border-radius:9px;margin:12px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.account strong{color:var(--green)}
+.copy-btn{padding:8px 12px;background:var(--green);color:white;border:0;border-radius:6px;font-size:12px}
+
+.packages{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.package{background:white;border:1px solid #dcebe0;border-radius:12px;padding:22px}
+.package h3{color:var(--green);margin-bottom:12px}
+.package p{color:var(--muted);margin:9px 0;font-size:14px}
+.package button{width:100%;background:var(--green);color:white;padding:12px;border:0;border-radius:8px;margin-top:12px}
+
+.fee-box{background:var(--light);padding:16px;border-radius:9px;line-height:2;margin:15px 0}
+.fee-box strong{color:var(--green)}
+table{width:100%;border-collapse:collapse;min-width:450px}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #e8eee9;font-size:13px}
+.table-wrap{overflow-x:auto}
+footer{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+
+@media(max-width:650px){
+.auth-grid{grid-template-columns:1fr}
+.auth-wrapper{margin:30px auto}
+.auth-card{padding:22px}
+.logo{font-size:20px}
+.container{margin:20px auto}
+.dashboard-top h2{font-size:21px}
+.nav button{flex:1 1 28%;padding:12px 7px;font-size:12px}
+.account{flex-wrap:wrap}
+}
 </style>
 </head>
+
 <body>
 
 <header>
- <div class="logo">🌱 GreenVest</div>
- <button class="lang" onclick="toggleLang()" id="langBtn">አማ</button>
+<div class="logo">🌱 GreenVest</div>
+<div class="header-right">
+<button class="refresh-btn hidden" id="headerRefresh" onclick="refreshRate()">↻</button>
+<button class="lang-btn" onclick="toggleLanguage()" id="languageBtn">አማ</button>
+</div>
 </header>
 
-<!-- LOGIN -->
-<div id="auth" class="auth">
- <h2 id="authTitle">Welcome Back</h2>
- <div id="registerFields" class="hidden">
-  <input id="fullname" placeholder="Full Name">
-  <input id="referral" placeholder="Referral Code (Optional)">
- </div>
- <input id="email" type="email" placeholder="Email Address">
- <input id="password" type="password" placeholder="Password">
- <button class="primary" onclick="login()" id="authBtn">Login</button>
- <p class="small" id="switchText">Don't have an account?
- <span class="link" onclick="switchAuth()">Register</span></p>
- <p class="small" id="authMsg"></p>
+<!-- REGISTER AND LOGIN -->
+
+<div id="authScreen" class="auth-wrapper">
+
+<div class="auth-heading">
+<h1>🌱 GreenVest</h1>
+<p>Welcome to your investment platform</p>
+</div>
+
+<div class="auth-grid">
+
+<div class="auth-card">
+<h2>Create Account</h2>
+<form id="registerForm">
+
+<input id="regName" required placeholder="Full Name">
+<input id="regEmail" type="email" required placeholder="Email Address">
+<input id="regPhone" type="tel" placeholder="Phone Number">
+<input id="regPassword" type="password" required minlength="8" placeholder="Create Password (8+ characters)">
+<input id="regConfirm" type="password" required minlength="8" placeholder="Confirm Password">
+<input id="regReferral" placeholder="Referral Code (Optional)">
+
+<button type="submit" class="primary">REGISTER NOW</button>
+<p id="registerMessage" class="message"></p>
+</form>
+</div>
+
+<div class="auth-card">
+<h2>Login Account</h2>
+<form id="loginForm">
+
+<input id="loginEmail" type="email" required placeholder="Email Address">
+<input id="loginPassword" type="password" required placeholder="Password">
+
+<button type="submit" class="primary">LOGIN</button>
+<p id="loginMessage" class="message"></p>
+</form>
+
+<p class="small">Create your account on the left, then login here using your registered email and password.</p>
+</div>
+
+</div>
 </div>
 
 <!-- DASHBOARD -->
-<main id="app" class="container hidden">
- <h2 id="welcome">Welcome to your Dashboard 👋</h2>
- <div class="cards">
-  <div class="card"><h3 data-en="Account Balance" data-am="የሂሳብ ቀሪ ሂሳብ">Account Balance</h3><div class="amount" id="balance">$0.00</div></div>
-  <div class="card"><h3 data-en="Total Investment" data-am="ጠቅላላ ኢንቨስትመንት">Total Investment</h3><div class="amount" id="invested">$0.00</div></div>
-  <div class="card"><h3 data-en="Referral Count" data-am="የጋበዝካቸው ሰዎች">Referral Count</h3><div class="amount" id="refCount">0</div></div>
- </div>
 
- <div class="nav">
-  <button class="active" onclick="showPage('home',this)" data-en="Dashboard" data-am="ዳሽቦርድ">Dashboard</button>
-  <button onclick="showPage('deposit',this)" data-en="Deposit" data-am="ገንዘብ አስገባ">Deposit</button>
-  <button onclick="showPage('withdraw',this)" data-en="Withdraw" data-am="ገንዘብ አውጣ">Withdraw</button>
-  <button onclick="showPage('packages',this)" data-en="Packages" data-am="ፓኬጆች">Packages</button>
-  <button onclick="showPage('referral',this)" data-en="Referral" data-am="ጋብዣ">Referral</button>
-  <button onclick="showPage('history',this)" data-en="History" data-am="ታሪክ">History</button>
-  <button onclick="logout()" data-en="Logout" data-am="ውጣ">Logout</button>
- </div>
+<main id="dashboard" class="container hidden">
 
- <section id="home" class="page">
-  <div class="panel">
-   <h2 data-en="Account Overview" data-am="የሂሳብ አጠቃላይ እይታ">Account Overview</h2>
-   <p data-en="Welcome to your GreenVest account." data-am="ወደ GreenVest መለያዎ እንኳን በደህና መጡ።">Welcome to your GreenVest account.</p>
-   <p class="small">Manage your account, review your activity and explore available packages.</p>
-  </div>
- </section>
+<div class="dashboard-top">
+<h2 id="welcomeText">Welcome to GreenVest 👋</h2>
+</div>
 
- <section id="deposit" class="page hidden">
-  <div class="panel">
-   <h2 data-en="Deposit Funds" data-am="ገንዘብ ማስገባት">Deposit Funds</h2>
-   <input type="number" id="depositAmount" placeholder="Amount in USD" min="1">
-   <select id="depositMethod" style="width:100%;padding:13px;border-radius:8px;border:1px solid #ddd">
-    <option>Bank Transfer</option>
-    <option>Mobile Money</option>
-    <option>Other Payment Method</option>
-   </select>
-   <input id="depositReference" placeholder="Payment Reference (Optional)">
-   <button class="primary" onclick="requestMoney('Deposit')">Submit Deposit Request</button>
-   <div class="notice">Demo only: this request does not transfer money. Real deposits require a verified payment provider.</div>
-  </div>
- </section>
+<div class="cards">
 
- <section id="withdraw" class="page hidden">
-  <div class="panel">
-   <h2 data-en="Withdraw Funds" data-am="ገንዘብ ማውጣት">Withdraw Funds</h2>
-   <input type="number" id="withdrawAmount" placeholder="Amount in USD" min="1">
-   <input id="withdrawMethod" placeholder="Bank / Mobile Money Details">
-   <button class="primary" onclick="requestMoney('Withdrawal')">Submit Withdrawal Request</button>
-   <div class="notice">Demo only: withdrawal requests are recorded locally and are not processed.</div>
-  </div>
- </section>
+<div class="card">
+<h3>TOTAL BALANCE</h3>
+<div class="amount" id="totalBalance">$0.00</div>
 
- <section id="packages" class="page hidden">
-  <h2 data-en="Investment Packages" data-am="የኢንቨስትመንት ፓኬጆች">Investment Packages</h2>
-  <div class="cards">
-   <div class="package">
-    <h3>Starter</h3><p>Illustrative package</p><p>Starting amount: $50</p>
-    <button onclick="selectPackage('Starter',50)">Select Package</button>
-   </div>
-   <div class="package">
-    <h3>Growth</h3><p>Illustrative package</p><p>Starting amount: $200</p>
-    <button onclick="selectPackage('Growth',200)">Select Package</button>
-   </div>
-   <div class="package">
-    <h3>Premium</h3><p>Illustrative package</p><p>Starting amount: $500</p>
-    <button onclick="selectPackage('Premium',500)">Select Package</button>
-   </div>
-  </div>
-  <div class="notice">These are sample package options, not actual investment offers or promises of profit. Real investments need clear risk disclosures and legal compliance.</div>
- </section>
+<div class="rate-box">
+<div>የብር ዋጋ = <span class="rate-value" id="birrBalance">ETB 0.00</span></div>
+<div>Exchange Rate = <span class="rate-value" id="exchangeRate">Loading...</span></div>
+<div class="rate-status" id="rateStatus">Waiting for exchange rate...</div>
+<button class="refresh-btn" style="background:var(--green);margin-top:8px" onclick="refreshRate()">↻ Refresh Rate</button>
+</div>
+</div>
 
- <section id="referral" class="page hidden">
-  <div class="panel">
-   <h2 data-en="Invite Friends" data-am="ጓደኞችን ጋብዝ">Invite Friends</h2>
-   <p>Your referral code:</p>
-   <div class="amount" id="myCode">GV-DEMO</div>
-   <button class="primary" onclick="copyCode()">Copy Referral Code</button>
-   <p class="small">Referral rewards must be configured transparently and according to applicable laws. No earnings are generated in this demo.</p>
-  </div>
- </section>
+<div class="card">
+<h3>TOTAL DEPOSIT</h3>
+<div class="amount" id="totalDeposit">$0.00</div>
+</div>
 
- <section id="history" class="page hidden">
-  <div class="panel">
-   <h2 data-en="Transaction History" data-am="የግብይት ታሪክ">Transaction History</h2>
-   <div style="overflow-x:auto">
-    <table>
-     <thead><tr><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
-     <tbody id="historyRows"><tr><td colspan="3">No transactions yet</td></tr></tbody>
-    </table>
-   </div>
-  </div>
- </section>
+<div class="card">
+<h3>TOTAL INVESTMENT</h3>
+<div class="amount" id="totalInvestment">$0.00</div>
+</div>
+
+<div class="card">
+<h3>TOTAL WITHDRAWAL</h3>
+<div class="amount" id="totalWithdrawal">$0.00</div>
+</div>
+
+</div>
+
+<div class="nav">
+<button class="active" onclick="showPage('home',this)">Dashboard</button>
+<button onclick="showPage('deposit',this)">Deposit</button>
+<button onclick="showPage('withdraw',this)">Withdrawal</button>
+<button onclick="showPage('packages',this)">Packages</button>
+<button onclick="showPage('referral',this)">Referral</button>
+<button onclick="showPage('history',this)">History</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+<section id="home" class="page">
+<div class="panel">
+<h2>Dashboard Overview</h2>
+<p>Welcome to your GreenVest account. Manage your deposits, withdrawals and packages here.</p>
+</div>
+</section>
+
+<!-- DEPOSIT -->
+
+<section id="deposit" class="page hidden">
+<div class="panel">
+<h2>Deposit Funds</h2>
+
+<div class="green-notice">
+<strong>Payment Accounts</strong>
+
+<div class="account">
+<div><strong>Telebirr</strong><p>0964488470</p></div>
+<button class="copy-btn" onclick="copyText('0964488470')">Copy</button>
+</div>
+
+<div class="account">
+<div><strong>CBE Bank</strong><p>1000298833585</p></div>
+<button class="copy-btn" onclick="copyText('1000298833585')">Copy</button>
+</div>
+
+<div class="account">
+<div><strong>Bank of Abyssinia</strong><p>166455979</p></div>
+<button class="copy-btn" onclick="copyText('166455979')">Copy</button>
+</div>
+</div>
+
+<form id="depositForm">
+<label>Deposit Amount (USD)</label>
+<input type="number" id="depositAmount" min="1" step="0.01" required placeholder="Enter amount">
+
+<label>Select Payment Method</label>
+<select id="depositMethod">
+<option value="Telebirr">Telebirr</option>
+<option value="CBE">CBE Bank</option>
+<option value="Abyssinia">Bank of Abyssinia</option>
+</select>
+
+<input id="depositReference" required placeholder="Transaction ID / Payment Reference">
+<button class="primary" type="submit">SUBMIT DEPOSIT REQUEST</button>
+</form>
+
+<div class="notice">Deposits remain pending until payment is verified. This demo does not automatically transfer money.</div>
+<p id="depositMessage" class="message"></p>
+</div>
+</section>
+
+<!-- WITHDRAWAL -->
+
+<section id="withdraw" class="page hidden">
+<div class="panel">
+<h2>Withdraw Funds</h2>
+<p>Available Balance: <strong id="availableBalance">$0.00</strong></p>
+
+<form id="withdrawForm">
+<label>Withdrawal Amount (USD)</label>
+<input type="number" id="withdrawAmount" min="1" step="0.01" required placeholder="Enter amount" oninput="calculateFee()">
+
+<label>Your Receiving Account</label>
+<select id="withdrawMethod">
+<option value="Telebirr">Telebirr</option>
+<option value="CBE">CBE Bank</option>
+<option value="Abyssinia">Bank of Abyssinia</option>
+</select>
+
+<input id="withdrawAccount" required placeholder="Enter your receiving account number">
+
+<div class="fee-box">
+<div>Withdrawal Amount: <strong id="feeAmount">$0.00</strong></div>
+<div>Withdrawal Fee (5%): <strong id="feeValue">$0.00</strong></div>
+<div>NET PAY: <strong id="netPay">$0.00</strong></div>
+</div>
+
+<button type="submit" class="primary">SUBMIT WITHDRAWAL REQUEST</button>
+</form>
+
+<p id="withdrawMessage" class="message"></p>
+</div>
+</section>
+
+<!-- PACKAGES -->
+
+<section id="packages" class="page hidden">
+<h2>Investment Packages</h2>
+
+<div class="packages">
+<div class="package">
+<h3>STARTER</h3>
+<h2>$50</h2>
+<p>Starter package</p>
+<button onclick="selectPackage('Starter',50)">SELECT PACKAGE</button>
+</div>
+
+<div class="package">
+<h3>GROWTH</h3>
+<h2>$200</h2>
+<p>Growth package</p>
+<button onclick="selectPackage('Growth',200)">SELECT PACKAGE</button>
+</div>
+
+<div class="package">
+<h3>PREMIUM</h3>
+<h2>$500</h2>
+<p>Premium package</p>
+<button onclick="selectPackage('Premium',500)">SELECT PACKAGE</button>
+</div>
+</div>
+
+<div class="notice">These are demo package prices, not promises of investment returns or profits.</div>
+</section>
+
+<!-- REFERRAL -->
+
+<section id="referral" class="page hidden">
+<div class="panel">
+<h2>Referral Program</h2>
+<p>Your personal referral code:</p>
+
+<div class="green-notice">
+<h2 id="referralCode">GV-DEMO</h2>
+<button class="copy-btn" onclick="copyReferral()">COPY CODE</button>
+</div>
+<p class="small">Referral tracking and rewards require a secure backend.</p>
+</div>
+</section>
+
+<!-- HISTORY -->
+
+<section id="history" class="page hidden">
+<div class="panel">
+<h2>Transaction History</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Type</th><th>Amount</th><th>Fee</th><th>Net Pay</th><th>Method</th><th>Status</th>
+</tr>
+</thead>
+<tbody id="historyRows"></tbody>
+</table>
+</div>
+<p id="emptyHistory" class="small">No transactions yet.</p>
+</div>
+</section>
+
 </main>
 
-<footer>© 2026 GreenVest. Demo platform.</footer>
-
-<script>
-let isAm=false;
-let isRegister=false;
-let currentUser=null;
-
-function toggleLang(){
- isAm=!isAm;
- document.getElementById('langBtn').textContent=isAm?'EN':'አማ';
- document.querySelectorAll('[data-en]').forEach(el=>{
-  el.textContent=isAm?el.dataset.am:el.dataset.en;
- });
-}
-
-function switchAuth(){
- isRegister=!isRegister;
- document.getElementById('registerFields').classList.toggle('hidden',!isRegister);
- document.getElementById('authTitle').textContent=isRegister?'Create Account':'Welcome Back';
- document.getElementById('authBtn').textContent=isRegister?'Register':'Login';
- document.getElementById('switchText').innerHTML=isRegister?
- 'Already have an account? <span class="link" onclick="switchAuth()">Login</span>':
- 'Don\\'t have an account? <span class="link" onclick="switchAuth()">Register</span>';
- document.getElementById('authMsg').textContent='';
-}
-
-function getUsers(){
- return JSON.parse(localStorage.getItem('gv_users')||'{}');
-}
-
-function login(){
- const email=document.getElementById('email').value.trim().toLowerCase();
- const password=document.getElementById('password').value;
- const users=getUsers();
- const msg=document.getElementById('authMsg');
-
- if(!email||password.length<6){
-  msg.textContent='Enter a valid email and password (minimum 6 characters).';
-  return;
- }
-
- if(isRegister){
-  const name=document.getElementById('fullname').value.trim();
-  if(!name){msg.textContent='Enter your full name.';return;}
-  if(users[email]){msg.textContent='Account already exists.';return;}
-  users[email]={name, password, balance:0, invested:0, transactions:[],code:'GV-'+Math.random().toString(36).slice(2,8).toUpperCase()};
-  localStorage.setItem('gv_users',JSON.stringify(users));
- }else{
-  if(!users[email]||users[email].password!==password){
-   msg.textContent='Incorrect email or password.';
-   return;
-  }
- }
- currentUser=email;
- localStorage.setItem('gv_session',email);
- openDashboard();
-}
-
-function openDashboard(){
- const users=getUsers();
- currentUser=localStorage.getItem('gv_session');
- if(!currentUser||!users[currentUser])return;
- document.getElementById('auth').classList.add('hidden');
- document.getElementById('app').classList.remove('hidden');
- document.getElementById('welcome').textContent='Welcome, '+users[currentUser].name+' 👋';
- document.getElementById('balance').textContent='$'+users[currentUser].balance.toFixed(2);
- document.getElementById('invested').textContent='$'+users[currentUser].invested.toFixed(2);
- document.getElementById('myCode').textContent=users[currentUser].code;
- document.getElementById('refCount').textContent='0';
- renderHistory();
-}
-
-function saveUser(user){
- const users=getUsers();
- users[currentUser]=user;
- localStorage.setItem('gv_users',JSON.stringify(users));
-}
-
-function showPage(id,btn){
- document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
- document.getElementById(id).classList.remove('hidden');
- document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
- btn.classList.add('active');
-}
-
-function requestMoney(type){
- const amount=Number(document.getElementById(type==='Deposit'?'depositAmount':'withdrawAmount').value);
- if(!amount||amount<=0){alert('Enter a valid amount');return;}
- if(type==='Withdrawal'&&amount>getUsers()[currentUser].balance){
-  alert('Insufficient demo balance');return;
- }
- const user=getUsers()[currentUser];
- user.transactions.unshift({type,amount,status:'Pending'});
- saveUser(user);
- renderHistory();
- alert(type+' request saved as Pending (demo only).');
-}
-
-function selectPackage(name,amount){
- if(!confirm('Select '+name+' package ($'+amount+')?'))return;
- alert('You selected '+name+'. This demo does not accept or invest real funds.');
-}
-
-function renderHistory(){
- const user=getUsers()[currentUser];
- const rows=document.getElementById('historyRows');
- rows.innerHTML='';
- if(!user.transactions.length){
-  rows.innerHTML='<tr><td colspan="3">No transactions yet</td></tr>';return;
- }
- user.transactions.forEach(t=>{
-  const tr=document.createElement('tr');
-  [t.type,'$'+t.amount.toFixed(2),t.status].forEach(value=>{
-   const td=document.createElement('td');
-   td.textContent=value;
-   tr.appendChild(td);
-  });
-  rows.appendChild(tr);
- });
-}
-
-function copyCode(){
- const code=getUsers()[currentUser].code;
- if(navigator.clipboard)navigator.clipboard.writeText(code).then(()=>alert('Copied!'));
- else alert(code);
-}
-
-function logout(){
- localStorage.removeItem('gv_session');
- location.reload();
-}
-
-window.onload=()=>{
- const session=localStorage.getItem('gv_session');
- if(session&&getUsers()[session])openDashboard();
-};
-</script>
-</body>
-</html>
+<footer>© 2026 GreenVest | Investment Platform</footer>
