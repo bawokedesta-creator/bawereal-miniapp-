@@ -106,7 +106,7 @@
   <div class="admin-header">
     <div>
       <div class="admin-title" data-i18n="adminTitle">EthioInvest Admin</div>
-      <div class="admin-sub" data-i18n="adminSub">Per-User Activity Table • Approve / Reject / Review / Delete</div>
+      <div class="admin-sub" data-i18n="adminSub">Live Backend Sync • Approve / Reject / Review / Delete</div>
     </div>
     <div class="header-right">
       <button class="sync-btn" onclick="syncAllData()" data-i18n="syncBtn">↻ Sync</button>
@@ -154,86 +154,30 @@
   </div>
 
   <script>
+    const API_BASE = "https://ethioinvest-lvsr.onrender.com";
     const ADMIN_PIN = "1234";
     let adminLang = "en";
-    const BRIDGE_KEY = "ethioinvest_bridge_state";
-    const liveChannel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("ethioinvest_live_channel") : null;
+    let latestAdminState = {
+      users: {},
+      requests: { deposits: [], withdrawals: [], referrals: [] },
+      announcements: []
+    };
 
-    function loadBridgeState() {
-      try {
-        const raw = sessionStorage.getItem(BRIDGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          return {
-            users: parsed.users || {},
-            requests: {
-              deposits: parsed.requests?.deposits || [],
-              withdrawals: parsed.requests?.withdrawals || [],
-              referrals: parsed.requests?.referrals || []
-            },
-            announcements: parsed.announcements || []
-          };
-        }
-      } catch (e) {}
-      return {
-        users: {},
-        requests: { deposits: [], withdrawals: [], referrals: [] },
-        announcements: []
-      };
-    }
-
-    function saveBridgeState(state) {
-      try {
-        sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(state));
-      } catch (e) {}
-      if (liveChannel) {
-        try {
-          liveChannel.postMessage({ type: "STATE_UPDATED", state });
-        } catch (e) {}
+    async function apiRequest(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed (${res.status})`);
       }
-    }
-
-    if (liveChannel) {
-      liveChannel.onmessage = (event) => {
-        if (!event.data || event.data.type !== "STATE_UPDATED") return;
-        const incoming = event.data.state || loadBridgeState();
-        const current = loadBridgeState();
-
-        // Merge incoming deposits/withdrawals/referrals/users if received via BroadcastChannel
-        const mergedUsers = { ...(current.users || {}), ...(incoming.users || {}) };
-        const mergeById = (a = [], b = []) => {
-          const map = new Map();
-          [...b, ...a].forEach(item => { if (item && item.id) map.set(item.id, item); });
-          return Array.from(map.values()).sort((x, y) => {
-            const tx = parseInt((x.id || "").split("_")[1] || "0", 10);
-            const ty = parseInt((y.id || "").split("_")[1] || "0", 10);
-            return ty - tx;
-          });
-        };
-
-        const mergedState = {
-          users: mergedUsers,
-          requests: {
-            deposits: mergeById(current.requests?.deposits, incoming.requests?.deposits),
-            withdrawals: mergeById(current.requests?.withdrawals, incoming.requests?.withdrawals),
-            referrals: mergeById(current.requests?.referrals, incoming.requests?.referrals)
-          },
-          announcements: mergeById(current.announcements, incoming.announcements)
-        };
-
-        try {
-          sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(mergedState));
-        } catch (e) {}
-
-        if (document.getElementById("admin-panel").style.display === "block") {
-          syncAllData();
-        }
-      };
+      return data;
     }
 
     const i18n = {
       en: {
-        adminTitle: "EthioInvest Admin", adminSub: "Per-User Activity Table • Approve / Reject / Review / Delete",
+        adminTitle: "EthioInvest Admin", adminSub: "Live Backend Sync • Approve / Reject / Review / Delete",
         syncBtn: "↻ Sync", gateTitle: "Admin Access", pinLabel: "Admin PIN / Passcode (Default: 1234)",
         openPanelBtn: "Open Admin Dashboard", statUsers: "Total Users", statBalances: "Total User Balances",
         statPendingDep: "Pending Deposits", statPendingWith: "Pending Withdrawals",
@@ -244,7 +188,7 @@
         reviewTitle: "Review Activity Details", closeBtn: "Close"
       },
       am: {
-        adminTitle: "EthioInvest Admin", adminSub: "የእያንዳንዱ User እንቅስቃሴ በአንድ ሰንጠረዥ • Approve / Reject / Review / Delete",
+        adminTitle: "EthioInvest Admin", adminSub: "ከ Backend ጋር ቀጥታ ግንኙነት • Approve / Reject / Review / Delete",
         syncBtn: "↻ አድስ", gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)", pinLabel: "የአድሚን ፒን (Default: 1234)",
         openPanelBtn: "አድሚን ፓነል ክፈት", statUsers: "ጠቅላላ ተጠቃሚዎች", statBalances: "ጠቅላላ የተጠቃሚ ሂሳብ",
         statPendingDep: "በመጠባበቅ ላይ ያሉ Deposits", statPendingWith: "በመጠባበቅ ላይ ያሉ Withdrawals",
@@ -265,7 +209,7 @@
       });
       document.getElementById("btnAmAdmin").classList.toggle("active", lang === "am");
       document.getElementById("btnEnAdmin").classList.toggle("active", lang === "en");
-      if (document.getElementById("admin-panel").style.display === "block") syncAllData();
+      if (document.getElementById("admin-panel").style.display === "block") renderAdminState(latestAdminState);
     }
 
     function unlockAdmin() {
@@ -280,19 +224,21 @@
       syncAllData();
     }
 
-    function postAnnouncement() {
+    async function postAnnouncement() {
       const input = document.getElementById("announceInput");
       const msg = input.value.trim();
       if (!msg) return;
-      const st = loadBridgeState();
-      st.announcements.unshift({
-        id: "ann_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        message: msg,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      });
-      saveBridgeState(st);
-      input.value = "";
-      alert(adminLang === "am" ? "ማስታወቂያው ለተጠቃሚዎች ተልኳል!" : "Announcement posted to users!");
+      try {
+        await apiRequest("/api/admin/announcements", {
+          method: "POST",
+          body: JSON.stringify({ message: msg })
+        });
+        input.value = "";
+        await syncAllData();
+        alert(adminLang === "am" ? "ማስታወቂያው ለተጠቃሚዎች ተልኳል!" : "Announcement posted to users!");
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function renderBadge(status) {
@@ -330,8 +276,19 @@
       return items;
     }
 
-    function syncAllData() {
-      const st = loadBridgeState();
+    async function syncAllData() {
+      try {
+        const st = await apiRequest("/api/admin/state");
+        latestAdminState = {
+          users: st.users || {},
+          requests: st.requests || { deposits: [], withdrawals: [], referrals: [] },
+          announcements: st.announcements || []
+        };
+        renderAdminState(latestAdminState);
+      } catch (err) {}
+    }
+
+    function renderAdminState(st) {
       const users = st.users || {};
       const reqs = st.requests || { deposits: [], withdrawals: [], referrals: [] };
 
@@ -423,118 +380,62 @@
       }).join("");
     }
 
-    function deleteActivity(kind, id) {
-      const st = loadBridgeState();
-      if (kind === "deposit") st.requests.deposits = (st.requests.deposits || []).filter(d => d.id !== id);
-      else if (kind === "withdrawal") st.requests.withdrawals = (st.requests.withdrawals || []).filter(w => w.id !== id);
-      else if (kind === "referral") st.requests.referrals = (st.requests.referrals || []).filter(r => r.id !== id);
-      saveBridgeState(st);
-      syncAllData();
-    }
-
-    function decideActivity(kind, id, action) {
-      const st = loadBridgeState();
-      const users = st.users;
-      const reqs = st.requests;
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-      if (kind === "deposit") {
-        const item = (reqs.deposits || []).find(d => d.id === id);
-        if (!item || !users[item.username]) return;
-        const amt = Number(item.amount || 0);
-        if (action === "approve") {
-          if (!item.appliedToBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({ title: `Admin Approved Deposit (${item.method})`, amount: amt, type: "plus", time: timeStr });
-            item.appliedToBalance = true;
-          }
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.appliedToBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
-            users[item.username].history.unshift({ title: `Admin Rejected Deposit (${item.method})`, amount: amt, type: "minus", time: timeStr });
-            item.appliedToBalance = false;
-          }
-          item.status = "rejected";
-        }
-      } else if (kind === "withdrawal") {
-        const item = (reqs.withdrawals || []).find(w => w.id === id);
-        if (!item || !users[item.username]) return;
-        const amt = Number(item.amount || 0);
-        if (action === "approve") {
-          if (!item.deductedFromBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
-            item.deductedFromBalance = true;
-          }
-          users[item.username].history.unshift({ title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB`, amount: amt, type: "minus", time: timeStr });
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.deductedFromBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({ title: `Admin Rejected Withdraw (Refunded ${item.method})`, amount: amt, type: "plus", time: timeStr });
-            item.deductedFromBalance = false;
-          }
-          item.status = "rejected";
-        }
-      } else if (kind === "referral") {
-        const item = (reqs.referrals || []).find(r => r.id === id);
-        if (!item || !users[item.username]) return;
-        const bonus = Number(item.amount || 100);
-        if (action === "approve") {
-          if (!item.appliedToBalance) {
-            users[item.username].balance = Number(users[item.username].balance || 0) + bonus;
-            users[item.username].refBonus = Number(users[item.username].refBonus || 0) + bonus;
-            users[item.username].history.unshift({ title: "Admin Approved Referral Bonus", amount: bonus, type: "plus", time: timeStr });
-            item.appliedToBalance = true;
-          }
-          item.status = "approved";
-        } else if (action === "reject") {
-          if (item.appliedToBalance) {
-            users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - bonus);
-            users[item.username].refBonus = Math.max(0, Number(users[item.username].refBonus || 0) - bonus);
-            users[item.username].history.unshift({ title: "Admin Rejected Referral Bonus", amount: bonus, type: "minus", time: timeStr });
-            item.appliedToBalance = false;
-          }
-          item.status = "rejected";
-        }
+    async function deleteActivity(kind, id) {
+      const endpointMap = {
+        deposit: `/api/admin/deposits/${encodeURIComponent(id)}`,
+        withdrawal: `/api/admin/withdrawals/${encodeURIComponent(id)}`,
+        referral: `/api/admin/referrals/${encodeURIComponent(id)}`
+      };
+      try {
+        await apiRequest(endpointMap[kind], { method: "DELETE" });
+        await syncAllData();
+      } catch (err) {
+        alert(err.message);
       }
-
-      saveBridgeState(st);
-      syncAllData();
     }
 
-    function adjustUserBalance(username, safeId, mode) {
+    async function decideActivity(kind, id, action) {
+      const endpointMap = {
+        deposit: `/api/admin/deposits/${encodeURIComponent(id)}/decide`,
+        withdrawal: `/api/admin/withdrawals/${encodeURIComponent(id)}/decide`,
+        referral: `/api/admin/referrals/${encodeURIComponent(id)}/decide`
+      };
+      try {
+        await apiRequest(endpointMap[kind], {
+          method: "POST",
+          body: JSON.stringify({ action })
+        });
+        await syncAllData();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function adjustUserBalance(username, safeId, mode) {
       const inputEl = document.getElementById("adj-amt-" + safeId);
       const val = parseFloat(inputEl.value);
       if (isNaN(val) || val <= 0) {
         alert("Enter a valid ETB amount.");
         return;
       }
-      const st = loadBridgeState();
-      if (!st.users[username]) return;
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      if (mode === "add") {
-        st.users[username].balance = Number(st.users[username].balance || 0) + val;
-        st.users[username].history.unshift({ title: "Admin Added Balance", amount: val, type: "plus", time: timeStr });
-      } else {
-        st.users[username].balance = Math.max(0, Number(st.users[username].balance || 0) - val);
-        st.users[username].history.unshift({ title: "Admin Deducted Balance", amount: val, type: "minus", time: timeStr });
+      try {
+        await apiRequest(`/api/admin/users/${encodeURIComponent(username)}/balance`, {
+          method: "POST",
+          body: JSON.stringify({ amount: val, mode })
+        });
+        inputEl.value = "";
+        await syncAllData();
+      } catch (err) {
+        alert(err.message);
       }
-      saveBridgeState(st);
-      inputEl.value = "";
-      syncAllData();
     }
 
     function reviewActivity(kind, id) {
-      const st = loadBridgeState();
-      const reqs = st.requests;
+      const reqs = latestAdminState.requests || {};
       const arr = kind === "deposit" ? (reqs.deposits || []) : kind === "withdrawal" ? (reqs.withdrawals || []) : (reqs.referrals || []);
       const item = arr.find(x => x.id === id);
       if (!item) return;
-      if (item.status === "pending") {
-        item.status = "reviewed";
-        saveBridgeState(st);
-      }
+
       let html = `
         <div><strong>Type:</strong> ${kind.toUpperCase()}</div>
         <div><strong>User:</strong> ${item.username}</div>
@@ -549,7 +450,6 @@
       if (item.screenshotDataUrl) html += `<div><strong>Payment Screenshot:</strong></div><img src="${item.screenshotDataUrl}" class="modal-img" alt="Screenshot" />`;
       document.getElementById("reviewModalBody").innerHTML = html;
       document.getElementById("review-modal").classList.add("active");
-      syncAllData();
     }
 
     function closeReviewModal() {
@@ -558,7 +458,7 @@
 
     setInterval(() => {
       if (document.getElementById("admin-panel").style.display === "block") syncAllData();
-    }, 2000);
+    }, 3000);
 
     if (sessionStorage.getItem("ethio_admin_unlocked") === "true") {
       document.getElementById("admin-gate").style.display = "none";
