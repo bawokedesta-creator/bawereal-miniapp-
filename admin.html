@@ -7,18 +7,19 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #090d16; color: #f8fafc; padding: 14px; max-width: 720px; margin: 0 auto; min-height: 100vh; }
+
     .admin-header {
       display: flex; justify-content: space-between; align-items: center;
-      background: #111827; border: 1px solid #1f2937; padding: 13px 15px;
-      border-radius: 14px; margin-bottom: 14px; gap: 10px;
+      background: #111827; border: 1px solid #1f2937; padding: 12px 14px;
+      border-radius: 14px; margin-bottom: 12px; gap: 8px;
     }
-    .admin-title { font-size: 1.1rem; font-weight: 800; color: #38bdf8; }
-    .admin-sub { font-size: 0.74rem; color: #94a3b8; margin-top: 2px; }
-    .header-right { display: flex; align-items: center; gap: 8px; }
+    .admin-title { font-size: 1.05rem; font-weight: 800; color: #38bdf8; }
+    .admin-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 6px; }
     .lang-box { display: flex; background: #0b1120; border-radius: 8px; padding: 2px; border: 1px solid #334155; }
-    .lang-btn { background: transparent; color: #94a3b8; border: none; padding: 5px 9px; font-size: 0.78rem; font-weight: 700; border-radius: 6px; cursor: pointer; }
+    .lang-btn { background: transparent; color: #94a3b8; border: none; padding: 5px 8px; font-size: 0.74rem; font-weight: 700; border-radius: 6px; cursor: pointer; }
     .lang-btn.active { background: #0284c7; color: #ffffff; }
-    .sync-btn { background: #1e293b; color: #38bdf8; border: 1px solid #334155; padding: 6px 11px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .sync-btn { background: #1e293b; color: #38bdf8; border: 1px solid #334155; padding: 6px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
 
     #admin-gate { background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 20px; margin-top: 18px; }
     #admin-gate h2 { font-size: 1.05rem; color: #38bdf8; margin-bottom: 12px; text-align: center; }
@@ -29,66 +30,159 @@
       background: #0b1120; color: #f8fafc; font-size: 0.88rem;
     }
 
-    .btn-blue { background: #0284c7; color: #ffffff; border: none; padding: 9px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
-    .btn-green { background: #16a34a; color: #ffffff; border: none; padding: 6px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
-    .btn-red { background: #dc2626; color: #ffffff; border: none; padding: 6px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
-    .btn-amber { background: #d97706; color: #ffffff; border: none; padding: 6px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
-    .btn-dark-del { background: #450a0a; color: #fca5a5; border: 1px solid #ef4444; padding: 6px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+    .btn-blue { background: #0284c7; color: #ffffff; border: none; padding: 9px 14px; border-radius: 8px; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-green { background: #16a34a; color: #ffffff; border: none; padding: 7px 11px; border-radius: 7px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-red { background: #dc2626; color: #ffffff; border: none; padding: 7px 11px; border-radius: 7px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-amber { background: #d97706; color: #ffffff; border: none; padding: 7px 11px; border-radius: 7px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-dark-del { background: #450a0a; color: #fca5a5; border: 1px solid #ef4444; padding: 7px 11px; border-radius: 7px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
 
     #admin-panel { display: none; }
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-    .stat-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 13px; }
-    .stat-card span { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
-    .stat-card strong { font-size: 1.12rem; color: #38bdf8; }
 
     .announce-card {
       background: #111827; border: 1px solid #1f2937; border-radius: 14px;
-      padding: 14px; margin-bottom: 14px;
+      padding: 12px; margin-bottom: 12px;
     }
-    .announce-card h3 { font-size: 0.95rem; color: #38bdf8; margin-bottom: 8px; }
+    .announce-card h3 { font-size: 0.88rem; color: #38bdf8; margin-bottom: 8px; }
     .announce-row { display: flex; gap: 8px; }
     .announce-row input {
       flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #374155;
       background: #0b1120; color: #ffffff; font-size: 0.84rem;
     }
 
-    .user-activity-block {
-      background: #111827; border: 1px solid #1f2937; border-radius: 14px;
-      padding: 14px; margin-bottom: 14px;
+    /* Horizontal 5 tabs: User | Deposit | Withdrawal | Investment | Referral */
+    .horizontal-nav-row {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      touch-action: pan-x;
     }
-    .user-block-header {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 8px; padding-bottom: 10px; margin-bottom: 10px;
+    .h-tab-btn {
+      flex: 1 0 auto;
+      min-width: 92px;
+      background: #111827;
+      color: #cbd5e1;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+    .h-tab-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+    .h-tab-count {
+      font-size: 0.7rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.55);
+      color: #fde047;
+    }
+
+    .section-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      touch-action: pan-y;
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
       border-bottom: 1px solid #1f2937;
     }
-    .user-block-title { font-size: 0.96rem; font-weight: 800; color: #38bdf8; }
-    .user-block-bal { font-size: 0.9rem; font-weight: 800; color: #4ade80; }
-    .user-submeta { font-size: 0.76rem; color: #94a3b8; margin-bottom: 10px; }
 
-    .activity-table-wrap { width: 100%; overflow-x: auto; border-radius: 10px; border: 1px solid #1f2937; background: #0b1120; }
-    .activity-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 560px; }
-    .activity-table th {
-      background: #162033; color: #cbd5e1; text-align: left;
-      padding: 8px 9px; border-bottom: 1px solid #1f2937; font-weight: 700;
+    .record-card {
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
     }
-    .activity-table td { padding: 8px 9px; border-bottom: 1px solid #131c2e; color: #e2e8f0; vertical-align: middle; }
-    .activity-table tr:last-child td { border-bottom: none; }
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .record-user {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+    .record-amount {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #4ade80;
+    }
+    .record-details {
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      word-break: break-word;
+    }
+    .record-details strong {
+      color: #94a3b8;
+    }
 
-    .status-pill { padding: 2px 7px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
+    .status-pill { padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
     .status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .status-approved { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
     .status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-    .status-reviewed { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
-    .action-btns-inline { display: flex; gap: 5px; flex-wrap: wrap; }
-    .adjust-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    /* Buttons wrap cleanly inside screen width - no horizontal swipe needed */
+    .action-btns-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+    .action-btns-grid.four-cols {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @media (max-width: 460px) {
+      .action-btns-grid.four-cols {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .adjust-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
     .adjust-row input {
-      flex: 1; min-width: 120px; padding: 7px 9px; border-radius: 7px;
-      border: 1px solid #374155; background: #0b1120; color: #ffffff; font-size: 0.82rem;
+      flex: 1;
+      min-width: 110px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      border: 1px solid #374155;
+      background: #111827;
+      color: #ffffff;
+      font-size: 0.82rem;
     }
 
     #review-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82);
+      display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
       z-index: 9999; align-items: center; justify-content: center; padding: 16px;
     }
     #review-modal.active { display: flex; }
@@ -98,7 +192,7 @@
     }
     .modal-card h4 { color: #38bdf8; margin-bottom: 10px; font-size: 1rem; }
     .modal-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 8px; background: #0b1120; border: 1px solid #1f2937; margin: 10px 0; }
-    .empty-msg { font-size: 0.84rem; color: #94a3b8; text-align: center; padding: 16px 0; }
+    .empty-msg { font-size: 0.82rem; color: #94a3b8; text-align: center; padding: 16px 0; }
   </style>
 </head>
 <body>
@@ -106,7 +200,7 @@
   <div class="admin-header">
     <div>
       <div class="admin-title" data-i18n="adminTitle">EthioInvest Admin</div>
-      <div class="admin-sub" data-i18n="adminSub">Live Backend Sync • Approve / Reject / Review / Delete</div>
+      <div class="admin-sub" data-i18n="adminSub">Live Backend • Tap Tab to View Full Info</div>
     </div>
     <div class="header-right">
       <button class="sync-btn" onclick="syncAllData()" data-i18n="syncBtn">↻ Sync</button>
@@ -127,13 +221,6 @@
   </div>
 
   <div id="admin-panel">
-    <div class="stats-grid">
-      <div class="stat-card"><span data-i18n="statUsers">Total Users</span><strong id="statUsersCount">0</strong></div>
-      <div class="stat-card"><span data-i18n="statBalances">Total User Balances</span><strong id="statTotalBalance">0.00 ETB</strong></div>
-      <div class="stat-card"><span data-i18n="statPendingDep">Pending Deposits</span><strong id="statPendingDeposits">0</strong></div>
-      <div class="stat-card"><span data-i18n="statPendingWith">Pending Withdrawals</span><strong id="statPendingWithdrawals">0</strong></div>
-    </div>
-
     <div class="announce-card">
       <h3 data-i18n="announceHeader">Post Announcement to Users</h3>
       <div class="announce-row">
@@ -142,12 +229,39 @@
       </div>
     </div>
 
-    <div id="consolidatedUsersContainer"></div>
+    <!-- Horizontal tabs: User | Deposit | Withdrawal | Investment | Referral -->
+    <div class="horizontal-nav-row" id="horizontalTabsRow">
+      <button type="button" class="h-tab-btn active" id="htab-user" onclick="selectAdminTab('user')">
+        <span>👤 User</span>
+        <span class="h-tab-count" id="count-user">0</span>
+      </button>
+      <button type="button" class="h-tab-btn" id="htab-deposit" onclick="selectAdminTab('deposit')">
+        <span>💳 Deposit</span>
+        <span class="h-tab-count" id="count-deposit">0</span>
+      </button>
+      <button type="button" class="h-tab-btn" id="htab-withdrawal" onclick="selectAdminTab('withdrawal')">
+        <span>💸 Withdrawal</span>
+        <span class="h-tab-count" id="count-withdrawal">0</span>
+      </button>
+      <button type="button" class="h-tab-btn" id="htab-investment" onclick="selectAdminTab('investment')">
+        <span>📦 Investment</span>
+        <span class="h-tab-count" id="count-investment">0</span>
+      </button>
+      <button type="button" class="h-tab-btn" id="htab-referral" onclick="selectAdminTab('referral')">
+        <span>👥 Referral</span>
+        <span class="h-tab-count" id="count-referral">0</span>
+      </button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title" id="activeSectionTitle">👤 User</div>
+      <div id="activeSectionContent"></div>
+    </div>
   </div>
 
   <div id="review-modal">
     <div class="modal-card">
-      <h4 data-i18n="reviewTitle">Review Activity Details</h4>
+      <h4 data-i18n="reviewTitle">Full Activity Details</h4>
       <div id="reviewModalBody" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.55;"></div>
       <button class="btn-blue" style="width: 100%; margin-top: 12px;" onclick="closeReviewModal()" data-i18n="closeBtn">Close</button>
     </div>
@@ -157,9 +271,10 @@
     const API_BASE = "https://ethioinvest-lvsr.onrender.com";
     const ADMIN_PIN = "1234";
     let adminLang = "en";
+    let activeAdminTab = "user";
     let latestAdminState = {
       users: {},
-      requests: { deposits: [], withdrawals: [], referrals: [] },
+      requests: { deposits: [], withdrawals: [], referrals: [], packages: [] },
       announcements: []
     };
 
@@ -177,26 +292,28 @@
 
     const i18n = {
       en: {
-        adminTitle: "EthioInvest Admin", adminSub: "Live Backend Sync • Approve / Reject / Review / Delete",
+        adminTitle: "EthioInvest Admin", adminSub: "Live Backend • Tap Tab to View Full Info",
         syncBtn: "↻ Sync", gateTitle: "Admin Access", pinLabel: "Admin PIN / Passcode (Default: 1234)",
-        openPanelBtn: "Open Admin Dashboard", statUsers: "Total Users", statBalances: "Total User Balances",
-        statPendingDep: "Pending Deposits", statPendingWith: "Pending Withdrawals",
-        announceHeader: "Post Announcement to Users", postBtn: "Post", colType: "Type",
-        colDetail: "Details / Time", colAmount: "Amount", colStatus: "Status", colAction: "Action",
-        noUserActivity: "No Deposit, Withdrawal, or Referral activity for this user yet.",
-        noUsersAtAll: "No registered users yet.", addBtn: "+ Add", deductBtn: "- Deduct",
-        reviewTitle: "Review Activity Details", closeBtn: "Close"
+        openPanelBtn: "Open Admin Dashboard", announceHeader: "Post Announcement to Users",
+        postBtn: "Post", addBtn: "+ Add Balance", deductBtn: "- Deduct Balance",
+        reviewTitle: "Full Activity Details", closeBtn: "Close",
+        emptyUser: "No registered users yet.",
+        emptyDeposit: "No deposit requests yet.",
+        emptyWithdrawal: "No withdrawal requests yet.",
+        emptyInvestment: "No investment package requests yet.",
+        emptyReferral: "No referral requests yet."
       },
       am: {
-        adminTitle: "EthioInvest Admin", adminSub: "ከ Backend ጋር ቀጥታ ግንኙነት • Approve / Reject / Review / Delete",
+        adminTitle: "EthioInvest Admin", adminSub: "ቀጥታ Backend • ሙሉ መረጃ ለማየት ክፍሉን ይንኩ",
         syncBtn: "↻ አድስ", gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)", pinLabel: "የአድሚን ፒን (Default: 1234)",
-        openPanelBtn: "አድሚን ፓነል ክፈት", statUsers: "ጠቅላላ ተጠቃሚዎች", statBalances: "ጠቅላላ የተጠቃሚ ሂሳብ",
-        statPendingDep: "በመጠባበቅ ላይ ያሉ Deposits", statPendingWith: "በመጠባበቅ ላይ ያሉ Withdrawals",
-        announceHeader: "ለተጠቃሚዎች ማስታወቂያ ላክ", postBtn: "ላክ", colType: "አይነት",
-        colDetail: "ዝርዝር / ቀን-ሰዓት", colAmount: "መጠን", colStatus: "ሁኔታ", colAction: "ቁጥጥር",
-        noUserActivity: "ለዚህ ተጠቃሚ እስካሁን የተመዘገበ Deposit / Withdrawal / Referral የለም።",
-        noUsersAtAll: "እስካሁን የተመዘገበ ተጠቃሚ የለም።", addBtn: "+ ጨምር", deductBtn: "- ቀንስ",
-        reviewTitle: "የእንቅስቃሴ ዝርዝር (Review)", closeBtn: "ዝጋ"
+        openPanelBtn: "አድሚን ፓነል ክፈት", announceHeader: "ለተጠቃሚዎች ማስታወቂያ ላክ",
+        postBtn: "ላክ", addBtn: "+ ሂሳብ ጨምር", deductBtn: "- ሂሳብ ቀንስ",
+        reviewTitle: "ሙሉ የእንቅስቃሴ መረጃ", closeBtn: "ዝጋ",
+        emptyUser: "እስካሁን የተመዘገበ ተጠቃሚ የለም።",
+        emptyDeposit: "እስካሁን የተቀማጭ ገንዘብ (Deposit) ጥያቄ የለም።",
+        emptyWithdrawal: "እስካሁን የገንዘብ ማውጫ (Withdrawal) ጥያቄ የለም።",
+        emptyInvestment: "እስካሁን የኢንቨስትመንት ፓኬጅ ጥያቄ የለም።",
+        emptyReferral: "እስካሁን የሪፈራል ጥያቄ የለም።"
       }
     };
 
@@ -235,45 +352,25 @@
         });
         input.value = "";
         await syncAllData();
-        alert(adminLang === "am" ? "ማስታወቂያው ለተጠቃሚዎች ተልኳል!" : "Announcement posted to users!");
+        alert(adminLang === "am" ? "ማስታወቂያው ተልኳል!" : "Announcement posted!");
       } catch (err) {
         alert(err.message);
       }
     }
 
-    function renderBadge(status) {
-      const cls =
-        status === "approved" ? "status-approved" :
-        status === "rejected" ? "status-rejected" :
-        status === "reviewed" ? "status-reviewed" : "status-pending";
-      return `<span class="status-pill ${cls}">${status}</span>`;
+    function selectAdminTab(tabName) {
+      activeAdminTab = tabName;
+      ["user", "deposit", "withdrawal", "investment", "referral"].forEach(t => {
+        const btn = document.getElementById("htab-" + t);
+        if (btn) btn.classList.toggle("active", t === tabName);
+      });
+      renderActiveSection(latestAdminState);
     }
 
-    function getUserConsolidatedActivities(username, reqs) {
-      const items = [];
-      (reqs.deposits || []).filter(d => d.username === username).forEach(d => {
-        items.push({
-          id: d.id, kind: "deposit", kindLabel: "Deposit",
-          detail: `${d.method || ""} • ${d.screenshotName || "No file"} • ${d.time || ""}`,
-          amount: Number(d.amount || 0), status: d.status || "pending"
-        });
-      });
-      (reqs.withdrawals || []).filter(w => w.username === username).forEach(w => {
-        items.push({
-          id: w.id, kind: "withdrawal", kindLabel: "Withdrawal",
-          detail: `${w.method || ""} (${w.account || ""}) | Net: ${Number(w.netPay || 0).toFixed(2)} • ${w.time || ""}`,
-          amount: Number(w.amount || 0), status: w.status || "pending"
-        });
-      });
-      (reqs.referrals || []).filter(r => r.username === username).forEach(r => {
-        items.push({
-          id: r.id, kind: "referral", kindLabel: "Referral",
-          detail: `${r.refLink || "Bonus"} • ${r.time || ""}`,
-          amount: Number(r.amount || 100), status: r.status || "pending"
-        });
-      });
-      items.sort((a, b) => parseInt((b.id || "").split("_")[1] || "0", 10) - parseInt((a.id || "").split("_")[1] || "0", 10));
-      return items;
+    function renderBadge(status) {
+      const st = status || "pending";
+      const cls = st === "approved" ? "status-approved" : st === "rejected" ? "status-rejected" : "status-pending";
+      return `<span class="status-pill ${cls}">${st}</span>`;
     }
 
     async function syncAllData() {
@@ -281,7 +378,12 @@
         const st = await apiRequest("/api/admin/state");
         latestAdminState = {
           users: st.users || {},
-          requests: st.requests || { deposits: [], withdrawals: [], referrals: [] },
+          requests: {
+            deposits: (st.requests && st.requests.deposits) || [],
+            withdrawals: (st.requests && st.requests.withdrawals) || [],
+            referrals: (st.requests && st.requests.referrals) || [],
+            packages: (st.requests && st.requests.packages) || []
+          },
           announcements: st.announcements || []
         };
         renderAdminState(latestAdminState);
@@ -290,101 +392,183 @@
 
     function renderAdminState(st) {
       const users = st.users || {};
-      const reqs = st.requests || { deposits: [], withdrawals: [], referrals: [] };
-
-      const userNames = Object.keys(users);
-      let totalBal = 0;
-      userNames.forEach(u => { totalBal += Number(users[u].balance || 0); });
-
-      const pendingDep = (reqs.deposits || []).filter(d => d.status === "pending" || d.status === "reviewed").length;
-      const pendingWith = (reqs.withdrawals || []).filter(w => w.status === "pending" || w.status === "reviewed").length;
-
-      document.getElementById("statUsersCount").innerText = userNames.length;
-      document.getElementById("statTotalBalance").innerText = totalBal.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
-      document.getElementById("statPendingDeposits").innerText = pendingDep;
-      document.getElementById("statPendingWithdrawals").innerText = pendingWith;
-
-      renderConsolidatedUsers(users, reqs);
+      const reqs = st.requests || {};
+      document.getElementById("count-user").innerText = Object.keys(users).length;
+      document.getElementById("count-deposit").innerText = (reqs.deposits || []).length;
+      document.getElementById("count-withdrawal").innerText = (reqs.withdrawals || []).length;
+      document.getElementById("count-investment").innerText = (reqs.packages || []).length;
+      document.getElementById("count-referral").innerText = (reqs.referrals || []).length;
+      renderActiveSection(st);
     }
 
-    function renderConsolidatedUsers(users, reqs) {
-      const container = document.getElementById("consolidatedUsersContainer");
-      const usernames = Object.keys(users);
+    function renderActiveSection(st) {
+      const users = st.users || {};
+      const reqs = st.requests || {};
+      const titleEl = document.getElementById("activeSectionTitle");
+      const contentEl = document.getElementById("activeSectionContent");
 
-      if (!usernames.length) {
-        container.innerHTML = `<div class="user-activity-block"><div class="empty-msg">${i18n[adminLang].noUsersAtAll}</div></div>`;
+      if (activeAdminTab === "user") {
+        titleEl.innerText = "👤 User — Registered Users & Full Info";
+        const usernames = Object.keys(users);
+        if (!usernames.length) {
+          contentEl.innerHTML = `<div class="empty-msg">${i18n[adminLang].emptyUser}</div>`;
+          return;
+        }
+        contentEl.innerHTML = usernames.map(u => {
+          const rec = users[u];
+          const safeId = encodeURIComponent(u);
+          return `
+            <div class="record-card">
+              <div class="record-top">
+                <span class="record-user">👤 User: ${u}</span>
+                <span class="record-amount">${Number(rec.balance || 0).toFixed(2)} ETB</span>
+              </div>
+              <div class="record-details">
+                <div><strong>Phone / Username:</strong> ${rec.phone || u}</div>
+                <div><strong>Balance:</strong> ${Number(rec.balance || 0).toFixed(2)} ETB</div>
+                <div><strong>Invested:</strong> ${Number(rec.invested || 0).toFixed(2)} ETB</div>
+                <div><strong>Referral Bonus:</strong> ${Number(rec.refBonus || 0).toFixed(2)} ETB</div>
+                <div><strong>History Entries:</strong> ${(rec.history || []).length}</div>
+              </div>
+              <div class="adjust-row">
+                <input type="number" id="adj-amt-${safeId}" placeholder="Amount (ETB)" />
+                <button class="btn-green" onclick="adjustUserBalance('${u}', '${safeId}', 'add')">${i18n[adminLang].addBtn}</button>
+                <button class="btn-red" onclick="adjustUserBalance('${u}', '${safeId}', 'sub')">${i18n[adminLang].deductBtn}</button>
+              </div>
+            </div>
+          `;
+        }).join("");
         return;
       }
 
-      container.innerHTML = usernames.map(u => {
-        const rec = users[u];
-        const safeId = encodeURIComponent(u);
-        const activities = getUserConsolidatedActivities(u, reqs);
-
-        let tableHtml = "";
-        if (!activities.length) {
-          tableHtml = `<div class="empty-msg">${i18n[adminLang].noUserActivity}</div>`;
-        } else {
-          const rows = activities.map(act => `
-            <tr>
-              <td><strong>${act.kindLabel}</strong></td>
-              <td>${act.detail}</td>
-              <td><strong>${act.amount.toFixed(2)} ETB</strong></td>
-              <td>${renderBadge(act.status)}</td>
-              <td>
-                <div class="action-btns-inline">
-                  <button class="btn-green" onclick="decideActivity('${act.kind}', '${act.id}', 'approve')">Approve</button>
-                  <button class="btn-red" onclick="decideActivity('${act.kind}', '${act.id}', 'reject')">Reject</button>
-                  <button class="btn-amber" onclick="reviewActivity('${act.kind}', '${act.id}')">Review</button>
-                  <button class="btn-dark-del" onclick="deleteActivity('${act.kind}', '${act.id}')">Delete</button>
-                </div>
-              </td>
-            </tr>
-          `).join("");
-
-          tableHtml = `
-            <div class="activity-table-wrap">
-              <table class="activity-table">
-                <thead>
-                  <tr>
-                    <th>${i18n[adminLang].colType}</th>
-                    <th>${i18n[adminLang].colDetail}</th>
-                    <th>${i18n[adminLang].colAmount}</th>
-                    <th>${i18n[adminLang].colStatus}</th>
-                    <th>${i18n[adminLang].colAction}</th>
-                  </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            </div>
-          `;
+      if (activeAdminTab === "deposit") {
+        titleEl.innerText = "💳 Deposit — User Submissions & Full Info";
+        const list = reqs.deposits || [];
+        if (!list.length) {
+          contentEl.innerHTML = `<div class="empty-msg">${i18n[adminLang].emptyDeposit}</div>`;
+          return;
         }
-
-        return `
-          <div class="user-activity-block">
-            <div class="user-block-header">
-              <span class="user-block-title">👤 ${u}</span>
-              <span class="user-block-bal">${Number(rec.balance || 0).toFixed(2)} ETB</span>
+        contentEl.innerHTML = list.map(d => `
+          <div class="record-card">
+            <div class="record-top">
+              <span class="record-user">👤 ${d.username}</span>
+              <div>${renderBadge(d.status)} <span class="record-amount">${Number(d.amount || 0).toFixed(2)} ETB</span></div>
             </div>
-            <div class="user-submeta">
-              Invested: ${Number(rec.invested || 0).toFixed(2)} ETB • Referral Bonus: ${Number(rec.refBonus || 0).toFixed(2)} ETB • Total Activities: ${activities.length}
+            <div class="record-details">
+              <div><strong>Method:</strong> ${d.method || "-"}</div>
+              <div><strong>Amount:</strong> ${Number(d.amount || 0).toFixed(2)} ETB</div>
+              <div><strong>Screenshot File:</strong> ${d.screenshotName || "No file"}</div>
+              <div><strong>Time:</strong> ${d.time || "-"}</div>
             </div>
-            ${tableHtml}
-            <div class="adjust-row">
-              <input type="number" id="adj-amt-${safeId}" placeholder="ETB" />
-              <button class="btn-green" onclick="adjustUserBalance('${u}', '${safeId}', 'add')">${i18n[adminLang].addBtn}</button>
-              <button class="btn-red" onclick="adjustUserBalance('${u}', '${safeId}', 'sub')">${i18n[adminLang].deductBtn}</button>
+            <div class="action-btns-grid four-cols">
+              <button class="btn-green" onclick="decideActivity('deposit', '${d.id}', 'approve')">Approve</button>
+              <button class="btn-red" onclick="decideActivity('deposit', '${d.id}', 'reject')">Reject</button>
+              <button class="btn-amber" onclick="reviewActivity('deposit', '${d.id}')">Review</button>
+              <button class="btn-dark-del" onclick="deleteActivity('deposit', '${d.id}')">Delete</button>
             </div>
           </div>
-        `;
-      }).join("");
+        `).join("");
+        return;
+      }
+
+      if (activeAdminTab === "withdrawal") {
+        titleEl.innerText = "💸 Withdrawal — User Requests & Full Info";
+        const list = reqs.withdrawals || [];
+        if (!list.length) {
+          contentEl.innerHTML = `<div class="empty-msg">${i18n[adminLang].emptyWithdrawal}</div>`;
+          return;
+        }
+        contentEl.innerHTML = list.map(w => `
+          <div class="record-card">
+            <div class="record-top">
+              <span class="record-user">👤 ${w.username}</span>
+              <div>${renderBadge(w.status)} <span class="record-amount">${Number(w.amount || 0).toFixed(2)} ETB</span></div>
+            </div>
+            <div class="record-details">
+              <div><strong>Method:</strong> ${w.method || "-"}</div>
+              <div><strong>User Account / Phone:</strong> ${w.account || "-"}</div>
+              <div><strong>Amount:</strong> ${Number(w.amount || 0).toFixed(2)} ETB</div>
+              <div><strong>Fee (5%):</strong> -${Number(w.fee || 0).toFixed(2)} ETB</div>
+              <div><strong>Net Pay:</strong> ${Number(w.netPay || 0).toFixed(2)} ETB</div>
+              <div><strong>Time:</strong> ${w.time || "-"}</div>
+            </div>
+            <div class="action-btns-grid four-cols">
+              <button class="btn-green" onclick="decideActivity('withdrawal', '${w.id}', 'approve')">Approve</button>
+              <button class="btn-red" onclick="decideActivity('withdrawal', '${w.id}', 'reject')">Reject</button>
+              <button class="btn-amber" onclick="reviewActivity('withdrawal', '${w.id}')">Review</button>
+              <button class="btn-dark-del" onclick="deleteActivity('withdrawal', '${w.id}')">Delete</button>
+            </div>
+          </div>
+        `).join("");
+        return;
+      }
+
+      if (activeAdminTab === "investment") {
+        titleEl.innerText = "📦 Investment — Package Requests & Full Info";
+        const list = reqs.packages || [];
+        if (!list.length) {
+          contentEl.innerHTML = `<div class="empty-msg">${i18n[adminLang].emptyInvestment}</div>`;
+          return;
+        }
+        contentEl.innerHTML = list.map(p => `
+          <div class="record-card">
+            <div class="record-top">
+              <span class="record-user">👤 ${p.username}</span>
+              <div>${renderBadge(p.status)} <span class="record-amount">${Number(p.amount || 0).toFixed(2)} ETB</span></div>
+            </div>
+            <div class="record-details">
+              <div><strong>Package:</strong> ${p.pkgName || "-"}</div>
+              <div><strong>Schedule:</strong> ${p.intervalDesc || "-"}</div>
+              <div><strong>Expected Profit (ROI):</strong> +${Number(p.userProfit || 0).toFixed(2)} ETB</div>
+              <div><strong>Invested Amount:</strong> ${Number(p.amount || 0).toFixed(2)} ETB</div>
+              <div><strong>Time:</strong> ${p.time || "-"}</div>
+            </div>
+            <div class="action-btns-grid four-cols">
+              <button class="btn-green" onclick="decideActivity('package', '${p.id}', 'approve')">Approve</button>
+              <button class="btn-red" onclick="decideActivity('package', '${p.id}', 'reject')">Reject</button>
+              <button class="btn-amber" onclick="reviewActivity('package', '${p.id}')">Review</button>
+              <button class="btn-dark-del" onclick="deleteActivity('package', '${p.id}')">Delete</button>
+            </div>
+          </div>
+        `).join("");
+        return;
+      }
+
+      if (activeAdminTab === "referral") {
+        titleEl.innerText = "👥 Referral — Referral Requests & Full Info";
+        const list = reqs.referrals || [];
+        if (!list.length) {
+          contentEl.innerHTML = `<div class="empty-msg">${i18n[adminLang].emptyReferral}</div>`;
+          return;
+        }
+        contentEl.innerHTML = list.map(r => `
+          <div class="record-card">
+            <div class="record-top">
+              <span class="record-user">👤 ${r.username}</span>
+              <div>${renderBadge(r.status)} <span class="record-amount">+${Number(r.amount || 100).toFixed(2)} ETB</span></div>
+            </div>
+            <div class="record-details">
+              <div><strong>Referral Link:</strong> ${r.refLink || "-"}</div>
+              <div><strong>Bonus Amount:</strong> +${Number(r.amount || 100).toFixed(2)} ETB</div>
+              <div><strong>Time:</strong> ${r.time || "-"}</div>
+            </div>
+            <div class="action-btns-grid four-cols">
+              <button class="btn-green" onclick="decideActivity('referral', '${r.id}', 'approve')">Approve</button>
+              <button class="btn-red" onclick="decideActivity('referral', '${r.id}', 'reject')">Reject</button>
+              <button class="btn-amber" onclick="reviewActivity('referral', '${r.id}')">Review</button>
+              <button class="btn-dark-del" onclick="deleteActivity('referral', '${r.id}')">Delete</button>
+            </div>
+          </div>
+        `).join("");
+      }
     }
 
     async function deleteActivity(kind, id) {
       const endpointMap = {
         deposit: `/api/admin/deposits/${encodeURIComponent(id)}`,
         withdrawal: `/api/admin/withdrawals/${encodeURIComponent(id)}`,
-        referral: `/api/admin/referrals/${encodeURIComponent(id)}`
+        referral: `/api/admin/referrals/${encodeURIComponent(id)}`,
+        package: `/api/admin/packages/${encodeURIComponent(id)}`
       };
       try {
         await apiRequest(endpointMap[kind], { method: "DELETE" });
@@ -398,7 +582,8 @@
       const endpointMap = {
         deposit: `/api/admin/deposits/${encodeURIComponent(id)}/decide`,
         withdrawal: `/api/admin/withdrawals/${encodeURIComponent(id)}/decide`,
-        referral: `/api/admin/referrals/${encodeURIComponent(id)}/decide`
+        referral: `/api/admin/referrals/${encodeURIComponent(id)}/decide`,
+        package: `/api/admin/packages/${encodeURIComponent(id)}/decide`
       };
       try {
         await apiRequest(endpointMap[kind], {
@@ -432,7 +617,10 @@
 
     function reviewActivity(kind, id) {
       const reqs = latestAdminState.requests || {};
-      const arr = kind === "deposit" ? (reqs.deposits || []) : kind === "withdrawal" ? (reqs.withdrawals || []) : (reqs.referrals || []);
+      const arr =
+        kind === "deposit" ? (reqs.deposits || []) :
+        kind === "withdrawal" ? (reqs.withdrawals || []) :
+        kind === "referral" ? (reqs.referrals || []) : (reqs.packages || []);
       const item = arr.find(x => x.id === id);
       if (!item) return;
 
@@ -443,6 +631,7 @@
         <div><strong>Status:</strong> ${item.status}</div>
         <div><strong>Time:</strong> ${item.time || ""}</div>
       `;
+      if (item.pkgName) html += `<div><strong>Package:</strong> ${item.pkgName} (${item.intervalDesc || ""})</div>`;
       if (item.method) html += `<div><strong>Method:</strong> ${item.method}</div>`;
       if (item.account) html += `<div><strong>User Account:</strong> ${item.account}</div>`;
       if (typeof item.netPay !== "undefined") html += `<div><strong>Net Pay (5% fee):</strong> ${Number(item.netPay).toFixed(2)} ETB</div>`;
