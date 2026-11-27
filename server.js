@@ -59,6 +59,48 @@ async function initDB() {
   }
 }
 
+function extractAmount(body) {
+  const candidates = [
+    body.amount,
+    body.depositAmount,
+    body.deposit_amount,
+    body.amt,
+    body.money,
+    body.etb,
+    body.value,
+  ];
+  for (const val of candidates) {
+    if (val !== undefined && val !== null && String(val).trim() !== '') {
+      const cleaned = String(val).replace(/[^0-9.]/g, '');
+      const num = Number(cleaned);
+      if (!Number.isNaN(num) && num > 0) {
+        return num;
+      }
+    }
+  }
+  return null;
+}
+
+function extractPaymentAccount(body) {
+  const candidates = [
+    body.paymentAccount,
+    body.payment_account,
+    body.account,
+    body.paymentMethod,
+    body.payment_method,
+    body.method,
+    body.channel,
+    body.provider,
+    body.bank,
+  ];
+  for (const val of candidates) {
+    if (val !== undefined && val !== null && String(val).trim() !== '') {
+      return String(val).trim();
+    }
+  }
+  return 'Telebirr / Bank';
+}
+
 app.get('/api/health', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW() AS server_time');
@@ -213,24 +255,20 @@ app.post('/api/login', async (req, res) => {
 
 async function handleDeposit(req, res) {
   try {
-    const paymentAccount = (
-      req.body.paymentAccount ||
-      req.body.payment_account ||
-      req.body.account ||
-      ''
-    ).trim();
-    const amount = Number(req.body.amount);
-    const phone = (req.body.phone || req.body.phoneNumber || '').trim() || null;
-    const userId = req.body.userId || req.body.user_id || null;
+    const body = req.body || {};
+    const paymentAccount = extractPaymentAccount(body);
+    const amount = extractAmount(body);
+    const phone = (body.phone || body.phoneNumber || '').trim() || null;
+    const userId = body.userId || body.user_id || null;
     const receiptImage =
-      req.body.receiptImage ||
-      req.body.receipt_image ||
-      req.body.screenshot ||
-      req.body.image ||
+      body.receiptImage ||
+      body.receipt_image ||
+      body.screenshot ||
+      body.image ||
       null;
 
-    if (!paymentAccount || !amount || Number.isNaN(amount) || amount <= 0) {
-      return res.status(400).json({ error: 'የክፍያ አካውንት እና ትክክለኛ የገንዘብ መጠን ያስፈልጋሉ።' });
+    if (!amount) {
+      return res.status(400).json({ error: 'እባክዎ ትክክለኛ የገንዘብ መጠን ያስገቡ።' });
     }
 
     const inserted = await pool.query(
