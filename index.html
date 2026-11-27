@@ -72,7 +72,8 @@
       display: none; align-items: center; justify-content: center; line-height: 1;
     }
     .notif-red-badge.show { display: inline-flex; }
-    .lang-box { display: flex; background: var(--bg-input); border-radius: 8px; padding: 2px; border: 1px solid var(--border-subtle); }
+    /* EN on left, አማ on right */
+    .lang-box { display: flex; flex-direction: row; background: var(--bg-input); border-radius: 8px; padding: 2px; border: 1px solid var(--border-subtle); }
     .lang-btn { background: transparent; color: var(--text-muted); border: none; padding: 5px 8px; font-size: 0.75rem; font-weight: 700; border-radius: 6px; cursor: pointer; }
     .lang-btn.active { background: var(--btn-blue); color: #ffffff; }
     .logout-btn { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-input); padding: 6px 9px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
@@ -211,11 +212,25 @@
     .pkg-meta { font-size: 0.73rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
 
     .tx-item {
-      background: var(--bg-input); padding: 9px 10px; border-radius: 8px; margin-bottom: 7px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; border: 1px solid var(--border-subtle); gap: 6px;
+      background: var(--bg-input); padding: 10px; border-radius: 9px; margin-bottom: 8px;
+      display: flex; flex-direction: column; gap: 7px; font-size: 0.76rem; border: 1px solid var(--border-subtle);
     }
+    .tx-top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .tx-plus { color: #4ade80; font-weight: 700; white-space: nowrap; }
     .tx-minus { color: #f87171; font-weight: 700; white-space: nowrap; }
+
+    .receipt-dl-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap;
+      padding-top: 6px; border-top: 1px dashed var(--border-subtle);
+    }
+    .receipt-dl-label { font-size: 0.7rem; font-weight: 700; color: var(--accent); }
+    .receipt-fmt-btns { display: flex; gap: 6px; }
+    .dl-fmt-btn {
+      background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-input);
+      border-radius: 6px; padding: 4px 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer;
+    }
+    .dl-fmt-btn:hover { border-color: var(--accent); color: var(--accent); }
+
     .notif-msg-card { background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px; margin-bottom: 7px; font-size: 0.75rem; color: var(--text-main); line-height: 1.4; }
     .notif-msg-card.unread { border-color: #ef4444; }
 
@@ -259,9 +274,10 @@
         <span class="notif-red-badge" id="topNotifRedBadge">0</span>
       </div>
       <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleColorMode()" title="Dark / Light Mode">🌙</button>
+      <!-- EN on left, አማ on right -->
       <div class="lang-box">
-        <button class="lang-btn" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
         <button class="lang-btn active" id="btnEnTop" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
       </div>
       <button class="logout-btn" id="headerLogoutBtn" onclick="logoutUser()" style="display: none;" data-i18n="logoutBtn">Logout</button>
     </div>
@@ -279,6 +295,10 @@
       </div>
 
       <div id="register-form" class="auth-form active">
+        <div class="form-group">
+          <label data-i18n="fullNameLabel">Full Name</label>
+          <input type="text" id="regFullName" placeholder="Bawoke Desta" />
+        </div>
         <div class="form-group">
           <label data-i18n="phoneLabel">Phone Number</label>
           <input type="text" id="regUser" placeholder="09..." />
@@ -621,7 +641,7 @@
       en: {
         preRegisterNotice: "Before going to login, first register and create a password",
         regTab: "Register", loginTab: "Login",
-        phoneLabel: "Phone Number", passLabel: "Password", confirmPassLabel: "Confirm Password",
+        fullNameLabel: "Full Name", phoneLabel: "Phone Number", passLabel: "Password", confirmPassLabel: "Confirm Password",
         agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
         regBtn: "Create Account", loginBtn: "Login",
         resetPassLink: "Password Reset (OTP)", resetPhoneLabel: "Registered Phone Number",
@@ -639,12 +659,13 @@
         feeLabel: "Fee (5%):", confirmWithBtn: "Submit", pkgHeader: "Packages (≤200k)",
         refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
         histHeader: "History", noHistory: "No transactions yet.", backBtn: "Back",
+        downloadReceiptText: "⬇️ Download receipt",
         ratePrefix: "ETB Rate (1 USD) =", loadingMsg: "Loading...", regRedirectMsg: "Going to Login..."
       },
       am: {
         preRegisterNotice: "ወደ login ከመሄድዎ በፊት መጀመሪያ ተመዝግበው ፓስዋርድ ይፍጠሩ",
         regTab: "Register", loginTab: "Login",
-        phoneLabel: "ስልክ ቁጥር (Phone)", passLabel: "የይለፍ ቃል (Password)", confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
+        fullNameLabel: "ሙሉ ስም (Full Name)", phoneLabel: "ስልክ ቁጥር (Phone)", passLabel: "የይለፍ ቃል (Password)", confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
         agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
         regBtn: "ተመዝገብ", loginBtn: "ግባ",
         resetPassLink: "Password Reset (OTP)", resetPhoneLabel: "የተመዘገበ ስልክ ቁጥር",
@@ -662,9 +683,94 @@
         feeLabel: "Fee (5%):", confirmWithBtn: "ላክ", pkgHeader: "Packages (≤200k)",
         refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
         histHeader: "ታሪክ (History)", noHistory: "እንቅስቃሴ የለም።", backBtn: "ተመለስ",
+        downloadReceiptText: "⬇️ Download receipt",
         ratePrefix: "የብር ዋጋ (1 USD) =", loadingMsg: "በመጫን ላይ...", regRedirectMsg: "ወደ Login በመሄድ ላይ..."
       }
     };
+
+    function escapeXml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
+    function buildReceiptSvgMarkup(item) {
+      const fullName = (currentUserRecord && currentUserRecord.fullName) || currentUser || "User";
+      const phone = currentUser || "-";
+      const sign = item.type === "plus" ? "+" : "-";
+      const amtStr = `${sign}${Number(item.amount || 0).toFixed(2)} ETB`;
+      const titleText = escapeXml(item.title || "Transaction");
+      const nameText = escapeXml(fullName);
+      const phoneText = escapeXml(phone);
+      const timeText = escapeXml(item.time || new Date().toLocaleTimeString());
+      const amtColor = item.type === "plus" ? "#16a34a" : "#dc2626";
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <rect width="600" height="360" rx="20" fill="#0f172a"/>
+  <rect x="16" y="16" width="568" height="328" rx="16" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="40" y="64" fill="#38bdf8" font-size="26" font-weight="800" font-family="sans-serif">EthioInvest Receipt</text>
+  <text x="560" y="64" text-anchor="end" fill="#94a3b8" font-size="16" font-family="sans-serif">${timeText}</text>
+  <line x1="40" y1="86" x2="560" y2="86" stroke="#334155" stroke-width="1.5"/>
+  <text x="40" y="126" fill="#94a3b8" font-size="16" font-family="sans-serif">Full Name:</text>
+  <text x="560" y="126" text-anchor="end" fill="#f8fafc" font-size="18" font-weight="700" font-family="sans-serif">${nameText}</text>
+  <text x="40" y="162" fill="#94a3b8" font-size="16" font-family="sans-serif">Phone:</text>
+  <text x="560" y="162" text-anchor="end" fill="#f8fafc" font-size="18" font-weight="700" font-family="sans-serif">${phoneText}</text>
+  <text x="40" y="198" fill="#94a3b8" font-size="16" font-family="sans-serif">Activity:</text>
+  <text x="40" y="226" fill="#e2e8f0" font-size="16" font-weight="600" font-family="sans-serif">${titleText.slice(0, 58)}</text>
+  <line x1="40" y1="252" x2="560" y2="252" stroke="#334155" stroke-width="1.5"/>
+  <text x="40" y="296" fill="#cbd5e1" font-size="20" font-weight="700" font-family="sans-serif">Amount:</text>
+  <text x="560" y="298" text-anchor="end" fill="${amtColor}" font-size="28" font-weight="900" font-family="sans-serif">${escapeXml(amtStr)}</text>
+</svg>`;
+    }
+
+    function triggerFileDownload(blobOrUrl, filename) {
+      const a = document.createElement("a");
+      a.href = blobOrUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function downloadReceiptFile(index, format) {
+      const list = (currentUserRecord && currentUserRecord.history) || [];
+      const item = list[index];
+      if (!item) return;
+
+      const safeBase = `ethioinvest-receipt-${(currentUser || "user")}-${index + 1}`;
+      const svgMarkup = buildReceiptSvgMarkup(item);
+
+      if (format === "svg") {
+        const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        triggerFileDownload(url, `${safeBase}.svg`);
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        return;
+      }
+
+      const img = new Image();
+      const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = 600;
+        canvas.height = 360;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(svgUrl);
+        canvas.toBlob(function (pngBlob) {
+          if (!pngBlob) return;
+          const pngUrl = URL.createObjectURL(pngBlob);
+          triggerFileDownload(pngUrl, `${safeBase}.png`);
+          setTimeout(() => URL.revokeObjectURL(pngUrl), 1500);
+        }, "image/png");
+      };
+      img.src = svgUrl;
+    }
 
     function toggleColorMode() {
       lightThemeActive = !lightThemeActive;
@@ -747,9 +853,10 @@
         const key = el.getAttribute("data-i18n");
         if (i18n[lang][key]) el.innerText = i18n[lang][key];
       });
-      document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
       document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
+      document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
       renderExchangeRate();
+      if (currentUserRecord) renderHistory(currentUserRecord.history || []);
     }
 
     async function fetchRealExchangeRate() {
@@ -806,6 +913,7 @@
     }
 
     async function registerUser() {
+      const fullName = document.getElementById("regFullName").value.trim();
       const phone = document.getElementById("regUser").value.trim();
       const pass = document.getElementById("regPass").value;
       const confirm = document.getElementById("regConfirm").value;
@@ -816,8 +924,8 @@
         showAuthMsg(currentLang === "am" ? "መጀመሪያ ሳጥኑን tick ያድርጉ!" : "Tick the checkbox first!", true);
         return;
       }
-      if (!phone || !pass) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ እና ፓስዋርድ ያስገቡ!" : "Please enter phone and password!", true);
+      if (!fullName || !phone || !pass) {
+        showAuthMsg(currentLang === "am" ? "እባክዎ ሙሉ ስም፣ ስልክ እና ፓስዋርድ ያስገቡ!" : "Please enter full name, phone, and password!", true);
         return;
       }
       if (pass !== confirm) {
@@ -828,8 +936,9 @@
       try {
         await apiRequest("/api/register", {
           method: "POST",
-          body: JSON.stringify({ phone, password: pass })
+          body: JSON.stringify({ fullName, phone, password: pass })
         });
+        document.getElementById("regFullName").value = "";
         document.getElementById("regPass").value = "";
         document.getElementById("regConfirm").value = "";
         document.getElementById("agreePolicyCheckbox").checked = false;
@@ -893,12 +1002,18 @@
       }
     }
 
+    function formatUserHeaderLabel() {
+      const name = currentUserRecord && currentUserRecord.fullName ? currentUserRecord.fullName : "";
+      if (name && currentUser) return `${name} (${currentUser})`;
+      return name || currentUser || "User";
+    }
+
     function showDashboardUI() {
       document.getElementById("auth-section").style.display = "none";
       document.getElementById("dashboard-section").style.display = "block";
       document.getElementById("bottomNavBar").classList.add("visible");
       document.getElementById("headerLogoutBtn").style.display = "inline-block";
-      document.getElementById("headerUserSub").innerText = currentUser || "User";
+      document.getElementById("headerUserSub").innerText = formatUserHeaderLabel();
     }
 
     function logoutUser() {
@@ -957,7 +1072,7 @@
     function applyUserRecordToUI(userObj, announcementsArr) {
       if (userObj) {
         currentUserRecord = userObj;
-        document.getElementById("headerUserSub").innerText = currentUser;
+        document.getElementById("headerUserSub").innerText = formatUserHeaderLabel();
         renderBalanceText();
         document.getElementById("refLinkText").innerText = `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
         renderHistory(userObj.history || []);
@@ -1159,10 +1274,19 @@
         container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">${i18n[currentLang].noHistory}</p>`;
         return;
       }
-      container.innerHTML = list.map(item => `
+      container.innerHTML = list.map((item, idx) => `
         <div class="tx-item">
-          <div><div>${item.title}</div><small style="color:var(--text-muted);">${item.time}</small></div>
-          <span class="${item.type === "plus" ? "tx-plus" : "tx-minus"}">${item.type === "plus" ? "+" : "-"}${Number(item.amount).toFixed(2)} ETB</span>
+          <div class="tx-top-row">
+            <div><div>${item.title}</div><small style="color:var(--text-muted);">${item.time}</small></div>
+            <span class="${item.type === "plus" ? "tx-plus" : "tx-minus"}">${item.type === "plus" ? "+" : "-"}${Number(item.amount).toFixed(2)} ETB</span>
+          </div>
+          <div class="receipt-dl-bar">
+            <span class="receipt-dl-label">${i18n[currentLang].downloadReceiptText}</span>
+            <div class="receipt-fmt-btns">
+              <button type="button" class="dl-fmt-btn" onclick="downloadReceiptFile(${idx}, 'png')">PNG</button>
+              <button type="button" class="dl-fmt-btn" onclick="downloadReceiptFile(${idx}, 'svg')">SVG</button>
+            </div>
+          </div>
         </div>
       `).join("");
     }
