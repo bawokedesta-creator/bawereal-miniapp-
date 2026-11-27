@@ -590,8 +590,12 @@
   </nav>
 
   <script>
+    const API_BASE = "https://ethioinvest-lvsr.onrender.com";
+
     let currentLang = "en";
     let currentUser = null;
+    let currentUserRecord = null;
+    let currentAnnouncements = [];
     let exchangeRate = 163.44;
     let selectedReceiptName = "";
     let selectedReceiptDataUrl = "";
@@ -599,56 +603,18 @@
     let isRegisteringRedirect = false;
     let balanceHidden = false;
     let lightThemeActive = false;
-    const SMS_OTP_API_ENDPOINT = "";
     let pendingOtpPhone = null;
 
-    const BRIDGE_KEY = "ethioinvest_bridge_state";
-    const liveChannel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("ethioinvest_live_channel") : null;
-
-    function loadBridgeState() {
-      try {
-        const raw = sessionStorage.getItem(BRIDGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          return {
-            users: parsed.users || {},
-            requests: {
-              deposits: parsed.requests?.deposits || [],
-              withdrawals: parsed.requests?.withdrawals || [],
-              referrals: parsed.requests?.referrals || []
-            },
-            announcements: parsed.announcements || []
-          };
-        }
-      } catch (e) {}
-      return {
-        users: {},
-        requests: { deposits: [], withdrawals: [], referrals: [] },
-        announcements: []
-      };
-    }
-
-    function saveBridgeState(state, extraEvent = null) {
-      try {
-        sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(state));
-      } catch (e) {}
-      if (liveChannel) {
-        try {
-          liveChannel.postMessage({ type: "STATE_UPDATED", state, extraEvent });
-        } catch (e) {}
+    async function apiRequest(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed (${res.status})`);
       }
-    }
-
-    if (liveChannel) {
-      liveChannel.onmessage = (event) => {
-        if (event.data && event.data.type === "STATE_UPDATED" && event.data.state) {
-          try {
-            sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(event.data.state));
-          } catch (e) {}
-          syncNotificationsUI();
-          if (currentUser) loadUserData();
-        }
-      };
+      return data;
     }
 
     const i18n = {
@@ -710,14 +676,8 @@
       document.getElementById("createAccountBtn").disabled = !document.getElementById("agreePolicyCheckbox").checked;
     }
 
-    function getUserRecord() {
-      if (!currentUser) return null;
-      return loadBridgeState().users[currentUser] || null;
-    }
-
     function renderBalanceText() {
-      const rec = getUserRecord();
-      const val = rec ? Number(rec.balance || 0) : 0;
+      const val = currentUserRecord ? Number(currentUserRecord.balance || 0) : 0;
       const el = document.getElementById("balanceDisplay");
       el.innerText = balanceHidden ? "•••••• ETB" : val.toLocaleString("en-US", { minimumFractionDigits: 2 }) + " ETB";
     }
@@ -734,20 +694,19 @@
 
     async function sendOtpToPhone() {
       const phone = document.getElementById("resetPhoneInput").value.trim();
-      const st = loadBridgeState();
       const banner = document.getElementById("otpDeliveryBanner");
-      if (!phone || !st.users[phone]) {
-        showAuthMsg(currentLang === "am" ? "ይህ ስልክ ቁጥር አልተመዘገበም!" : "This phone number is not registered!", true);
+      if (!phone) {
+        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ ቁጥር ያስገቡ!" : "Please enter a phone number!", true);
         return;
       }
       pendingOtpPhone = phone;
       banner.classList.add("show");
       banner.innerText = currentLang === "am"
-        ? `የ SMS Gateway API ስላልተገናኘ የ OTP ጥያቄ ለ ${phone} ተመዝግቧል።`
-        : `No SMS gateway API connected yet. OTP request recorded for ${phone}.`;
+        ? `የ OTP ጥያቄ ለ ${phone} ተመዝግቧል። አዲስ ፓስዋርድ አስገብተው ይቀይሩ።`
+        : `OTP reset ready for ${phone}. Enter your new password below.`;
     }
 
-    function confirmOtpPasswordReset() {
+    async function confirmOtpPasswordReset() {
       const phone = document.getElementById("resetPhoneInput").value.trim();
       const otpInput = document.getElementById("otpCodeInput").value.trim();
       const newPass = document.getElementById("newPasswordInput").value;
@@ -755,17 +714,21 @@
         showAuthMsg(currentLang === "am" ? "እባክዎ ትክክለኛ መረጃ ያስገቡ!" : "Please enter valid reset fields!", true);
         return;
       }
-      const st = loadBridgeState();
-      if (!st.users[phone]) return;
-      st.users[phone].password = newPass;
-      saveBridgeState(st);
-      pendingOtpPhone = null;
-      document.getElementById("otpCodeInput").value = "";
-      document.getElementById("newPasswordInput").value = "";
-      document.getElementById("otpDeliveryBanner").classList.remove("show");
-      document.getElementById("otpResetBox").classList.remove("open");
-      document.getElementById("loginUser").value = phone;
-      showAuthMsg(currentLang === "am" ? "የይለፍ ቃል ተቀይሯል! አሁን ይግቡ።" : "Password updated! You can now log in.", false);
+      try {
+        await apiRequest("/api/reset-password", {
+          method: "POST",
+          body: JSON.stringify({ phone, newPassword: newPass })
+        });
+        pendingOtpPhone = null;
+        document.getElementById("otpCodeInput").value = "";
+        document.getElementById("newPasswordInput").value = "";
+        document.getElementById("otpDeliveryBanner").classList.remove("show");
+        document.getElementById("otpResetBox").classList.remove("open");
+        document.getElementById("loginUser").value = phone;
+        showAuthMsg(currentLang === "am" ? "የይለፍ ቃል ተቀይሯል! አሁን ይግቡ።" : "Password updated! You can now log in.", false);
+      } catch (err) {
+        showAuthMsg(err.message, true);
+      }
     }
 
     function switchAuthMode(mode) {
@@ -814,7 +777,7 @@
       const btn = document.getElementById("refreshBalanceBtn");
       btn.classList.add("spinning");
       fetchRealExchangeRate();
-      if (currentUser) loadUserData();
+      if (currentUser) loadUserDataFromServer();
       setTimeout(() => btn.classList.remove("spinning"), 450);
     }
 
@@ -842,7 +805,7 @@
       }, 1000);
     }
 
-    function registerUser() {
+    async function registerUser() {
       const phone = document.getElementById("regUser").value.trim();
       const pass = document.getElementById("regPass").value;
       const confirm = document.getElementById("regConfirm").value;
@@ -862,21 +825,19 @@
         return;
       }
 
-      const st = loadBridgeState();
-      if (st.users[phone]) {
-        showAuthMsg("Already registered", true);
-        return;
+      try {
+        await apiRequest("/api/register", {
+          method: "POST",
+          body: JSON.stringify({ phone, password: pass })
+        });
+        document.getElementById("regPass").value = "";
+        document.getElementById("regConfirm").value = "";
+        document.getElementById("agreePolicyCheckbox").checked = false;
+        updateRegisterButtonState();
+        runOneSecondToLogin(phone, currentLang === "am" ? "ምዝገባው ተሳክቷል! በፓስዋርድ ይግቡ።" : "Registered! Log in with your password.");
+      } catch (err) {
+        showAuthMsg(err.message, true);
       }
-
-      st.users[phone] = { password: pass, balance: 0, invested: 0, refBonus: 0, history: [], seenAnnouncementIds: [] };
-      saveBridgeState(st, { kind: "USER_REGISTERED", username: phone });
-
-      document.getElementById("regPass").value = "";
-      document.getElementById("regConfirm").value = "";
-      document.getElementById("agreePolicyCheckbox").checked = false;
-      updateRegisterButtonState();
-
-      runOneSecondToLogin(phone, currentLang === "am" ? "ምዝገባው ተሳክቷል! በፓስዋርድ ይግቡ።" : "Registered! Log in with your password.");
     }
 
     function runLoginLoadingScreen(onComplete) {
@@ -906,21 +867,30 @@
       });
     }
 
-    function loginUser() {
+    async function loginUser() {
       const phone = document.getElementById("loginUser").value.trim();
       const pass = document.getElementById("loginPass").value;
-      const st = loadBridgeState();
-      const userRec = st.users[phone];
-      if (!userRec || userRec.password !== pass) {
-        showAuthMsg(currentLang === "am" ? "የተሳሳተ ስልክ ወይም ፓስዋርድ!" : "Invalid phone or password!", true);
+      if (!phone || !pass) {
+        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ እና ፓስዋርድ ያስገቡ!" : "Please enter phone and password!", true);
         return;
       }
-      currentUser = phone;
-      document.getElementById("authMessage").style.display = "none";
-      runLoginLoadingScreen(() => {
-        showDashboardUI();
-        loadUserData();
-      });
+
+      try {
+        const data = await apiRequest("/api/login", {
+          method: "POST",
+          body: JSON.stringify({ phone, password: pass })
+        });
+        currentUser = phone;
+        currentUserRecord = data.user;
+        document.getElementById("authMessage").style.display = "none";
+        runLoginLoadingScreen(() => {
+          showDashboardUI();
+          applyUserRecordToUI(currentUserRecord, currentAnnouncements);
+          loadUserDataFromServer();
+        });
+      } catch (err) {
+        showAuthMsg(err.message, true);
+      }
     }
 
     function showDashboardUI() {
@@ -933,6 +903,7 @@
 
     function logoutUser() {
       currentUser = null;
+      currentUserRecord = null;
       closeAllInnerPanels("bnav-home");
       document.getElementById("dashboard-section").style.display = "none";
       document.getElementById("bottomNavBar").classList.remove("visible");
@@ -943,10 +914,8 @@
     }
 
     function syncNotificationsUI() {
-      const st = loadBridgeState();
-      const announcements = st.announcements || [];
-      const userRec = currentUser ? st.users[currentUser] : null;
-      const seenIds = (userRec && userRec.seenAnnouncementIds) || [];
+      const announcements = currentAnnouncements || [];
+      const seenIds = (currentUserRecord && currentUserRecord.seenAnnouncementIds) || [];
       const unreadCount = announcements.filter(a => !seenIds.includes(a.id)).length;
       const badgeEl = document.getElementById("topNotifRedBadge");
       if (unreadCount > 0) {
@@ -971,12 +940,8 @@
     }
 
     function markAllAnnouncementsSeen() {
-      if (!currentUser) return;
-      const st = loadBridgeState();
-      const userRec = st.users[currentUser];
-      if (!userRec) return;
-      userRec.seenAnnouncementIds = (st.announcements || []).map(a => a.id);
-      saveBridgeState(st);
+      if (!currentUserRecord) return;
+      currentUserRecord.seenAnnouncementIds = (currentAnnouncements || []).map(a => a.id);
       syncNotificationsUI();
     }
 
@@ -989,14 +954,26 @@
       }
     }
 
-    function loadUserData() {
-      const data = getUserRecord();
-      if (!data) return;
-      document.getElementById("headerUserSub").innerText = currentUser;
-      renderBalanceText();
-      document.getElementById("refLinkText").innerText = `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
-      renderHistory(data.history);
+    function applyUserRecordToUI(userObj, announcementsArr) {
+      if (userObj) {
+        currentUserRecord = userObj;
+        document.getElementById("headerUserSub").innerText = currentUser;
+        renderBalanceText();
+        document.getElementById("refLinkText").innerText = `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
+        renderHistory(userObj.history || []);
+      }
+      if (Array.isArray(announcementsArr)) {
+        currentAnnouncements = announcementsArr;
+      }
       syncNotificationsUI();
+    }
+
+    async function loadUserDataFromServer() {
+      if (!currentUser) return;
+      try {
+        const res = await apiRequest(`/api/user/${encodeURIComponent(currentUser)}`);
+        applyUserRecordToUI(res.user, res.announcements);
+      } catch (err) {}
     }
 
     function closeAllInnerPanels(bnavId = "bnav-home") {
@@ -1061,12 +1038,8 @@
       reader.readAsDataURL(file);
     }
 
-    function submitDeposit() {
+    async function submitDeposit() {
       if (!currentUser) return;
-      const st = loadBridgeState();
-      const data = st.users[currentUser];
-      if (!data) return;
-
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
 
@@ -1079,37 +1052,28 @@
         return;
       }
 
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      const depItem = {
-        id: "dep_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        username: currentUser,
-        method: method,
-        amount: amount,
-        screenshotName: selectedReceiptName,
-        screenshotDataUrl: selectedReceiptDataUrl,
-        status: "pending",
-        appliedToBalance: false,
-        time: timeStr
-      };
-      st.requests.deposits.unshift(depItem);
-
-      data.history.unshift({
-        title: `Deposit Pending Admin (${method}) • ${selectedReceiptName}`,
-        amount: amount,
-        type: "plus",
-        time: timeStr
-      });
-      saveBridgeState(st, { kind: "NEW_DEPOSIT", item: depItem });
-      loadUserData();
-
-      document.getElementById("depAmount").value = "";
-      document.getElementById("depReceiptInput").value = "";
-      selectedReceiptName = "";
-      selectedReceiptDataUrl = "";
-      document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
-      document.getElementById("receiptPreview").style.display = "none";
-
-      alert(currentLang === "am" ? "የተቀማጭ ገንዘብ ጥያቄ ወደ Admin ተልኳል!" : "Deposit request sent to Admin!");
+      try {
+        const res = await apiRequest("/api/deposits", {
+          method: "POST",
+          body: JSON.stringify({
+            phone: currentUser,
+            method,
+            amount,
+            screenshotName: selectedReceiptName,
+            screenshotDataUrl: selectedReceiptDataUrl
+          })
+        });
+        applyUserRecordToUI(res.user);
+        document.getElementById("depAmount").value = "";
+        document.getElementById("depReceiptInput").value = "";
+        selectedReceiptName = "";
+        selectedReceiptDataUrl = "";
+        document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
+        document.getElementById("receiptPreview").style.display = "none";
+        alert(currentLang === "am" ? "የተቀማጭ ገንዘብ ጥያቄ ወደ Admin ተልኳል!" : "Deposit request sent to Admin!");
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function calculateNetPay() {
@@ -1124,12 +1088,8 @@
       document.getElementById("calcNetPay").innerText = (raw - fee).toFixed(2) + " ETB";
     }
 
-    function submitWithdrawal() {
+    async function submitWithdrawal() {
       if (!currentUser) return;
-      const st = loadBridgeState();
-      const data = st.users[currentUser];
-      if (!data) return;
-
       const method = document.getElementById("withMethod").value;
       const userAcc = document.getElementById("withUserAccount").value.trim();
       const amount = parseFloat(document.getElementById("withAmount").value);
@@ -1138,87 +1098,59 @@
         alert(currentLang === "am" ? "እባክዎ አካውንት እና የብር መጠን ያስገቡ።" : "Please enter account and valid amount.");
         return;
       }
-      if (amount > data.balance) {
+      if (amount > Number(currentUserRecord?.balance || 0)) {
         alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም!" : "Insufficient balance!");
         return;
       }
 
-      const fee = amount * 0.05;
-      const netPay = amount - fee;
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-      data.balance = Number(data.balance || 0) - amount;
-      data.history.unshift({
-        title: `Withdraw Pending Admin (${method}: ${userAcc}) | Net = ${netPay.toFixed(2)}`,
-        amount: amount,
-        type: "minus",
-        time: timeStr
-      });
-
-      const withItem = {
-        id: "with_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        username: currentUser,
-        method: method,
-        account: userAcc,
-        amount: amount,
-        fee: fee,
-        netPay: netPay,
-        status: "pending",
-        deductedFromBalance: true,
-        refundedToBalance: false,
-        time: timeStr
-      };
-      st.requests.withdrawals.unshift(withItem);
-      saveBridgeState(st, { kind: "NEW_WITHDRAWAL", item: withItem });
-      loadUserData();
-      document.getElementById("withAmount").value = "";
-      calculateNetPay();
-      alert(currentLang === "am" ? `የወጪ ጥያቄ ተልኳል! Net Pay = ${netPay.toFixed(2)} ETB` : `Withdrawal sent! Net Pay = ${netPay.toFixed(2)} ETB`);
+      try {
+        const res = await apiRequest("/api/withdrawals", {
+          method: "POST",
+          body: JSON.stringify({ phone: currentUser, method, account: userAcc, amount })
+        });
+        applyUserRecordToUI(res.user);
+        document.getElementById("withAmount").value = "";
+        calculateNetPay();
+        const netPay = amount - amount * 0.05;
+        alert(currentLang === "am" ? `የወጪ ጥያቄ ተልኳል! Net Pay = ${netPay.toFixed(2)} ETB` : `Withdrawal sent! Net Pay = ${netPay.toFixed(2)} ETB`);
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
-    function buyPackage(cost, pkgName, userProfit, intervalDesc) {
+    async function buyPackage(cost, pkgName, userProfit, intervalDesc) {
       if (!currentUser) return;
-      const st = loadBridgeState();
-      const data = st.users[currentUser];
-      if (!data) return;
-      if (data.balance < cost) {
+      if (Number(currentUserRecord?.balance || 0) < cost) {
         alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም።" : "Insufficient balance.");
         return;
       }
-      data.balance -= cost;
-      data.invested = Number(data.invested || 0) + cost;
-      data.history.unshift({
-        title: `${pkgName} [${intervalDesc}] (+${userProfit.toFixed(2)} ROI)`,
-        amount: cost,
-        type: "minus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      });
-      saveBridgeState(st);
-      loadUserData();
-      alert(currentLang === "am" ? `${pkgName} ተጀምሯል!` : `${pkgName} activated!`);
+      try {
+        const res = await apiRequest("/api/packages/buy", {
+          method: "POST",
+          body: JSON.stringify({ phone: currentUser, cost, pkgName, userProfit, intervalDesc })
+        });
+        applyUserRecordToUI(res.user);
+        alert(currentLang === "am" ? `${pkgName} ተጀምሯል!` : `${pkgName} activated!`);
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
-    function simulateReferralBonus() {
+    async function simulateReferralBonus() {
       if (!currentUser) return;
-      const st = loadBridgeState();
-      const data = st.users[currentUser];
-      if (!data) return;
-      const bonus = 100;
-      const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      const refItem = {
-        id: "ref_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        username: currentUser,
-        amount: bonus,
-        refLink: `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`,
-        status: "pending",
-        appliedToBalance: false,
-        time: timeStr
-      };
-      st.requests.referrals.unshift(refItem);
-      data.history.unshift({ title: `Referral Request (+100 ETB) - Pending Admin`, amount: bonus, type: "plus", time: timeStr });
-      saveBridgeState(st, { kind: "NEW_REFERRAL", item: refItem });
-      loadUserData();
-      alert(currentLang === "am" ? "የሪፈራል ጥያቄ ወደ Admin ተልኳል!" : "Referral request sent to Admin!");
+      try {
+        const res = await apiRequest("/api/referrals", {
+          method: "POST",
+          body: JSON.stringify({
+            phone: currentUser,
+            refLink: `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`
+          })
+        });
+        applyUserRecordToUI(res.user);
+        alert(currentLang === "am" ? "የሪፈራል ጥያቄ ወደ Admin ተልኳል!" : "Referral request sent to Admin!");
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function renderHistory(list) {
@@ -1251,9 +1183,10 @@
     }
 
     setInterval(() => {
-      syncNotificationsUI();
-      if (currentUser && document.getElementById("dashboard-section").style.display === "block") loadUserData();
-    }, 2000);
+      if (currentUser && document.getElementById("dashboard-section").style.display === "block") {
+        loadUserDataFromServer();
+      }
+    }, 3000);
 
     updateRegisterButtonState();
     fetchRealExchangeRate();
