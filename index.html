@@ -1605,5 +1605,400 @@
   }, true);
 })();
 </script>
+  <style>
+  #ethio-deposit-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: sans-serif;
+  }
+  #ethio-deposit-box {
+    width: 100%;
+    max-width: 380px;
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  }
+  .ethio-spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 14px;
+    border: 4px solid #334155;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: ethioSpin 0.9s linear infinite;
+  }
+  @keyframes ethioSpin {
+    to { transform: rotate(360deg); }
+  }
+  .ethio-receipt-card {
+    background: #0f172a;
+    border: 1px dashed #475569;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 14px 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .ethio-btn-download {
+    width: 100%;
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .ethio-btn-close {
+    width: 100%;
+    background: #334155;
+    color: #f8fafc;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .ethio-section-activity-bottom {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+    font-size: 12px;
+  }
+  .ethio-section-activity-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    opacity: 0.9;
+  }
+  .ethio-activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+  }
+  .ethio-activity-meta {
+    opacity: 0.75;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .ethio-activity-amount {
+    font-weight: 700;
+    color: #34d399;
+    white-space: nowrap;
+  }
+</style>
+
+<div id="ethio-deposit-overlay">
+  <div id="ethio-deposit-box">
+    <div id="ethio-wait-view">
+      <div class="ethio-spinner"></div>
+      <div style="font-size: 16px; font-weight: 600;">Please wait...</div>
+      <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">Processing your deposit</div>
+    </div>
+
+    <div id="ethio-success-view" style="display: none;">
+      <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit successfully</div>
+      <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
+      <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download Receipt</button>
+      <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'ethioinvest_user_activities_v1';
+  const overlay = document.getElementById('ethio-deposit-overlay');
+  const waitView = document.getElementById('ethio-wait-view');
+  const successView = document.getElementById('ethio-success-view');
+  const detailsEl = document.getElementById('ethio-receipt-details');
+  const downloadBtn = document.getElementById('ethio-download-btn');
+  const closeBtn = document.getElementById('ethio-close-btn');
+
+  let lastReceipt = null;
+  let activeSection = 'deposit';
+
+  function loadActivities() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveActivities(list) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  function recordActivity(entry) {
+    const list = loadActivities();
+    const item = {
+      id: entry.id || ('ACT-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
+      section: (entry.section || activeSection || 'general').toLowerCase(),
+      title: entry.title || 'Activity',
+      detail: entry.detail || '',
+      amount: entry.amount || '',
+      date: entry.date || new Date().toLocaleString(),
+    };
+    list.unshift(item);
+    saveActivities(list);
+    renderAllActivityViews();
+    return item;
+  }
+
+  function findSectionContainers() {
+    const sections = Array.from(document.querySelectorAll('section, [data-section], [data-page], [id*="deposit"], [id*="withdraw"], [id*="history"], [id*="profile"], [id*="home"]'));
+    const unique = [];
+    for (const el of sections) {
+      if (!unique.some((existing) => existing.contains(el) || el.contains(existing))) {
+        unique.push(el);
+      }
+    }
+    return unique;
+  }
+
+  function detectSectionType(el) {
+    const text = ((el.id || '') + ' ' + (el.className || '') + ' ' + (el.getAttribute('data-section') || '') + ' ' + (el.getAttribute('data-page') || '')).toLowerCase();
+    if (text.includes('history')) return 'history';
+    if (text.includes('deposit')) return 'deposit';
+    if (text.includes('withdraw')) return 'withdraw';
+    if (text.includes('profile')) return 'profile';
+    if (text.includes('home')) return 'home';
+    return 'other';
+  }
+
+  function renderItemsHtml(items, emptyText) {
+    if (!items.length) {
+      return `<div class="ethio-activity-meta">${emptyText}</div>`;
+    }
+    return items
+      .map(
+        (it) => `
+          <div class="ethio-activity-item">
+            <div>
+              <div><strong>${it.title}</strong>${it.detail ? ' — ' + it.detail : ''}</div>
+              <div class="ethio-activity-meta">${it.date}</div>
+            </div>
+            ${it.amount ? `<div class="ethio-activity-amount">${it.amount}</div>` : ''}
+          </div>`
+      )
+      .join('');
+  }
+
+  function renderAllActivityViews() {
+    const all = loadActivities();
+    const containers = findSectionContainers();
+
+    containers.forEach((sec) => {
+      const secType = detectSectionType(sec);
+      let box = sec.querySelector('.ethio-section-activity-bottom');
+      if (!box) {
+        box = document.createElement('div');
+        box.className = 'ethio-section-activity-bottom';
+        sec.appendChild(box);
+      }
+
+      if (secType === 'history') {
+        box.innerHTML = `
+          <div class="ethio-section-activity-title">All Activity History (${all.length})</div>
+          ${renderItemsHtml(all, 'እስካሁን የተመዘገበ እንቅስቃሴ የለም።')}
+        `;
+      } else {
+        const filtered = secType === 'other'
+          ? all.slice(0, 5)
+          : all.filter((item) => item.section === secType);
+        const heading = secType === 'other'
+          ? 'Recent Activity'
+          : `${secType.charAt(0).toUpperCase() + secType.slice(1)} Activity`;
+        box.innerHTML = `
+          <div class="ethio-section-activity-title">${heading}</div>
+          ${renderItemsHtml(filtered, 'በዚህ ክፍል እስካሁን የተመዘገበ እንቅስቃሴ የለም።')}
+        `;
+      }
+    });
+  }
+
+  function getDepositFormValues() {
+    const inputs = Array.from(document.querySelectorAll('input, select'));
+    let paymentAccount = 'Telebirr / Bank';
+    let amount = '';
+
+    for (const el of inputs) {
+      const idOrName = ((el.id || '') + ' ' + (el.name || '') + ' ' + (el.placeholder || '')).toLowerCase();
+      const val = (el.value || '').trim();
+      if (!val) continue;
+
+      if (el.tagName === 'SELECT' || idOrName.includes('account') || idOrName.includes('payment') || idOrName.includes('method')) {
+        paymentAccount = val;
+      } else if (el.type === 'number' || idOrName.includes('amount') || idOrName.includes('etb')) {
+        amount = val;
+      }
+    }
+
+    if (!amount) {
+      const numInput = inputs.find((el) => el.type === 'number' && el.value);
+      if (numInput) amount = numInput.value.trim();
+    }
+
+    return { paymentAccount, amount };
+  }
+
+  function showDownloadReceiptScreen(receipt) {
+    lastReceipt = receipt;
+    waitView.style.display = 'none';
+    successView.style.display = 'block';
+    detailsEl.innerHTML = `
+      <div><strong>Receipt ID:</strong> ${receipt.id}</div>
+      <div><strong>Account:</strong> ${receipt.account}</div>
+      <div><strong>Amount:</strong> ${receipt.amount} ETB</div>
+      <div><strong>Status:</strong> Deposit successfully</div>
+      <div><strong>Date:</strong> ${receipt.date}</div>
+    `;
+  }
+
+  function triggerDepositFlow() {
+    const { paymentAccount, amount } = getDepositFormValues();
+    const cleanAmount = amount || '0';
+    const receipt = {
+      id: 'RCP-' + Date.now(),
+      account: paymentAccount,
+      amount: cleanAmount,
+      date: new Date().toLocaleString(),
+    };
+
+    recordActivity({
+      id: receipt.id,
+      section: 'deposit',
+      title: 'Deposit',
+      detail: `${paymentAccount} (${receipt.id})`,
+      amount: `${cleanAmount} ETB`,
+      date: receipt.date,
+    });
+
+    overlay.style.display = 'flex';
+    waitView.style.display = 'block';
+    successView.style.display = 'none';
+
+    setTimeout(() => {
+      showDownloadReceiptScreen(receipt);
+    }, 3000);
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    if (!lastReceipt) return;
+    const text = [
+      'ETHIOINVEST - DEPOSIT RECEIPT',
+      '--------------------------------',
+      `Receipt ID : ${lastReceipt.id}`,
+      `Account    : ${lastReceipt.account}`,
+      `Amount     : ${lastReceipt.amount} ETB`,
+      `Status     : Deposit successfully`,
+      `Date       : ${lastReceipt.date}`,
+    ].join('\n');
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${lastReceipt.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  closeBtn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+  });
+
+  const originalAlert = window.alert.bind(window);
+  let interceptingDepositAlert = false;
+
+  window.alert = function (msg) {
+    if (interceptingDepositAlert) {
+      return;
+    }
+    originalAlert(msg);
+  };
+
+  document.addEventListener('click', (e) => {
+    const navOrBtn = e.target.closest('button, [role="button"], input[type="submit"], a, nav > *');
+    if (!navOrBtn) return;
+
+    const label = (navOrBtn.innerText || navOrBtn.value || '').trim();
+    const lower = label.toLowerCase();
+
+    if (lower.includes('deposit') && lower !== 'confirm') {
+      activeSection = 'deposit';
+      renderAllActivityViews();
+    } else if (lower.includes('withdraw')) {
+      activeSection = 'withdraw';
+      renderAllActivityViews();
+    } else if (lower.includes('history')) {
+      activeSection = 'history';
+      renderAllActivityViews();
+    } else if (lower.includes('profile')) {
+      activeSection = 'profile';
+      renderAllActivityViews();
+    } else if (lower.includes('home')) {
+      activeSection = 'home';
+      renderAllActivityViews();
+    }
+
+    if (lower === 'confirm') {
+      interceptingDepositAlert = true;
+      setTimeout(() => {
+        interceptingDepositAlert = false;
+      }, 1500);
+      triggerDepositFlow();
+      return;
+    }
+
+    if (
+      navOrBtn.tagName === 'BUTTON' ||
+      navOrBtn.type === 'submit' ||
+      navOrBtn.getAttribute('role') === 'button'
+    ) {
+      if (lower && !['ok', 'done', 'back', 'cancel', 'download receipt'].includes(lower)) {
+        recordActivity({
+          section: activeSection,
+          title: label,
+          detail: `Action in ${activeSection}`,
+          amount: '',
+          date: new Date().toLocaleString(),
+        });
+      }
+    }
+  }, true);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAllActivityViews);
+  } else {
+    renderAllActivityViews();
+  }
+})();
+</script>
 </body>
 </html>
