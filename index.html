@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="am">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -842,7 +842,7 @@
       <div class="loader-bar-track">
         <div class="loader-bar-fill" id="regLoaderFill" style="width: 100%;"></div>
       </div>
-      <div class="loader-status" id="regLoaderText">ወደ Login በመሄድ ላይ...</div>
+      <div class="loader-status" id="regLoaderText">Going to Login...</div>
     </div>
   </div>
 
@@ -872,8 +872,8 @@
       <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleColorMode()" title="Dark / Light Mode">🌙</button>
 
       <div class="lang-box">
-        <button class="lang-btn active" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
-        <button class="lang-btn" id="btnEnTop" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
+        <button class="lang-btn active" id="btnEnTop" onclick="setLanguage('en')">EN</button>
       </div>
       <button class="logout-btn" id="headerLogoutBtn" onclick="logoutUser()" style="display: none;" data-i18n="logoutBtn">Logout</button>
     </div>
@@ -883,7 +883,7 @@
   <div id="auth-section">
     <div class="auth-box">
       <div class="pre-reg-notice" data-i18n="preRegisterNotice">
-        ወደ login ከመሄድዎ በፊት መጀመሪያ ተመዝግበው ፓስዋርድ ይፍጠሩ
+        Before going to login, first register and create a password
       </div>
 
       <div class="auth-switcher">
@@ -894,15 +894,15 @@
       <!-- Register Form -->
       <div id="register-form" class="auth-form active">
         <div class="form-group">
-          <label data-i18n="phoneLabel">ስልክ ቁጥር (Phone)</label>
+          <label data-i18n="phoneLabel">Phone Number</label>
           <input type="text" id="regUser" placeholder="09..." />
         </div>
         <div class="form-group">
-          <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+          <label data-i18n="passLabel">Password</label>
           <input type="password" id="regPass" placeholder="******" />
         </div>
         <div class="form-group">
-          <label data-i18n="confirmPassLabel">የይለፍ ቃል ያረጋግጡ</label>
+          <label data-i18n="confirmPassLabel">Confirm Password</label>
           <input type="password" id="regConfirm" placeholder="******" />
         </div>
 
@@ -912,21 +912,21 @@
           <span class="agree-rect-text" data-i18n="agreePolicyText">I agree to the Privacy Policy & Terms of EthioInvest</span>
         </label>
 
-        <button class="btn-success" id="createAccountBtn" onclick="registerUser()" disabled data-i18n="regBtn">ተመዝገብ</button>
+        <button class="btn-success" id="createAccountBtn" onclick="registerUser()" disabled data-i18n="regBtn">Create Account</button>
       </div>
 
       <!-- Login Form + OTP Password Reset -->
       <div id="login-form" class="auth-form">
         <div class="form-group">
-          <label data-i18n="phoneLabel">ስልክ ቁጥር (Phone)</label>
+          <label data-i18n="phoneLabel">Phone Number</label>
           <input type="text" id="loginUser" placeholder="09..." />
         </div>
         <div class="form-group">
-          <label data-i18n="passLabel">የይለፍ ቃል (Password)</label>
+          <label data-i18n="passLabel">Password</label>
           <input type="password" id="loginPass" placeholder="******" />
         </div>
 
-        <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">ግባ</button>
+        <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">Login</button>
 
         <div class="reset-toggle-wrap">
           <button type="button" class="reset-link-btn" onclick="toggleOtpResetBox()" data-i18n="resetPassLink">Password Reset (OTP)</button>
@@ -934,22 +934,22 @@
 
         <div id="otpResetBox" class="otp-reset-box">
           <div class="form-group">
-            <label data-i18n="resetPhoneLabel">የተመዘገበ ስልክ ቁጥር</label>
+            <label data-i18n="resetPhoneLabel">Registered Phone Number</label>
             <input type="text" id="resetPhoneInput" placeholder="09..." />
           </div>
-          <button type="button" class="btn-secondary" onclick="sendOtpToPhone()" data-i18n="sendOtpBtn">OTP ወደ ስልክ ላክ</button>
+          <button type="button" class="btn-secondary" onclick="sendOtpToPhone()" data-i18n="sendOtpBtn">Send OTP to Phone</button>
 
           <div id="otpDeliveryBanner" class="otp-note-box"></div>
 
           <div class="form-group" style="margin-top: 8px;">
-            <label data-i18n="otpCodeLabel">OTP ኮድ ያስገቡ</label>
+            <label data-i18n="otpCodeLabel">Enter OTP Code</label>
             <input type="text" id="otpCodeInput" placeholder="123456" />
           </div>
           <div class="form-group">
-            <label data-i18n="newPassLabel">አዲስ የይለፍ ቃል</label>
+            <label data-i18n="newPassLabel">New Password</label>
             <input type="password" id="newPasswordInput" placeholder="******" />
           </div>
-          <button type="button" class="btn-success" onclick="confirmOtpPasswordReset()" data-i18n="confirmResetBtn">Password ቀይር</button>
+          <button type="button" class="btn-success" onclick="confirmOtpPasswordReset()" data-i18n="confirmResetBtn">Reset Password</button>
         </div>
       </div>
     </div>
@@ -976,7 +976,7 @@
       </div>
 
       <div class="exchange-rate-strip">
-        <span class="exchange-rate-left" id="exchangeRateText">የብር ዋጋ (1 USD) = 163.44 ETB</span>
+        <span class="exchange-rate-left" id="exchangeRateText">ETB Rate (1 USD) = 163.44 ETB</span>
         <span class="exchange-rate-time" id="rateUpdatedTime">Updated: --:--</span>
       </div>
     </div>
@@ -991,7 +991,7 @@
           <span data-i18n="tabDeposit">Deposit</span>
         </button>
         <div id="panel-deposit" class="inner-panel">
-          <h3 data-i18n="depHeader">ገንዘብ ማስገቢያ</h3>
+          <h3 data-i18n="depHeader">Deposit ETB</h3>
 
           <div class="bank-card">
             <div class="bank-left">
@@ -1054,7 +1054,7 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="selectMethodLabel">የከፈሉበትን መንገድ ይምረጡ</label>
+            <label data-i18n="selectMethodLabel">Select Payment Account</label>
             <select id="depMethod">
               <option value="Telebirr (0964488470)">Telebirr - 0964488470</option>
               <option value="CBE (1000298833585)">CBE - 1000298833585</option>
@@ -1063,24 +1063,24 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="amountLabel">የገንዘብ መጠን (ETB)</label>
+            <label data-i18n="amountLabel">Amount (ETB)</label>
             <input type="number" id="depAmount" placeholder="1000" />
           </div>
 
           <div class="form-group">
             <span class="screenshot-section-title" id="screenshotPromptLabel">
-              <span data-i18n="addPaymentScreenshotTitle">የክፍያ ስክሪንሾት ያክሉ</span><span class="req-star">*</span>
+              <span data-i18n="addPaymentScreenshotTitle">Add payment screenshot</span><span class="req-star">*</span>
             </span>
             <div class="wide-screenshot-box">
-              <label for="depReceiptInput" class="add-file-trigger" data-i18n="addFileBtn">ፋይል ያክሉ</label>
+              <label for="depReceiptInput" class="add-file-trigger" data-i18n="addFileBtn">Add file</label>
               <input type="file" id="depReceiptInput" accept="image/*" style="display: none;" onchange="handleReceiptFile(this)" />
-              <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">ስክሪንሾት አልተመረጠም (*)</span>
+              <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">No screenshot selected (*)</span>
               <img id="receiptPreview" class="receipt-preview" alt="Payment Screenshot" />
             </div>
           </div>
 
-          <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">አረጋግጥ</button>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">Confirm</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1091,10 +1091,10 @@
           <span data-i18n="tabWithdraw">Withdrawal</span>
         </button>
         <div id="panel-withdrawal" class="inner-panel">
-          <h3 data-i18n="withHeader">ገንዘብ ማውጫ</h3>
+          <h3 data-i18n="withHeader">Withdrawal</h3>
 
           <div class="form-group">
-            <label data-i18n="withMethodLabel">ባንክ / ቴሌብር</label>
+            <label data-i18n="withMethodLabel">Method</label>
             <select id="withMethod">
               <option value="Telebirr">Telebirr</option>
               <option value="CBE">CBE</option>
@@ -1103,12 +1103,12 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="userAccLabel">አካውንት / ስልክ</label>
+            <label data-i18n="userAccLabel">Account / Phone</label>
             <input type="text" id="withUserAccount" placeholder="09... / 1000..." />
           </div>
 
           <div class="form-group">
-            <label data-i18n="withAmountLabel">መጠን (ETB)</label>
+            <label data-i18n="withAmountLabel">Amount (ETB)</label>
             <input type="number" id="withAmount" oninput="calculateNetPay()" placeholder="1000" />
           </div>
 
@@ -1123,8 +1123,8 @@
             </div>
           </div>
 
-          <button class="btn-primary" onclick="submitWithdrawal()" data-i18n="confirmWithBtn">ላክ</button>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button class="btn-primary" onclick="submitWithdrawal()" data-i18n="confirmWithBtn">Submit</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1135,11 +1135,11 @@
           <span data-i18n="tabHistory">History</span>
         </button>
         <div id="panel-history" class="inner-panel">
-          <h3 data-i18n="histHeader">ታሪክ (History)</h3>
+          <h3 data-i18n="histHeader">History</h3>
           <div id="historyList">
-            <p style="font-size: 0.76rem; color: #94a3b8; text-align: center;" data-i18n="noHistory">እንቅስቃሴ የለም።</p>
+            <p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;" data-i18n="noHistory">No transactions yet.</p>
           </div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1159,7 +1159,7 @@
             <button class="copy-sign-btn" onclick="copyReferralReplaceSign(this)" title="Copy">⧉</button>
           </div>
           <button class="btn-success" onclick="simulateReferralBonus()" data-i18n="claimRefBtn">+100 ETB</button>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1208,7 +1208,7 @@
             <button class="btn-primary" onclick="buyPackage(200000, 'Executive Max Plan', 90000, 'Every 10 Days (6 intervals)')">200,000 ETB</button>
           </div>
 
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1223,7 +1223,7 @@
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             Telebirr: 0964488470<br />CBE: 1000298833585<br />Abyssinia: 166455979
           </p>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1236,7 +1236,7 @@
         <div id="panel-notifications" class="inner-panel">
           <h3 data-i18n="tabNotifications">Notifications</h3>
           <div id="notificationsList"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1249,9 +1249,9 @@
         <div id="panel-faq" class="inner-panel">
           <h3 data-i18n="tabFaq">Help / FAQ</h3>
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
-            • ስክሪንሾት (*) ግዴታ ነው።<br />• የወጪ ክፍያ 5% ነው።
+            • Screenshot (*) is required.<br />• Withdrawal fee is 5%.
           </p>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">ተመለስ</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
 
@@ -1283,7 +1283,8 @@
   </nav>
 
   <script>
-    let currentLang = "am";
+    // Default language stays English unless user clicks አማ
+    let currentLang = "en";
     let currentUser = null;
     let exchangeRate = 163.44;
     let selectedReceiptName = "";
@@ -1293,7 +1294,6 @@
     let balanceHidden = false;
     let lightThemeActive = false;
 
-    // Optional SMS Gateway API endpoint (leave empty until you connect a backend SMS gateway)
     const SMS_OTP_API_ENDPOINT = "";
     let pendingOtpPhone = null;
 
@@ -1329,6 +1329,57 @@
     }
 
     const i18n = {
+      en: {
+        preRegisterNotice: "Before going to login, first register and create a password",
+        regTab: "Register",
+        loginTab: "Login",
+        phoneLabel: "Phone Number",
+        passLabel: "Password",
+        confirmPassLabel: "Confirm Password",
+        agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
+        regBtn: "Create Account",
+        loginBtn: "Login",
+        resetPassLink: "Password Reset (OTP)",
+        resetPhoneLabel: "Registered Phone Number",
+        sendOtpBtn: "Send OTP to Phone",
+        otpCodeLabel: "Enter OTP Code",
+        newPassLabel: "New Password",
+        confirmResetBtn: "Reset Password",
+        logoutBtn: "Logout",
+        currentBalTitle: "Current Balance",
+        refreshBalBtn: "Refresh Balance",
+        tabDeposit: "Deposit",
+        tabWithdraw: "Withdrawal",
+        tabHistory: "History",
+        tabReferral: "Referral",
+        tabPackage: "Packages",
+        tabSupport: "Support",
+        tabNotifications: "Notifications",
+        tabFaq: "Help / FAQ",
+        depHeader: "Deposit ETB",
+        selectMethodLabel: "Select Payment Account",
+        amountLabel: "Amount (ETB)",
+        addPaymentScreenshotTitle: "Add payment screenshot",
+        addFileBtn: "Add file",
+        noFileSelected: "No screenshot selected (*)",
+        confirmDepBtn: "Confirm",
+        withHeader: "Withdrawal",
+        withMethodLabel: "Method",
+        userAccLabel: "Account / Phone",
+        withAmountLabel: "Amount (ETB)",
+        feeLabel: "Fee (5%):",
+        confirmWithBtn: "Submit",
+        pkgHeader: "Packages (≤200k)",
+        refHeader: "Referral",
+        yourRefLink: "Link",
+        claimRefBtn: "+100 ETB",
+        histHeader: "History",
+        noHistory: "No transactions yet.",
+        backBtn: "Back",
+        ratePrefix: "ETB Rate (1 USD) =",
+        loadingMsg: "Loading...",
+        regRedirectMsg: "Going to Login..."
+      },
       am: {
         preRegisterNotice: "ወደ login ከመሄድዎ በፊት መጀመሪያ ተመዝግበው ፓስዋርድ ይፍጠሩ",
         regTab: "Register",
@@ -1378,60 +1429,7 @@
         backBtn: "ተመለስ",
         ratePrefix: "የብር ዋጋ (1 USD) =",
         loadingMsg: "በመጫን ላይ...",
-        regRedirectMsg: "ወደ Login በመሄድ ላይ...",
-        speakScreenshotAm: "የክፍያ ስክሪንሾት ያክሉ"
-      },
-      en: {
-        preRegisterNotice: "Before going to login, first register and create a password",
-        regTab: "Register",
-        loginTab: "Login",
-        phoneLabel: "Phone Number",
-        passLabel: "Password",
-        confirmPassLabel: "Confirm Password",
-        agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
-        regBtn: "Create Account",
-        loginBtn: "Login",
-        resetPassLink: "Password Reset (OTP)",
-        resetPhoneLabel: "Registered Phone Number",
-        sendOtpBtn: "Send OTP to Phone",
-        otpCodeLabel: "Enter OTP Code",
-        newPassLabel: "New Password",
-        confirmResetBtn: "Reset Password",
-        logoutBtn: "Logout",
-        currentBalTitle: "Current Balance",
-        refreshBalBtn: "Refresh Balance",
-        tabDeposit: "Deposit",
-        tabWithdraw: "Withdrawal",
-        tabHistory: "History",
-        tabReferral: "Referral",
-        tabPackage: "Packages",
-        tabSupport: "Support",
-        tabNotifications: "Notifications",
-        tabFaq: "Help / FAQ",
-        depHeader: "Deposit ETB",
-        selectMethodLabel: "Payment Account",
-        amountLabel: "Amount (ETB)",
-        addPaymentScreenshotTitle: "Add payment screenshot",
-        addFileBtn: "Add file",
-        noFileSelected: "No screenshot selected (*)",
-        confirmDepBtn: "Confirm",
-        withHeader: "Withdrawal",
-        withMethodLabel: "Method",
-        userAccLabel: "Account / Phone",
-        withAmountLabel: "Amount (ETB)",
-        feeLabel: "Fee (5%):",
-        confirmWithBtn: "Submit",
-        pkgHeader: "Packages (≤200k)",
-        refHeader: "Referral",
-        yourRefLink: "Link",
-        claimRefBtn: "+100 ETB",
-        histHeader: "History",
-        noHistory: "No transactions yet.",
-        backBtn: "Back",
-        ratePrefix: "ETB Rate (1 USD) =",
-        loadingMsg: "Loading...",
-        regRedirectMsg: "Going to Login...",
-        speakScreenshotAm: ""
+        regRedirectMsg: "ወደ Login በመሄድ ላይ..."
       }
     };
 
@@ -1444,16 +1442,6 @@
     function updateRegisterButtonState() {
       const checked = document.getElementById("agreePolicyCheckbox").checked;
       document.getElementById("createAccountBtn").disabled = !checked;
-    }
-
-    function speakAmharicText(text) {
-      if (!text || !("speechSynthesis" in window)) return;
-      try {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = "am-ET";
-        window.speechSynthesis.speak(utter);
-      } catch (e) {}
     }
 
     function getUserRecord() {
@@ -1490,7 +1478,9 @@
 
       if (!phone || !st.users[phone]) {
         showAuthMsg(
-          currentLang === "am" ? "ይህ ስልክ ቁጥር አልተመዘገበም!" : "This phone number is not registered!",
+          currentLang === "am"
+            ? "ይህ ስልክ ቁጥር አልተመዘገበም!"
+            : "This phone number is not registered!",
           true
         );
         return;
@@ -1502,8 +1492,8 @@
       if (!SMS_OTP_API_ENDPOINT) {
         banner.innerText =
           currentLang === "am"
-            ? `የቀጥታ SMS API (እንደ AfroMessage / SMS Gateway) ስላልተገናኘ የ OTP መላኪያ ጥያቄ ለ ${phone} ተመዝግቧል። SMS ወደ ስልክ እንዲደርስ Backend SMS API ያገናኙ።`
-            : `No live SMS API gateway is connected yet. OTP dispatch request recorded for ${phone}; connect an SMS gateway API to deliver real SMS.`;
+            ? `የ SMS Gateway API ስላልተገናኘ የ OTP ጥያቄ ለ ${phone} ተመዝግቧል። SMS ወደ ስልክ ለመላክ SMS API ያገናኙ።`
+            : `No SMS gateway API connected yet. OTP request recorded for ${phone}; connect an SMS API to send real SMS.`;
         return;
       }
 
@@ -1529,7 +1519,9 @@
 
       if (!pendingOtpPhone || phone !== pendingOtpPhone) {
         showAuthMsg(
-          currentLang === "am" ? "መጀመሪያ የተመዘገበውን ስልክ አስገብተው ይላኩ!" : "Enter your registered phone and request OTP first!",
+          currentLang === "am"
+            ? "መጀመሪያ የተመዘገበውን ስልክ አስገብተው ይላኩ!"
+            : "Enter your registered phone and request OTP first!",
           true
         );
         return;
@@ -1543,7 +1535,9 @@
       }
       if (!newPass || newPass.length < 4) {
         showAuthMsg(
-          currentLang === "am" ? "አዲስ የይለፍ ቃል ያስገቡ (ቢያንስ 4 ፊደል/ቁጥር)!" : "Enter a new password (min 4 chars)!",
+          currentLang === "am"
+            ? "አዲስ የይለፍ ቃል ያስገቡ (ቢያንስ 4 ፊደል/ቁጥር)!"
+            : "Enter a new password (min 4 chars)!",
           true
         );
         return;
@@ -1580,6 +1574,7 @@
 
     function setLanguage(lang) {
       currentLang = lang;
+      document.documentElement.lang = lang;
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         if (i18n[lang][key]) el.innerText = i18n[lang][key];
@@ -1587,10 +1582,6 @@
       document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
       document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
       renderExchangeRate();
-
-      if (lang === "am" && i18n.am.speakScreenshotAm) {
-        speakAmharicText(i18n.am.speakScreenshotAm);
-      }
     }
 
     async function fetchRealExchangeRate() {
@@ -1678,11 +1669,19 @@
         return;
       }
       if (!phone || !pass) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ!" : "Please enter phone number and password!", true);
+        showAuthMsg(
+          currentLang === "am"
+            ? "እባክዎ ስልክ ቁጥር እና የይለፍ ቃል ያስገቡ!"
+            : "Please enter phone number and password!",
+          true
+        );
         return;
       }
       if (pass !== confirm) {
-        showAuthMsg(currentLang === "am" ? "የይለፍ ቃሉ አይመሳሰልም!" : "Passwords do not match!", true);
+        showAuthMsg(
+          currentLang === "am" ? "የይለፍ ቃሉ አይመሳሰልም!" : "Passwords do not match!",
+          true
+        );
         return;
       }
 
@@ -1690,8 +1689,8 @@
       if (st.users[phone]) {
         showAuthMsg(
           currentLang === "am"
-            ? "ይህ ስልክ ቁጥር አስቀድሞ ተመዝግቧል! በ Password ይግቡ።"
-            : "This phone is already registered! Log in with your password.",
+            ? "Already registered! ይህ ስልክ ቀድሞ ተመዝግቧል።"
+            : "Already registered",
           true
         );
         return;
@@ -1813,7 +1812,7 @@
       if (!listEl) return;
 
       if (!announcements.length) {
-        listEl.innerHTML = `<p style="font-size: 0.74rem; color: var(--text-muted); text-align: center;">ምንም ማስታወቂያ የለም።</p>`;
+        listEl.innerHTML = `<p style="font-size: 0.74rem; color: var(--text-muted); text-align: center;">No notifications yet.</p>`;
         return;
       }
 
@@ -1862,7 +1861,6 @@
       syncNotificationsUI();
     }
 
-    // Restores 2-column grid and all tiles when returning to Home
     function closeAllInnerPanels(bnavId = "bnav-home") {
       document.getElementById("mainTileGrid").classList.remove("single-active");
       document.querySelectorAll(".tile-slot").forEach(slot => slot.classList.remove("hidden-slot"));
@@ -1875,7 +1873,6 @@
       }
     }
 
-    // Expands active panel across full width with no empty side gap
     function toggleInnerPanel(panelName, bnavId = null) {
       const targetSlot = document.getElementById("slot-" + panelName);
       const panelEl = document.getElementById("panel-" + panelName);
@@ -1904,9 +1901,6 @@
       panelEl.classList.add("active");
       if (tileEl) tileEl.classList.add("active");
 
-      if (panelName === "deposit" && currentLang === "am" && i18n.am.speakScreenshotAm) {
-        speakAmharicText(i18n.am.speakScreenshotAm);
-      }
       if (panelName === "notifications") {
         markAllAnnouncementsSeen();
       }
