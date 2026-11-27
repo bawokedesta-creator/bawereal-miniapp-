@@ -195,67 +195,64 @@
 
     if (liveChannel) {
       liveChannel.onmessage = (event) => {
-        if (event.data && event.data.type === "STATE_UPDATED" && event.data.state) {
-          try {
-            sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(event.data.state));
-          } catch (e) {}
-          if (document.getElementById("admin-panel").style.display === "block") {
-            syncAllData();
-          }
+        if (!event.data || event.data.type !== "STATE_UPDATED") return;
+        const incoming = event.data.state || loadBridgeState();
+        const current = loadBridgeState();
+
+        // Merge incoming deposits/withdrawals/referrals/users if received via BroadcastChannel
+        const mergedUsers = { ...(current.users || {}), ...(incoming.users || {}) };
+        const mergeById = (a = [], b = []) => {
+          const map = new Map();
+          [...b, ...a].forEach(item => { if (item && item.id) map.set(item.id, item); });
+          return Array.from(map.values()).sort((x, y) => {
+            const tx = parseInt((x.id || "").split("_")[1] || "0", 10);
+            const ty = parseInt((y.id || "").split("_")[1] || "0", 10);
+            return ty - tx;
+          });
+        };
+
+        const mergedState = {
+          users: mergedUsers,
+          requests: {
+            deposits: mergeById(current.requests?.deposits, incoming.requests?.deposits),
+            withdrawals: mergeById(current.requests?.withdrawals, incoming.requests?.withdrawals),
+            referrals: mergeById(current.requests?.referrals, incoming.requests?.referrals)
+          },
+          announcements: mergeById(current.announcements, incoming.announcements)
+        };
+
+        try {
+          sessionStorage.setItem(BRIDGE_KEY, JSON.stringify(mergedState));
+        } catch (e) {}
+
+        if (document.getElementById("admin-panel").style.display === "block") {
+          syncAllData();
         }
       };
     }
 
     const i18n = {
       en: {
-        adminTitle: "EthioInvest Admin",
-        adminSub: "Per-User Activity Table • Approve / Reject / Review / Delete",
-        syncBtn: "↻ Sync",
-        gateTitle: "Admin Access",
-        pinLabel: "Admin PIN / Passcode (Default: 1234)",
-        openPanelBtn: "Open Admin Dashboard",
-        statUsers: "Total Users",
-        statBalances: "Total User Balances",
-        statPendingDep: "Pending Deposits",
-        statPendingWith: "Pending Withdrawals",
-        announceHeader: "Post Announcement to Users",
-        postBtn: "Post",
-        colType: "Type",
-        colDetail: "Details / Time",
-        colAmount: "Amount",
-        colStatus: "Status",
-        colAction: "Action",
+        adminTitle: "EthioInvest Admin", adminSub: "Per-User Activity Table • Approve / Reject / Review / Delete",
+        syncBtn: "↻ Sync", gateTitle: "Admin Access", pinLabel: "Admin PIN / Passcode (Default: 1234)",
+        openPanelBtn: "Open Admin Dashboard", statUsers: "Total Users", statBalances: "Total User Balances",
+        statPendingDep: "Pending Deposits", statPendingWith: "Pending Withdrawals",
+        announceHeader: "Post Announcement to Users", postBtn: "Post", colType: "Type",
+        colDetail: "Details / Time", colAmount: "Amount", colStatus: "Status", colAction: "Action",
         noUserActivity: "No Deposit, Withdrawal, or Referral activity for this user yet.",
-        noUsersAtAll: "No registered users yet.",
-        addBtn: "+ Add",
-        deductBtn: "- Deduct",
-        reviewTitle: "Review Activity Details",
-        closeBtn: "Close"
+        noUsersAtAll: "No registered users yet.", addBtn: "+ Add", deductBtn: "- Deduct",
+        reviewTitle: "Review Activity Details", closeBtn: "Close"
       },
       am: {
-        adminTitle: "EthioInvest Admin",
-        adminSub: "የእያንዳንዱ User እንቅስቃሴ በአንድ ሰንጠረዥ • Approve / Reject / Review / Delete",
-        syncBtn: "↻ አድስ",
-        gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)",
-        pinLabel: "የአድሚን ፒን (Default: 1234)",
-        openPanelBtn: "አድሚን ፓነል ክፈት",
-        statUsers: "ጠቅላላ ተጠቃሚዎች",
-        statBalances: "ጠቅላላ የተጠቃሚ ሂሳብ",
-        statPendingDep: "በመጠባበቅ ላይ ያሉ Deposits",
-        statPendingWith: "በመጠባበቅ ላይ ያሉ Withdrawals",
-        announceHeader: "ለተጠቃሚዎች ማስታወቂያ ላክ",
-        postBtn: "ላክ",
-        colType: "አይነት",
-        colDetail: "ዝርዝር / ቀን-ሰዓት",
-        colAmount: "መጠን",
-        colStatus: "ሁኔታ",
-        colAction: "ቁጥጥር",
+        adminTitle: "EthioInvest Admin", adminSub: "የእያንዳንዱ User እንቅስቃሴ በአንድ ሰንጠረዥ • Approve / Reject / Review / Delete",
+        syncBtn: "↻ አድስ", gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)", pinLabel: "የአድሚን ፒን (Default: 1234)",
+        openPanelBtn: "አድሚን ፓነል ክፈት", statUsers: "ጠቅላላ ተጠቃሚዎች", statBalances: "ጠቅላላ የተጠቃሚ ሂሳብ",
+        statPendingDep: "በመጠባበቅ ላይ ያሉ Deposits", statPendingWith: "በመጠባበቅ ላይ ያሉ Withdrawals",
+        announceHeader: "ለተጠቃሚዎች ማስታወቂያ ላክ", postBtn: "ላክ", colType: "አይነት",
+        colDetail: "ዝርዝር / ቀን-ሰዓት", colAmount: "መጠን", colStatus: "ሁኔታ", colAction: "ቁጥጥር",
         noUserActivity: "ለዚህ ተጠቃሚ እስካሁን የተመዘገበ Deposit / Withdrawal / Referral የለም።",
-        noUsersAtAll: "እስካሁን የተመዘገበ ተጠቃሚ የለም።",
-        addBtn: "+ ጨምር",
-        deductBtn: "- ቀንስ",
-        reviewTitle: "የእንቅስቃሴ ዝርዝር (Review)",
-        closeBtn: "ዝጋ"
+        noUsersAtAll: "እስካሁን የተመዘገበ ተጠቃሚ የለም።", addBtn: "+ ጨምር", deductBtn: "- ቀንስ",
+        reviewTitle: "የእንቅስቃሴ ዝርዝር (Review)", closeBtn: "ዝጋ"
       }
     };
 
@@ -310,40 +307,26 @@
       const items = [];
       (reqs.deposits || []).filter(d => d.username === username).forEach(d => {
         items.push({
-          id: d.id,
-          kind: "deposit",
-          kindLabel: "Deposit",
+          id: d.id, kind: "deposit", kindLabel: "Deposit",
           detail: `${d.method || ""} • ${d.screenshotName || "No file"} • ${d.time || ""}`,
-          amount: Number(d.amount || 0),
-          status: d.status || "pending"
+          amount: Number(d.amount || 0), status: d.status || "pending"
         });
       });
       (reqs.withdrawals || []).filter(w => w.username === username).forEach(w => {
         items.push({
-          id: w.id,
-          kind: "withdrawal",
-          kindLabel: "Withdrawal",
+          id: w.id, kind: "withdrawal", kindLabel: "Withdrawal",
           detail: `${w.method || ""} (${w.account || ""}) | Net: ${Number(w.netPay || 0).toFixed(2)} • ${w.time || ""}`,
-          amount: Number(w.amount || 0),
-          status: w.status || "pending"
+          amount: Number(w.amount || 0), status: w.status || "pending"
         });
       });
       (reqs.referrals || []).filter(r => r.username === username).forEach(r => {
         items.push({
-          id: r.id,
-          kind: "referral",
-          kindLabel: "Referral",
+          id: r.id, kind: "referral", kindLabel: "Referral",
           detail: `${r.refLink || "Bonus"} • ${r.time || ""}`,
-          amount: Number(r.amount || 100),
-          status: r.status || "pending"
+          amount: Number(r.amount || 100), status: r.status || "pending"
         });
       });
-
-      items.sort((a, b) => {
-        const ta = parseInt((a.id || "").split("_")[1] || "0", 10);
-        const tb = parseInt((b.id || "").split("_")[1] || "0", 10);
-        return tb - ta;
-      });
+      items.sort((a, b) => parseInt((b.id || "").split("_")[1] || "0", 10) - parseInt((a.id || "").split("_")[1] || "0", 10));
       return items;
     }
 
@@ -440,16 +423,11 @@
       }).join("");
     }
 
-    // Permanently deletes the activity row from the Admin list
     function deleteActivity(kind, id) {
       const st = loadBridgeState();
-      if (kind === "deposit") {
-        st.requests.deposits = (st.requests.deposits || []).filter(d => d.id !== id);
-      } else if (kind === "withdrawal") {
-        st.requests.withdrawals = (st.requests.withdrawals || []).filter(w => w.id !== id);
-      } else if (kind === "referral") {
-        st.requests.referrals = (st.requests.referrals || []).filter(r => r.id !== id);
-      }
+      if (kind === "deposit") st.requests.deposits = (st.requests.deposits || []).filter(d => d.id !== id);
+      else if (kind === "withdrawal") st.requests.withdrawals = (st.requests.withdrawals || []).filter(w => w.id !== id);
+      else if (kind === "referral") st.requests.referrals = (st.requests.referrals || []).filter(r => r.id !== id);
       saveBridgeState(st);
       syncAllData();
     }
@@ -464,24 +442,17 @@
         const item = (reqs.deposits || []).find(d => d.id === id);
         if (!item || !users[item.username]) return;
         const amt = Number(item.amount || 0);
-
         if (action === "approve") {
           if (!item.appliedToBalance) {
             users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({
-              title: `Admin Approved Deposit (${item.method})`,
-              amount: amt, type: "plus", time: timeStr
-            });
+            users[item.username].history.unshift({ title: `Admin Approved Deposit (${item.method})`, amount: amt, type: "plus", time: timeStr });
             item.appliedToBalance = true;
           }
           item.status = "approved";
         } else if (action === "reject") {
           if (item.appliedToBalance) {
             users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
-            users[item.username].history.unshift({
-              title: `Admin Rejected Deposit (${item.method})`,
-              amount: amt, type: "minus", time: timeStr
-            });
+            users[item.username].history.unshift({ title: `Admin Rejected Deposit (${item.method})`, amount: amt, type: "minus", time: timeStr });
             item.appliedToBalance = false;
           }
           item.status = "rejected";
@@ -490,24 +461,17 @@
         const item = (reqs.withdrawals || []).find(w => w.id === id);
         if (!item || !users[item.username]) return;
         const amt = Number(item.amount || 0);
-
         if (action === "approve") {
           if (!item.deductedFromBalance) {
             users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - amt);
             item.deductedFromBalance = true;
           }
-          users[item.username].history.unshift({
-            title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB`,
-            amount: amt, type: "minus", time: timeStr
-          });
+          users[item.username].history.unshift({ title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay || 0).toFixed(2)} ETB`, amount: amt, type: "minus", time: timeStr });
           item.status = "approved";
         } else if (action === "reject") {
           if (item.deductedFromBalance) {
             users[item.username].balance = Number(users[item.username].balance || 0) + amt;
-            users[item.username].history.unshift({
-              title: `Admin Rejected Withdraw (Refunded ${item.method})`,
-              amount: amt, type: "plus", time: timeStr
-            });
+            users[item.username].history.unshift({ title: `Admin Rejected Withdraw (Refunded ${item.method})`, amount: amt, type: "plus", time: timeStr });
             item.deductedFromBalance = false;
           }
           item.status = "rejected";
@@ -516,15 +480,11 @@
         const item = (reqs.referrals || []).find(r => r.id === id);
         if (!item || !users[item.username]) return;
         const bonus = Number(item.amount || 100);
-
         if (action === "approve") {
           if (!item.appliedToBalance) {
             users[item.username].balance = Number(users[item.username].balance || 0) + bonus;
             users[item.username].refBonus = Number(users[item.username].refBonus || 0) + bonus;
-            users[item.username].history.unshift({
-              title: "Admin Approved Referral Bonus",
-              amount: bonus, type: "plus", time: timeStr
-            });
+            users[item.username].history.unshift({ title: "Admin Approved Referral Bonus", amount: bonus, type: "plus", time: timeStr });
             item.appliedToBalance = true;
           }
           item.status = "approved";
@@ -532,10 +492,7 @@
           if (item.appliedToBalance) {
             users[item.username].balance = Math.max(0, Number(users[item.username].balance || 0) - bonus);
             users[item.username].refBonus = Math.max(0, Number(users[item.username].refBonus || 0) - bonus);
-            users[item.username].history.unshift({
-              title: "Admin Rejected Referral Bonus",
-              amount: bonus, type: "minus", time: timeStr
-            });
+            users[item.username].history.unshift({ title: "Admin Rejected Referral Bonus", amount: bonus, type: "minus", time: timeStr });
             item.appliedToBalance = false;
           }
           item.status = "rejected";
@@ -556,7 +513,6 @@
       const st = loadBridgeState();
       if (!st.users[username]) return;
       const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
       if (mode === "add") {
         st.users[username].balance = Number(st.users[username].balance || 0) + val;
         st.users[username].history.unshift({ title: "Admin Added Balance", amount: val, type: "plus", time: timeStr });
@@ -575,12 +531,10 @@
       const arr = kind === "deposit" ? (reqs.deposits || []) : kind === "withdrawal" ? (reqs.withdrawals || []) : (reqs.referrals || []);
       const item = arr.find(x => x.id === id);
       if (!item) return;
-
       if (item.status === "pending") {
         item.status = "reviewed";
         saveBridgeState(st);
       }
-
       let html = `
         <div><strong>Type:</strong> ${kind.toUpperCase()}</div>
         <div><strong>User:</strong> ${item.username}</div>
@@ -593,7 +547,6 @@
       if (typeof item.netPay !== "undefined") html += `<div><strong>Net Pay (5% fee):</strong> ${Number(item.netPay).toFixed(2)} ETB</div>`;
       if (item.refLink) html += `<div><strong>Referral Link:</strong> ${item.refLink}</div>`;
       if (item.screenshotDataUrl) html += `<div><strong>Payment Screenshot:</strong></div><img src="${item.screenshotDataUrl}" class="modal-img" alt="Screenshot" />`;
-
       document.getElementById("reviewModalBody").innerHTML = html;
       document.getElementById("review-modal").classList.add("active");
       syncAllData();
