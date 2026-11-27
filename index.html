@@ -201,17 +201,57 @@
     .file-name-text { font-size: 0.72rem; color: var(--text-muted); word-break: break-all; }
     .receipt-preview { max-width: 100%; max-height: 130px; border-radius: 8px; display: none; border: 1px solid var(--border-subtle); margin-top: 4px; }
 
-    .deposit-receipt-trigger {
-      width: 100%;
-      background: var(--bg-input);
-      color: var(--accent);
-      border: 1px solid var(--accent);
+    /* Immediate inline receipt bar shown right after Confirm */
+    .instant-receipt-bar {
+      display: none;
+      margin-top: 10px;
       padding: 9px 10px;
-      border-radius: 8px;
-      font-size: 0.82rem;
+      border-radius: 10px;
+      background: var(--bg-input);
+      border: 1.5px solid #22c55e;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    .instant-receipt-bar.show {
+      display: flex;
+    }
+    .instant-receipt-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .instant-receipt-label {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #4ade80;
+      white-space: nowrap;
+    }
+    .instant-fmt-btn {
+      border: none;
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 0.74rem;
       font-weight: 800;
       cursor: pointer;
-      margin-top: 8px;
+      color: #ffffff;
+    }
+    .instant-png-btn { background: var(--btn-green); }
+    .instant-svg-btn { background: var(--btn-blue); }
+    .instant-cancel-btn {
+      margin-left: auto;
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid #ef4444;
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
     .calc-box { background: var(--bg-input); border: 1px dashed var(--accent); padding: 9px 10px; border-radius: 9px; margin: 8px 0; font-size: 0.78rem; }
@@ -232,30 +272,6 @@
 
     .notif-msg-card { background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px; margin-bottom: 7px; font-size: 0.75rem; color: var(--text-main); line-height: 1.4; }
     .notif-msg-card.unread { border-color: #ef4444; }
-
-    /* Receipt Format Modal: PNG, SVG, Cancel */
-    #receipt-format-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78);
-      z-index: 9999; align-items: center; justify-content: center; padding: 18px;
-    }
-    #receipt-format-modal.active { display: flex; }
-    .receipt-modal-card {
-      width: 100%; max-width: 340px; background: var(--bg-card); border: 1px solid var(--accent);
-      border-radius: 16px; padding: 18px 16px; text-align: center; color: var(--text-main);
-    }
-    .receipt-modal-title { font-size: 0.98rem; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
-    .receipt-modal-sub { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4; }
-    .format-choice-btn {
-      width: 100%; padding: 10px; border-radius: 9px; border: none; font-size: 0.86rem;
-      font-weight: 800; cursor: pointer; margin-bottom: 8px;
-    }
-    .format-png-btn { background: var(--btn-green); color: #ffffff; }
-    .format-svg-btn { background: var(--btn-blue); color: #ffffff; }
-    .format-cancel-btn {
-      width: 100%; padding: 9px; border-radius: 9px; background: var(--bg-input);
-      color: var(--text-main); border: 1px solid var(--border-input); font-size: 0.84rem;
-      font-weight: 700; cursor: pointer;
-    }
 
     .bottom-nav {
       display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -283,17 +299,6 @@
       <div class="loader-percent" id="loaderPercentText">25%</div>
       <div class="loader-bar-track"><div class="loader-bar-fill" id="loaderBarFill" style="width: 25%;"></div></div>
       <div class="loader-status" id="loaderStatusText">Loading account...</div>
-    </div>
-  </div>
-
-  <!-- Receipt Format Choice Modal: PNG, SVG, Cancel -->
-  <div id="receipt-format-modal" role="dialog" aria-modal="true">
-    <div class="receipt-modal-card">
-      <div class="receipt-modal-title" data-i18n="downloadReceiptText">⬇️ Download receipt</div>
-      <div class="receipt-modal-sub" id="receiptModalMeta">Select format</div>
-      <button type="button" class="format-choice-btn format-png-btn" onclick="executeReceiptDownload('png')">PNG</button>
-      <button type="button" class="format-choice-btn format-svg-btn" onclick="executeReceiptDownload('svg')">SVG</button>
-      <button type="button" class="format-cancel-btn" onclick="closeReceiptFormatModal()" data-i18n="cancelBtn">Cancel</button>
     </div>
   </div>
 
@@ -494,7 +499,17 @@
           </div>
 
           <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">Confirm</button>
-          <button type="button" class="deposit-receipt-trigger" onclick="openDepositReceiptChooser()" data-i18n="downloadReceiptText">⬇️ Download receipt</button>
+
+          <!-- Appears immediately right after Confirm is clicked -->
+          <div id="depositInstantReceiptBar" class="instant-receipt-bar">
+            <div class="instant-receipt-left">
+              <span class="instant-receipt-label" data-i18n="downloadReceiptText">⬇️ Download receipt</span>
+              <button type="button" class="instant-fmt-btn instant-png-btn" onclick="executeReceiptDownload('png')">PNG</button>
+              <button type="button" class="instant-fmt-btn instant-svg-btn" onclick="executeReceiptDownload('svg')">SVG</button>
+            </div>
+            <button type="button" class="instant-cancel-btn" onclick="hideInstantReceiptBar()" data-i18n="cancelBtn">Cancel</button>
+          </div>
+
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -659,7 +674,7 @@
     let balanceHidden = false;
     let lightThemeActive = false;
     let pendingOtpPhone = null;
-    let pendingReceiptItem = null;
+    let latestReceiptData = null;
 
     async function apiRequest(path, options = {}) {
       const res = await fetch(`${API_BASE}${path}`, {
@@ -728,39 +743,20 @@
       return (
         (currentUserRecord && currentUserRecord.fullName) ||
         currentFullName ||
-        document.getElementById("regFullName").value.trim() ||
+        localStorage.getItem("ethio_name_" + (currentUser || "")) ||
         currentUser ||
         "User"
       );
     }
 
-    function openReceiptFormatModal(item) {
-      pendingReceiptItem = item || {
-        title: "Deposit Request",
-        amount: Number(document.getElementById("depAmount").value || 0),
-        type: "plus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      };
-      const fullName = getActiveFullName();
-      document.getElementById("receiptModalMeta").innerText =
-        `${fullName} • ${Number(pendingReceiptItem.amount || 0).toFixed(2)} ETB`;
-      document.getElementById("receipt-format-modal").classList.add("active");
+    function showInstantReceiptBar(receiptObj) {
+      latestReceiptData = receiptObj;
+      document.getElementById("depositInstantReceiptBar").classList.add("show");
     }
 
-    function openDepositReceiptChooser() {
-      const amt = parseFloat(document.getElementById("depAmount").value);
-      const method = document.getElementById("depMethod").value;
-      openReceiptFormatModal({
-        title: `Deposit (${method})`,
-        amount: isNaN(amt) ? 0 : amt,
-        type: "plus",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      });
-    }
-
-    function closeReceiptFormatModal() {
-      pendingReceiptItem = null;
-      document.getElementById("receipt-format-modal").classList.remove("active");
+    function hideInstantReceiptBar() {
+      latestReceiptData = null;
+      document.getElementById("depositInstantReceiptBar").classList.remove("show");
     }
 
     function escapeXml(str) {
@@ -777,7 +773,7 @@
       const phone = currentUser || "-";
       const sign = item.type === "plus" ? "+" : "-";
       const amtStr = `${sign}${Number(item.amount || 0).toFixed(2)} ETB`;
-      const titleText = escapeXml(item.title || "Transaction");
+      const titleText = escapeXml(item.title || "Deposit Request");
       const nameText = escapeXml(fullName);
       const phoneText = escapeXml(phone);
       const timeText = escapeXml(item.time || new Date().toLocaleTimeString());
@@ -812,8 +808,7 @@
     }
 
     function executeReceiptDownload(format) {
-      const item = pendingReceiptItem;
-      closeReceiptFormatModal();
+      const item = latestReceiptData;
       if (!item) return;
 
       const safeName = getActiveFullName().replace(/[^a-zA-Z0-9_-]/g, "_") || "user";
@@ -1015,6 +1010,7 @@
           body: JSON.stringify({ fullName, phone, password: pass })
         });
         currentFullName = fullName;
+        localStorage.setItem("ethio_name_" + phone, fullName);
         document.getElementById("regFullName").value = "";
         document.getElementById("regPass").value = "";
         document.getElementById("regConfirm").value = "";
@@ -1067,8 +1063,12 @@
           body: JSON.stringify({ phone, password: pass })
         });
         currentUser = phone;
+        const savedName = (data.user && data.user.fullName) || localStorage.getItem("ethio_name_" + phone) || "";
+        if (savedName) {
+          currentFullName = savedName;
+          if (data.user) data.user.fullName = savedName;
+        }
         currentUserRecord = data.user;
-        if (data.user && data.user.fullName) currentFullName = data.user.fullName;
         document.getElementById("authMessage").style.display = "none";
         runLoginLoadingScreen(() => {
           showDashboardUI();
@@ -1097,6 +1097,7 @@
     function logoutUser() {
       currentUser = null;
       currentUserRecord = null;
+      hideInstantReceiptBar();
       closeAllInnerPanels("bnav-home");
       document.getElementById("dashboard-section").style.display = "none";
       document.getElementById("bottomNavBar").classList.remove("visible");
@@ -1149,8 +1150,9 @@
 
     function applyUserRecordToUI(userObj, announcementsArr) {
       if (userObj) {
-        if (!userObj.fullName && currentFullName) {
-          userObj.fullName = currentFullName;
+        const cachedName = currentFullName || localStorage.getItem("ethio_name_" + (currentUser || "")) || "";
+        if (!userObj.fullName && cachedName) {
+          userObj.fullName = cachedName;
         } else if (userObj.fullName) {
           currentFullName = userObj.fullName;
         }
@@ -1262,13 +1264,21 @@
           })
         });
         applyUserRecordToUI(res.user);
+
+        // Immediately show: ⬇️ Download receipt | PNG | SVG ... Cancel
+        showInstantReceiptBar({
+          title: `Deposit (${method})`,
+          amount,
+          type: "plus",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        });
+
         document.getElementById("depAmount").value = "";
         document.getElementById("depReceiptInput").value = "";
         selectedReceiptName = "";
         selectedReceiptDataUrl = "";
         document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
         document.getElementById("receiptPreview").style.display = "none";
-        alert(currentLang === "am" ? "የተቀማጭ ገንዘብ ጥያቄ ወደ Admin ተልኳል!" : "Deposit request sent to Admin!");
       } catch (err) {
         alert(err.message);
       }
@@ -1328,7 +1338,7 @@
           body: JSON.stringify({ phone: currentUser, cost, pkgName, userProfit, intervalDesc })
         });
         applyUserRecordToUI(res.user);
-        alert(currentLang === "am" ? `${pkgName} ተጀምሯል!` : `${pkgName} activated!`);
+        alert(currentLang === "am" ? `${pkgName} ጥያቄ ተልኳል!` : `${pkgName} request sent!`);
       } catch (err) {
         alert(err.message);
       }
