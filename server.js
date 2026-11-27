@@ -24,17 +24,18 @@ app.get("/", (req, res) => {
   res.json({ ok: true, service: "EthioInvest Backend" });
 });
 
-// Register (prevents duplicate phone numbers)
+// Register (saves fullName & prevents duplicate phone numbers)
 app.post("/api/register", (req, res) => {
-  const { phone, password } = req.body;
-  if (!phone || !password) {
-    return res.status(400).json({ error: "Phone and password are required" });
+  const { fullName, phone, password } = req.body;
+  if (!fullName || !phone || !password) {
+    return res.status(400).json({ error: "Full name, phone, and password are required" });
   }
   if (db.users[phone]) {
     return res.status(409).json({ error: "Already registered" });
   }
   db.users[phone] = {
-    phone,
+    fullName: String(fullName).trim(),
+    phone: String(phone).trim(),
     password,
     balance: 0,
     invested: 0,
@@ -42,7 +43,14 @@ app.post("/api/register", (req, res) => {
     history: [],
     seenAnnouncementIds: []
   };
-  return res.status(201).json({ ok: true, user: { phone, balance: 0 } });
+  return res.status(201).json({
+    ok: true,
+    user: {
+      fullName: db.users[phone].fullName,
+      phone: db.users[phone].phone,
+      balance: 0
+    }
+  });
 });
 
 // Login
@@ -83,6 +91,7 @@ app.post("/api/deposits", (req, res) => {
   const item = {
     id: "dep_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
+    fullName: user.fullName || phone,
     method,
     amount: amt,
     screenshotName: screenshotName || "receipt.png",
@@ -168,6 +177,7 @@ app.post("/api/withdrawals", (req, res) => {
   const item = {
     id: "with_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
+    fullName: user.fullName || phone,
     method,
     account,
     amount: amt,
@@ -250,6 +260,7 @@ app.post("/api/referrals", (req, res) => {
   const item = {
     id: "ref_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
+    fullName: user.fullName || phone,
     amount: bonus,
     refLink: refLink || `https://ethioinvest.app/?ref=${encodeURIComponent(phone)}`,
     status: "pending",
@@ -332,6 +343,7 @@ app.post("/api/packages/buy", (req, res) => {
   const item = {
     id: "pkg_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
+    fullName: user.fullName || phone,
     pkgName: pkgName || "Investment Package",
     intervalDesc: intervalDesc || "",
     userProfit: Number(userProfit || 0),
