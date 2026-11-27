@@ -201,59 +201,6 @@
     .file-name-text { font-size: 0.72rem; color: var(--text-muted); word-break: break-all; }
     .receipt-preview { max-width: 100%; max-height: 130px; border-radius: 8px; display: none; border: 1px solid var(--border-subtle); margin-top: 4px; }
 
-    /* Immediate inline receipt bar shown right after Confirm */
-    .instant-receipt-bar {
-      display: none;
-      margin-top: 10px;
-      padding: 9px 10px;
-      border-radius: 10px;
-      background: var(--bg-input);
-      border: 1.5px solid #22c55e;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      flex-wrap: nowrap;
-    }
-    .instant-receipt-bar.show {
-      display: flex;
-    }
-    .instant-receipt-left {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      min-width: 0;
-      flex-wrap: wrap;
-    }
-    .instant-receipt-label {
-      font-size: 0.74rem;
-      font-weight: 800;
-      color: #4ade80;
-      white-space: nowrap;
-    }
-    .instant-fmt-btn {
-      border: none;
-      border-radius: 6px;
-      padding: 5px 9px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      cursor: pointer;
-      color: #ffffff;
-    }
-    .instant-png-btn { background: var(--btn-green); }
-    .instant-svg-btn { background: var(--btn-blue); }
-    .instant-cancel-btn {
-      margin-left: auto;
-      background: rgba(239, 68, 68, 0.18);
-      color: #fca5a5;
-      border: 1px solid #ef4444;
-      border-radius: 6px;
-      padding: 5px 9px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
     .calc-box { background: var(--bg-input); border: 1px dashed var(--accent); padding: 9px 10px; border-radius: 9px; margin: 8px 0; font-size: 0.78rem; }
     .calc-row { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-label); gap: 6px; }
     .net-pay-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.88rem; color: #4ade80; border-top: 1px solid var(--border-subtle); padding-top: 5px; margin-top: 4px; }
@@ -270,6 +217,18 @@
     .tx-plus { color: #4ade80; font-weight: 700; white-space: nowrap; }
     .tx-minus { color: #f87171; font-weight: 700; white-space: nowrap; }
 
+    .section-activity-footer {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-subtle);
+    }
+    .section-activity-footer-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
     .notif-msg-card { background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px; margin-bottom: 7px; font-size: 0.75rem; color: var(--text-main); line-height: 1.4; }
     .notif-msg-card.unread { border-color: #ef4444; }
 
@@ -282,6 +241,73 @@
     .bnav-btn { background: transparent; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
     .bnav-btn.active { color: var(--accent); }
     .bnav-btn span.bnav-ico { font-size: 1.15rem; line-height: 1; }
+
+    #ethio-deposit-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    #ethio-deposit-box {
+      width: 100%;
+      max-width: 380px;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+    .ethio-spinner {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 14px;
+      border: 4px solid #334155;
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: ethioSpin 0.9s linear infinite;
+    }
+    @keyframes ethioSpin {
+      to { transform: rotate(360deg); }
+    }
+    .ethio-receipt-card {
+      background: #0f172a;
+      border: 1px dashed #475569;
+      border-radius: 10px;
+      padding: 14px;
+      margin: 14px 0;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .ethio-btn-download {
+      width: 100%;
+      background: #059669;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .ethio-btn-close {
+      width: 100%;
+      background: #334155;
+      color: #f8fafc;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -500,15 +526,7 @@
 
           <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">Confirm</button>
 
-          <!-- Appears immediately right after Confirm is clicked -->
-          <div id="depositInstantReceiptBar" class="instant-receipt-bar">
-            <div class="instant-receipt-left">
-              <span class="instant-receipt-label" data-i18n="downloadReceiptText">⬇️ Download receipt</span>
-              <button type="button" class="instant-fmt-btn instant-png-btn" onclick="executeReceiptDownload('png')">PNG</button>
-              <button type="button" class="instant-fmt-btn instant-svg-btn" onclick="executeReceiptDownload('svg')">SVG</button>
-            </div>
-            <button type="button" class="instant-cancel-btn" onclick="hideInstantReceiptBar()" data-i18n="cancelBtn">Cancel</button>
-          </div>
+          <div id="depositSectionActivity" class="section-activity-footer"></div>
 
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
@@ -545,6 +563,7 @@
             <div class="net-pay-row"><span>Net Pay =</span><span id="calcNetPay">0.00 ETB</span></div>
           </div>
           <button class="btn-primary" onclick="submitWithdrawal()" data-i18n="confirmWithBtn">Submit</button>
+          <div id="withdrawalSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -573,6 +592,7 @@
             <button class="copy-sign-btn" onclick="copyReferralReplaceSign(this)" title="Copy">⧉</button>
           </div>
           <button class="btn-success" onclick="simulateReferralBonus()" data-i18n="claimRefBtn">+100 ETB</button>
+          <div id="referralSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -604,6 +624,7 @@
             <div class="pkg-meta">+90,000 ETB (+45%)</div>
             <button class="btn-primary" onclick="buyPackage(200000, 'Executive Max Plan', 90000, 'Every 10 Days (6 intervals)')">200,000 ETB</button>
           </div>
+          <div id="packageSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -618,6 +639,7 @@
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             Telebirr: 0964488470<br />CBE: 1000298833585<br />Abyssinia: 166455979
           </p>
+          <div id="supportSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -630,6 +652,7 @@
         <div id="panel-notifications" class="inner-panel">
           <h3 data-i18n="tabNotifications">Notifications</h3>
           <div id="notificationsList"></div>
+          <div id="notificationsSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -644,6 +667,7 @@
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             • Screenshot (*) is required.<br />• Withdrawal fee is 5%.
           </p>
+          <div id="faqSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
         </div>
       </div>
@@ -657,6 +681,23 @@
     <button type="button" class="bnav-btn" id="bnav-history" onclick="toggleInnerPanel('history', 'bnav-history')"><span class="bnav-ico">📋</span><span>History</span></button>
     <button type="button" class="bnav-btn" id="bnav-profile" onclick="toggleInnerPanel('referral', 'bnav-profile')"><span class="bnav-ico">👤</span><span>Profile</span></button>
   </nav>
+
+  <div id="ethio-deposit-overlay">
+    <div id="ethio-deposit-box">
+      <div id="ethio-wait-view">
+        <div class="ethio-spinner"></div>
+        <div style="font-size: 16px; font-weight: 600;">Please wait...</div>
+        <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">Processing your deposit</div>
+      </div>
+
+      <div id="ethio-success-view" style="display: none;">
+        <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit successfully</div>
+        <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
+        <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download Receipt</button>
+        <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const API_BASE = "https://ethioinvest-lvsr.onrender.com";
@@ -674,7 +715,47 @@
     let balanceHidden = false;
     let lightThemeActive = false;
     let pendingOtpPhone = null;
-    let latestReceiptData = null;
+    let lastReceipt = null;
+    let localActivities = [];
+
+    function getActivityStorageKey() {
+      return "ethioinvest_activities_" + (currentUser || "guest");
+    }
+
+    function loadLocalActivities() {
+      try {
+        const raw = localStorage.getItem(getActivityStorageKey());
+        const parsed = raw ? JSON.parse(raw) : [];
+        localActivities = Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        localActivities = [];
+      }
+      return localActivities;
+    }
+
+    function saveLocalActivities() {
+      try {
+        localStorage.setItem(getActivityStorageKey(), JSON.stringify(localActivities));
+      } catch (_) {}
+    }
+
+    function addActivityEntry(section, title, amount, type, extraTime) {
+      loadLocalActivities();
+      const entry = {
+        section: section || "general",
+        title: title || "Activity",
+        amount: amount !== undefined && amount !== null && amount !== "" ? Number(amount) : null,
+        type: type || "info",
+        time: extraTime || new Date().toLocaleString()
+      };
+      localActivities.unshift(entry);
+      saveLocalActivities();
+      renderAllSectionActivities();
+      if (currentUserRecord) {
+        renderHistory(currentUserRecord.history || []);
+      }
+      return entry;
+    }
 
     async function apiRequest(path, options = {}) {
       const res = await fetch(`${API_BASE}${path}`, {
@@ -710,7 +791,6 @@
         feeLabel: "Fee (5%):", confirmWithBtn: "Submit", pkgHeader: "Packages (≤200k)",
         refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
         histHeader: "History", noHistory: "No transactions yet.", backBtn: "Back",
-        downloadReceiptText: "⬇️ Download receipt", cancelBtn: "Cancel",
         ratePrefix: "ETB Rate (1 USD) =", loadingMsg: "Loading...", regRedirectMsg: "Going to Login..."
       },
       am: {
@@ -734,7 +814,6 @@
         feeLabel: "Fee (5%):", confirmWithBtn: "ላክ", pkgHeader: "Packages (≤200k)",
         refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
         histHeader: "ታሪክ (History)", noHistory: "እንቅስቃሴ የለም።", backBtn: "ተመለስ",
-        downloadReceiptText: "⬇️ Download receipt", cancelBtn: "Cancel",
         ratePrefix: "የብር ዋጋ (1 USD) =", loadingMsg: "በመጫን ላይ...", regRedirectMsg: "ወደ Login በመሄድ ላይ..."
       }
     };
@@ -749,104 +828,63 @@
       );
     }
 
-    function showInstantReceiptBar(receiptObj) {
-      latestReceiptData = receiptObj;
-      document.getElementById("depositInstantReceiptBar").classList.add("show");
+    function openDepositSpinnerAndReceipt(receipt) {
+      lastReceipt = receipt;
+      const overlay = document.getElementById("ethio-deposit-overlay");
+      const waitView = document.getElementById("ethio-wait-view");
+      const successView = document.getElementById("ethio-success-view");
+      const detailsEl = document.getElementById("ethio-receipt-details");
+
+      overlay.style.display = "flex";
+      waitView.style.display = "block";
+      successView.style.display = "none";
+
+      setTimeout(() => {
+        waitView.style.display = "none";
+        successView.style.display = "block";
+        detailsEl.innerHTML = `
+          <div><strong>Receipt ID:</strong> ${receipt.id}</div>
+          <div><strong>Account:</strong> ${receipt.account}</div>
+          <div><strong>Amount:</strong> ${receipt.amount} ETB</div>
+          <div><strong>Status:</strong> Deposit successfully</div>
+          <div><strong>Date:</strong> ${receipt.date}</div>
+        `;
+      }, 3000);
     }
 
-    function hideInstantReceiptBar() {
-      latestReceiptData = null;
-      document.getElementById("depositInstantReceiptBar").classList.remove("show");
-    }
+    document.getElementById("ethio-download-btn").addEventListener("click", () => {
+      if (!lastReceipt) return;
+      const text = [
+        "ETHIOINVEST - DEPOSIT RECEIPT",
+        "--------------------------------",
+        `Receipt ID : ${lastReceipt.id}`,
+        `Account    : ${lastReceipt.account}`,
+        `Amount     : ${lastReceipt.amount} ETB`,
+        `Status     : Deposit successfully`,
+        `Date       : ${lastReceipt.date}`,
+      ].join("\n");
 
-    function escapeXml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
-    }
-
-    function buildReceiptSvgMarkup(item) {
-      const fullName = getActiveFullName();
-      const phone = currentUser || "-";
-      const sign = item.type === "plus" ? "+" : "-";
-      const amtStr = `${sign}${Number(item.amount || 0).toFixed(2)} ETB`;
-      const titleText = escapeXml(item.title || "Deposit Request");
-      const nameText = escapeXml(fullName);
-      const phoneText = escapeXml(phone);
-      const timeText = escapeXml(item.time || new Date().toLocaleTimeString());
-      const amtColor = item.type === "plus" ? "#16a34a" : "#dc2626";
-
-      return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="380" viewBox="0 0 620 380">
-  <rect width="620" height="380" rx="20" fill="#0f172a"/>
-  <rect x="16" y="16" width="588" height="348" rx="16" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
-  <text x="40" y="64" fill="#38bdf8" font-size="26" font-weight="800" font-family="sans-serif">EthioInvest Receipt</text>
-  <text x="580" y="64" text-anchor="end" fill="#94a3b8" font-size="16" font-family="sans-serif">${timeText}</text>
-  <line x1="40" y1="86" x2="580" y2="86" stroke="#334155" stroke-width="1.5"/>
-  <text x="40" y="128" fill="#94a3b8" font-size="17" font-family="sans-serif">Full Name:</text>
-  <text x="580" y="128" text-anchor="end" fill="#4ade80" font-size="20" font-weight="800" font-family="sans-serif">${nameText}</text>
-  <text x="40" y="166" fill="#94a3b8" font-size="17" font-family="sans-serif">Phone:</text>
-  <text x="580" y="166" text-anchor="end" fill="#f8fafc" font-size="18" font-weight="700" font-family="sans-serif">${phoneText}</text>
-  <text x="40" y="204" fill="#94a3b8" font-size="17" font-family="sans-serif">Activity:</text>
-  <text x="40" y="234" fill="#e2e8f0" font-size="16" font-weight="600" font-family="sans-serif">${titleText.slice(0, 62)}</text>
-  <line x1="40" y1="262" x2="580" y2="262" stroke="#334155" stroke-width="1.5"/>
-  <text x="40" y="308" fill="#cbd5e1" font-size="20" font-weight="700" font-family="sans-serif">Amount:</text>
-  <text x="580" y="310" text-anchor="end" fill="${amtColor}" font-size="28" font-weight="900" font-family="sans-serif">${escapeXml(amtStr)}</text>
-</svg>`;
-    }
-
-    function triggerFileDownload(blobOrUrl, filename) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = blobOrUrl;
-      a.download = filename;
+      a.href = url;
+      a.download = `${lastReceipt.id}.txt`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-    }
+      a.remove();
+      URL.revokeObjectURL(url);
+      addActivityEntry("deposit", `Downloaded Receipt (${lastReceipt.id})`, null, "info");
+    });
 
-    function executeReceiptDownload(format) {
-      const item = latestReceiptData;
-      if (!item) return;
-
-      const safeName = getActiveFullName().replace(/[^a-zA-Z0-9_-]/g, "_") || "user";
-      const safeBase = `ethioinvest-receipt-${safeName}-${Date.now()}`;
-      const svgMarkup = buildReceiptSvgMarkup(item);
-
-      if (format === "svg") {
-        const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        triggerFileDownload(url, `${safeBase}.svg`);
-        setTimeout(() => URL.revokeObjectURL(url), 1500);
-        return;
-      }
-
-      const img = new Image();
-      const svgBlob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
-      const svgUrl = URL.createObjectURL(svgBlob);
-      img.onload = function () {
-        const canvas = document.createElement("canvas");
-        canvas.width = 620;
-        canvas.height = 380;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(svgUrl);
-        canvas.toBlob(function (pngBlob) {
-          if (!pngBlob) return;
-          const pngUrl = URL.createObjectURL(pngBlob);
-          triggerFileDownload(pngUrl, `${safeBase}.png`);
-          setTimeout(() => URL.revokeObjectURL(pngUrl), 1500);
-        }, "image/png");
-      };
-      img.src = svgUrl;
-    }
+    document.getElementById("ethio-close-btn").addEventListener("click", () => {
+      document.getElementById("ethio-deposit-overlay").style.display = "none";
+    });
 
     function toggleColorMode() {
       lightThemeActive = !lightThemeActive;
       document.body.classList.toggle("light-mode", lightThemeActive);
       document.getElementById("themeToggleBtn").innerText = lightThemeActive ? "☀️" : "🌙";
+      addActivityEntry("general", `Theme switched to ${lightThemeActive ? "Light" : "Dark"}`, null, "info");
     }
 
     function updateRegisterButtonState() {
@@ -863,6 +901,7 @@
       balanceHidden = !balanceHidden;
       document.getElementById("balanceEyeBtn").innerText = balanceHidden ? "🙈" : "👁";
       renderBalanceText();
+      addActivityEntry("general", balanceHidden ? "Balance hidden" : "Balance shown", null, "info");
     }
 
     function toggleOtpResetBox() {
@@ -927,6 +966,7 @@
       document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
       document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
       renderExchangeRate();
+      renderAllSectionActivities();
       if (currentUserRecord) renderHistory(currentUserRecord.history || []);
     }
 
@@ -956,6 +996,7 @@
       btn.classList.add("spinning");
       fetchRealExchangeRate();
       if (currentUser) loadUserDataFromServer();
+      addActivityEntry("general", "Refreshed balance", null, "info");
       setTimeout(() => btn.classList.remove("spinning"), 450);
     }
 
@@ -1063,12 +1104,14 @@
           body: JSON.stringify({ phone, password: pass })
         });
         currentUser = phone;
+        loadLocalActivities();
         const savedName = (data.user && data.user.fullName) || localStorage.getItem("ethio_name_" + phone) || "";
         if (savedName) {
           currentFullName = savedName;
           if (data.user) data.user.fullName = savedName;
         }
         currentUserRecord = data.user;
+        addActivityEntry("general", "Logged in to account", null, "info");
         document.getElementById("authMessage").style.display = "none";
         runLoginLoadingScreen(() => {
           showDashboardUI();
@@ -1092,12 +1135,13 @@
       document.getElementById("bottomNavBar").classList.add("visible");
       document.getElementById("headerLogoutBtn").style.display = "inline-block";
       document.getElementById("headerUserSub").innerText = formatUserHeaderLabel();
+      renderAllSectionActivities();
     }
 
     function logoutUser() {
+      addActivityEntry("general", "Logged out", null, "info");
       currentUser = null;
       currentUserRecord = null;
-      hideInstantReceiptBar();
       closeAllInnerPanels("bnav-home");
       document.getElementById("dashboard-section").style.display = "none";
       document.getElementById("bottomNavBar").classList.remove("visible");
@@ -1143,6 +1187,7 @@
       if (document.getElementById("dashboard-section").style.display === "block") {
         toggleInnerPanel("notifications");
         markAllAnnouncementsSeen();
+        addActivityEntry("notifications", "Opened notifications", null, "info");
       } else {
         syncNotificationsUI();
       }
@@ -1166,6 +1211,7 @@
         currentAnnouncements = announcementsArr;
       }
       syncNotificationsUI();
+      renderAllSectionActivities();
     }
 
     async function loadUserDataFromServer() {
@@ -1206,6 +1252,7 @@
       panelEl.classList.add("active");
       if (tileEl) tileEl.classList.add("active");
       if (panelName === "notifications") markAllAnnouncementsSeen();
+      renderAllSectionActivities();
 
       document.querySelectorAll(".bnav-btn").forEach(b => b.classList.remove("active"));
       if (bnavId && document.getElementById(bnavId)) {
@@ -1236,6 +1283,7 @@
         previewImg.style.display = "block";
       };
       reader.readAsDataURL(file);
+      addActivityEntry("deposit", `Attached screenshot (${file.name})`, null, "info");
     }
 
     async function submitDeposit() {
@@ -1252,6 +1300,16 @@
         return;
       }
 
+      const receiptObj = {
+        id: "RCP-" + Date.now(),
+        account: method,
+        amount: amount.toFixed(2),
+        date: new Date().toLocaleString()
+      };
+
+      addActivityEntry("deposit", `Deposit (${method})`, amount, "plus", receiptObj.date);
+      openDepositSpinnerAndReceipt(receiptObj);
+
       try {
         const res = await apiRequest("/api/deposits", {
           method: "POST",
@@ -1264,24 +1322,14 @@
           })
         });
         applyUserRecordToUI(res.user);
+      } catch (_) {}
 
-        // Immediately show: ⬇️ Download receipt | PNG | SVG ... Cancel
-        showInstantReceiptBar({
-          title: `Deposit (${method})`,
-          amount,
-          type: "plus",
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        });
-
-        document.getElementById("depAmount").value = "";
-        document.getElementById("depReceiptInput").value = "";
-        selectedReceiptName = "";
-        selectedReceiptDataUrl = "";
-        document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
-        document.getElementById("receiptPreview").style.display = "none";
-      } catch (err) {
-        alert(err.message);
-      }
+      document.getElementById("depAmount").value = "";
+      document.getElementById("depReceiptInput").value = "";
+      selectedReceiptName = "";
+      selectedReceiptDataUrl = "";
+      document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
+      document.getElementById("receiptPreview").style.display = "none";
     }
 
     function calculateNetPay() {
@@ -1317,6 +1365,7 @@
           body: JSON.stringify({ phone: currentUser, method, account: userAcc, amount })
         });
         applyUserRecordToUI(res.user);
+        addActivityEntry("withdrawal", `Withdrawal (${method} - ${userAcc})`, amount, "minus");
         document.getElementById("withAmount").value = "";
         calculateNetPay();
         const netPay = amount - amount * 0.05;
@@ -1338,6 +1387,7 @@
           body: JSON.stringify({ phone: currentUser, cost, pkgName, userProfit, intervalDesc })
         });
         applyUserRecordToUI(res.user);
+        addActivityEntry("package", `Package: ${pkgName}`, cost, "minus");
         alert(currentLang === "am" ? `${pkgName} ጥያቄ ተልኳል!` : `${pkgName} request sent!`);
       } catch (err) {
         alert(err.message);
@@ -1355,28 +1405,76 @@
           })
         });
         applyUserRecordToUI(res.user);
+        addActivityEntry("referral", "Referral bonus request", 100, "plus");
         alert(currentLang === "am" ? "የሪፈራል ጥያቄ ወደ Admin ተልኳል!" : "Referral request sent to Admin!");
       } catch (err) {
         alert(err.message);
       }
     }
 
+    function formatActivityRowHtml(item) {
+      let badgeHtml = "";
+      if (item.amount !== null && item.amount !== undefined && !isNaN(Number(item.amount))) {
+        const sign = item.type === "plus" ? "+" : "-";
+        const cls = item.type === "plus" ? "tx-plus" : "tx-minus";
+        badgeHtml = `<span class="${cls}">${sign}${Number(item.amount).toFixed(2)} ETB</span>`;
+      }
+      return `
+        <div class="tx-item">
+          <div><div>${item.title}</div><small style="color:var(--text-muted);">${item.time}</small></div>
+          ${badgeHtml}
+        </div>
+      `;
+    }
+
+    function renderAllSectionActivities() {
+      loadLocalActivities();
+      const map = {
+        depositSectionActivity: { sec: "deposit", label: currentLang === "am" ? "የ Deposit እንቅስቃሴዎች" : "Deposit Activity" },
+        withdrawalSectionActivity: { sec: "withdrawal", label: currentLang === "am" ? "የ Withdrawal እንቅስቃሴዎች" : "Withdrawal Activity" },
+        referralSectionActivity: { sec: "referral", label: currentLang === "am" ? "የ Referral እንቅስቃሴዎች" : "Referral Activity" },
+        packageSectionActivity: { sec: "package", label: currentLang === "am" ? "የ Package እንቅስቃሴዎች" : "Package Activity" },
+        supportSectionActivity: { sec: "support", label: currentLang === "am" ? "የ Support እንቅስቃሴዎች" : "Support Activity" },
+        notificationsSectionActivity: { sec: "notifications", label: currentLang === "am" ? "የ Notifications እንቅስቃሴዎች" : "Notifications Activity" },
+        faqSectionActivity: { sec: "faq", label: currentLang === "am" ? "የ Help / FAQ እንቅስቃሴዎች" : "Help / FAQ Activity" }
+      };
+
+      Object.keys(map).forEach(elId => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        const { sec, label } = map[elId];
+        const items = localActivities.filter(a => a.section === sec);
+        el.innerHTML = `
+          <div class="section-activity-footer-title">${label} (${items.length})</div>
+          ${items.length
+            ? items.map(formatActivityRowHtml).join("")
+            : `<p style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">${i18n[currentLang].noHistory}</p>`}
+        `;
+      });
+    }
+
     function renderHistory(list) {
       const container = document.getElementById("historyList");
-      if (!list || list.length === 0) {
+      loadLocalActivities();
+
+      const serverItems = (Array.isArray(list) ? list : []).map(item => ({
+        title: item.title,
+        amount: item.amount,
+        type: item.type,
+        time: item.time
+      }));
+
+      const combined = [...localActivities, ...serverItems];
+      if (!combined.length) {
         container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">${i18n[currentLang].noHistory}</p>`;
         return;
       }
-      container.innerHTML = list.map(item => `
-        <div class="tx-item">
-          <div><div>${item.title}</div><small style="color:var(--text-muted);">${item.time}</small></div>
-          <span class="${item.type === "plus" ? "tx-plus" : "tx-minus"}">${item.type === "plus" ? "+" : "-"}${Number(item.amount).toFixed(2)} ETB</span>
-        </div>
-      `).join("");
+      container.innerHTML = combined.map(formatActivityRowHtml).join("");
     }
 
     function copyReplaceSign(btnEl, textToCopy) {
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(textToCopy).catch(() => {});
+      addActivityEntry("deposit", `Copied ${textToCopy}`, null, "info");
       if (btnEl._copyTimer) clearTimeout(btnEl._copyTimer);
       btnEl.innerText = "copied";
       btnEl.classList.add("is-copied");
@@ -1387,7 +1485,9 @@
     }
 
     function copyReferralReplaceSign(btnEl) {
-      copyReplaceSign(btnEl, document.getElementById("refLinkText").innerText);
+      const link = document.getElementById("refLinkText").innerText;
+      copyReplaceSign(btnEl, link);
+      addActivityEntry("referral", "Copied referral link", null, "info");
     }
 
     setInterval(() => {
@@ -1399,211 +1499,7 @@
     updateRegisterButtonState();
     fetchRealExchangeRate();
     syncNotificationsUI();
+    renderAllSectionActivities();
   </script>
-  <style>
-  #ethio-deposit-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.85);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    font-family: sans-serif;
-  }
-  #ethio-deposit-box {
-    width: 100%;
-    max-width: 380px;
-    background: #1e293b;
-    color: #f8fafc;
-    border: 1px solid #334155;
-    border-radius: 14px;
-    padding: 22px;
-    text-align: center;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-  }
-  .ethio-spinner {
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 14px;
-    border: 4px solid #334155;
-    border-top-color: #10b981;
-    border-radius: 50%;
-    animation: ethioSpin 0.9s linear infinite;
-  }
-  @keyframes ethioSpin {
-    to { transform: rotate(360deg); }
-  }
-  .ethio-receipt-card {
-    background: #0f172a;
-    border: 1px dashed #475569;
-    border-radius: 10px;
-    padding: 14px;
-    margin: 14px 0;
-    text-align: left;
-    font-size: 13px;
-    line-height: 1.7;
-  }
-  .ethio-btn-download {
-    width: 100%;
-    background: #059669;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    padding: 11px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 8px;
-  }
-  .ethio-btn-close {
-    width: 100%;
-    background: #334155;
-    color: #f8fafc;
-    border: none;
-    border-radius: 8px;
-    padding: 9px 14px;
-    font-size: 13px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="ethio-deposit-overlay">
-  <div id="ethio-deposit-box">
-    <div id="ethio-wait-view">
-      <div class="ethio-spinner"></div>
-      <div style="font-size: 16px; font-weight: 600;">Please wait...</div>
-      <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">Processing your deposit</div>
-    </div>
-
-    <div id="ethio-success-view" style="display: none;">
-      <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit successfully</div>
-      <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
-      <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download Receipt</button>
-      <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function () {
-  const overlay = document.getElementById('ethio-deposit-overlay');
-  const waitView = document.getElementById('ethio-wait-view');
-  const successView = document.getElementById('ethio-success-view');
-  const detailsEl = document.getElementById('ethio-receipt-details');
-  const downloadBtn = document.getElementById('ethio-download-btn');
-  const closeBtn = document.getElementById('ethio-close-btn');
-
-  let lastReceipt = null;
-
-  function getDepositFormValues() {
-    const inputs = Array.from(document.querySelectorAll('input, select'));
-    let paymentAccount = 'Telebirr / Bank';
-    let amount = '';
-
-    for (const el of inputs) {
-      const idOrName = ((el.id || '') + ' ' + (el.name || '') + ' ' + (el.placeholder || '')).toLowerCase();
-      const val = (el.value || '').trim();
-      if (!val) continue;
-
-      if (el.tagName === 'SELECT' || idOrName.includes('account') || idOrName.includes('payment') || idOrName.includes('method')) {
-        paymentAccount = val;
-      } else if (el.type === 'number' || idOrName.includes('amount') || idOrName.includes('etb')) {
-        amount = val;
-      }
-    }
-
-    if (!amount) {
-      const numInput = inputs.find((el) => el.type === 'number' && el.value);
-      if (numInput) amount = numInput.value.trim();
-    }
-
-    return { paymentAccount, amount };
-  }
-
-  function showDownloadReceiptScreen(receipt) {
-    lastReceipt = receipt;
-    waitView.style.display = 'none';
-    successView.style.display = 'block';
-    detailsEl.innerHTML = `
-      <div><strong>Receipt ID:</strong> ${receipt.id}</div>
-      <div><strong>Account:</strong> ${receipt.account}</div>
-      <div><strong>Amount:</strong> ${receipt.amount} ETB</div>
-      <div><strong>Status:</strong> Deposit successfully</div>
-      <div><strong>Date:</strong> ${receipt.date}</div>
-    `;
-  }
-
-  function triggerDepositFlow() {
-    const { paymentAccount, amount } = getDepositFormValues();
-    const receipt = {
-      id: 'RCP-' + Date.now(),
-      account: paymentAccount,
-      amount: amount || '0',
-      date: new Date().toLocaleString(),
-    };
-
-    overlay.style.display = 'flex';
-    waitView.style.display = 'block';
-    successView.style.display = 'none';
-
-    setTimeout(() => {
-      showDownloadReceiptScreen(receipt);
-    }, 3000);
-  }
-
-  downloadBtn.addEventListener('click', () => {
-    if (!lastReceipt) return;
-    const text = [
-      'ETHIOINVEST - DEPOSIT RECEIPT',
-      '--------------------------------',
-      `Receipt ID : ${lastReceipt.id}`,
-      `Account    : ${lastReceipt.account}`,
-      `Amount     : ${lastReceipt.amount} ETB`,
-      `Status     : Deposit successfully`,
-      `Date       : ${lastReceipt.date}`,
-    ].join('\n');
-
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${lastReceipt.id}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  });
-
-  closeBtn.addEventListener('click', () => {
-    overlay.style.display = 'none';
-  });
-
-  // Intercept native alert only when a deposit validation/success alert fires during deposit flow
-  const originalAlert = window.alert.bind(window);
-  let interceptingDepositAlert = false;
-
-  window.alert = function (msg) {
-    if (interceptingDepositAlert) {
-      return;
-    }
-    originalAlert(msg);
-  };
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button, [role="button"], input[type="submit"]');
-    if (!btn) return;
-    const label = (btn.innerText || btn.value || '').trim().toLowerCase();
-    if (label === 'confirm') {
-      interceptingDepositAlert = true;
-      setTimeout(() => {
-        interceptingDepositAlert = false;
-      }, 1500);
-      triggerDepositFlow();
-    }
-  }, true);
-})();
-</script>
 </body>
 </html>
