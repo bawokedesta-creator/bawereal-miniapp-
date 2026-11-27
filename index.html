@@ -1400,5 +1400,210 @@
     fetchRealExchangeRate();
     syncNotificationsUI();
   </script>
+  <style>
+  #ethio-deposit-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: sans-serif;
+  }
+  #ethio-deposit-box {
+    width: 100%;
+    max-width: 380px;
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  }
+  .ethio-spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 14px;
+    border: 4px solid #334155;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: ethioSpin 0.9s linear infinite;
+  }
+  @keyframes ethioSpin {
+    to { transform: rotate(360deg); }
+  }
+  .ethio-receipt-card {
+    background: #0f172a;
+    border: 1px dashed #475569;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 14px 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .ethio-btn-download {
+    width: 100%;
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .ethio-btn-close {
+    width: 100%;
+    background: #334155;
+    color: #f8fafc;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+</style>
+
+<div id="ethio-deposit-overlay">
+  <div id="ethio-deposit-box">
+    <div id="ethio-wait-view">
+      <div class="ethio-spinner"></div>
+      <div style="font-size: 16px; font-weight: 600;">Please wait...</div>
+      <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">Processing your deposit</div>
+    </div>
+
+    <div id="ethio-success-view" style="display: none;">
+      <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit successfully</div>
+      <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
+      <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download Receipt</button>
+      <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const overlay = document.getElementById('ethio-deposit-overlay');
+  const waitView = document.getElementById('ethio-wait-view');
+  const successView = document.getElementById('ethio-success-view');
+  const detailsEl = document.getElementById('ethio-receipt-details');
+  const downloadBtn = document.getElementById('ethio-download-btn');
+  const closeBtn = document.getElementById('ethio-close-btn');
+
+  let lastReceipt = null;
+
+  function getDepositFormValues() {
+    const inputs = Array.from(document.querySelectorAll('input, select'));
+    let paymentAccount = 'Telebirr / Bank';
+    let amount = '';
+
+    for (const el of inputs) {
+      const idOrName = ((el.id || '') + ' ' + (el.name || '') + ' ' + (el.placeholder || '')).toLowerCase();
+      const val = (el.value || '').trim();
+      if (!val) continue;
+
+      if (el.tagName === 'SELECT' || idOrName.includes('account') || idOrName.includes('payment') || idOrName.includes('method')) {
+        paymentAccount = val;
+      } else if (el.type === 'number' || idOrName.includes('amount') || idOrName.includes('etb')) {
+        amount = val;
+      }
+    }
+
+    if (!amount) {
+      const numInput = inputs.find((el) => el.type === 'number' && el.value);
+      if (numInput) amount = numInput.value.trim();
+    }
+
+    return { paymentAccount, amount };
+  }
+
+  function showDownloadReceiptScreen(receipt) {
+    lastReceipt = receipt;
+    waitView.style.display = 'none';
+    successView.style.display = 'block';
+    detailsEl.innerHTML = `
+      <div><strong>Receipt ID:</strong> ${receipt.id}</div>
+      <div><strong>Account:</strong> ${receipt.account}</div>
+      <div><strong>Amount:</strong> ${receipt.amount} ETB</div>
+      <div><strong>Status:</strong> Deposit successfully</div>
+      <div><strong>Date:</strong> ${receipt.date}</div>
+    `;
+  }
+
+  function triggerDepositFlow() {
+    const { paymentAccount, amount } = getDepositFormValues();
+    const receipt = {
+      id: 'RCP-' + Date.now(),
+      account: paymentAccount,
+      amount: amount || '0',
+      date: new Date().toLocaleString(),
+    };
+
+    overlay.style.display = 'flex';
+    waitView.style.display = 'block';
+    successView.style.display = 'none';
+
+    setTimeout(() => {
+      showDownloadReceiptScreen(receipt);
+    }, 3000);
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    if (!lastReceipt) return;
+    const text = [
+      'ETHIOINVEST - DEPOSIT RECEIPT',
+      '--------------------------------',
+      `Receipt ID : ${lastReceipt.id}`,
+      `Account    : ${lastReceipt.account}`,
+      `Amount     : ${lastReceipt.amount} ETB`,
+      `Status     : Deposit successfully`,
+      `Date       : ${lastReceipt.date}`,
+    ].join('\n');
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${lastReceipt.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  closeBtn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+  });
+
+  // Intercept native alert only when a deposit validation/success alert fires during deposit flow
+  const originalAlert = window.alert.bind(window);
+  let interceptingDepositAlert = false;
+
+  window.alert = function (msg) {
+    if (interceptingDepositAlert) {
+      return;
+    }
+    originalAlert(msg);
+  };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button, [role="button"], input[type="submit"]');
+    if (!btn) return;
+    const label = (btn.innerText || btn.value || '').trim().toLowerCase();
+    if (label === 'confirm') {
+      interceptingDepositAlert = true;
+      setTimeout(() => {
+        interceptingDepositAlert = false;
+      }, 1500);
+      triggerDepositFlow();
+    }
+  }, true);
+})();
+</script>
 </body>
 </html>
