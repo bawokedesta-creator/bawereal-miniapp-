@@ -12,8 +12,13 @@ const db = {
   deposits: [],
   withdrawals: [],
   referrals: [],
+  packages: [],
   announcements: []
 };
+
+function nowTime() {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
 
 app.get("/", (req, res) => {
   res.json({ ok: true, service: "EthioInvest Backend" });
@@ -64,7 +69,7 @@ app.post("/api/reset-password", (req, res) => {
   return res.json({ ok: true });
 });
 
-// Submit deposit (stays pending until Admin approves)
+// 1) Deposit: pending only - NO balance change until Admin approves
 app.post("/api/deposits", (req, res) => {
   const { phone, method, amount, screenshotName, screenshotDataUrl } = req.body;
   const user = db.users[phone];
@@ -74,7 +79,7 @@ app.post("/api/deposits", (req, res) => {
     return res.status(400).json({ error: "Invalid deposit data or missing screenshot" });
   }
 
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   const item = {
     id: "dep_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
@@ -89,7 +94,7 @@ app.post("/api/deposits", (req, res) => {
 
   db.deposits.unshift(item);
   user.history.unshift({
-    title: `Deposit Pending Admin (${method}) • ${item.screenshotName}`,
+    title: `Deposit Pending Admin Approval (${method}) • ${item.screenshotName}`,
     amount: amt,
     type: "plus",
     time
@@ -98,7 +103,6 @@ app.post("/api/deposits", (req, res) => {
   return res.status(201).json({ ok: true, item, user });
 });
 
-// Admin approve or reject deposit
 app.post("/api/admin/deposits/:id/decide", (req, res) => {
   const { action } = req.body;
   const item = db.deposits.find(d => d.id === req.params.id);
@@ -107,7 +111,7 @@ app.post("/api/admin/deposits/:id/decide", (req, res) => {
   }
 
   const user = db.users[item.username];
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   const amt = Number(item.amount || 0);
 
   if (action === "approve") {
@@ -125,47 +129,41 @@ app.post("/api/admin/deposits/:id/decide", (req, res) => {
   } else if (action === "reject") {
     if (item.appliedToBalance) {
       user.balance = Math.max(0, Number(user.balance || 0) - amt);
-      user.history.unshift({
-        title: `Admin Rejected Deposit (${item.method})`,
-        amount: amt,
-        type: "minus",
-        time
-      });
       item.appliedToBalance = false;
     }
     item.status = "rejected";
+    user.history.unshift({
+      title: `Admin Rejected Deposit (${item.method})`,
+      amount: amt,
+      type: "minus",
+      time
+    });
   }
 
   return res.json({ ok: true, item, user });
 });
 
-// Delete deposit
 app.delete("/api/admin/deposits/:id", (req, res) => {
   db.deposits = db.deposits.filter(d => d.id !== req.params.id);
   return res.json({ ok: true });
 });
 
-// Submit withdrawal (5% fee, Net Pay; refunded if Admin rejects)
+// 2) Withdrawal: pending only - NO balance deduction until Admin approves
 app.post("/api/withdrawals", (req, res) => {
   const { phone, method, account, amount } = req.body;
   const user = db.users[phone];
   const amt = Number(amount);
 
-  if (!user || !account || isNaN(amt) || amt <= 0 || amt > user.balance) {
-    return res.status(400).json({ error: "Invalid withdrawal or insufficient balance" });
+  if (!user || !account || isNaN(amt) || amt <= 0) {
+    return res.status(400).json({ error: "Invalid withdrawal data" });
+  }
+  if (amt > Number(user.balance || 0)) {
+    return res.status(400).json({ error: "Insufficient balance" });
   }
 
   const fee = amt * 0.05;
   const netPay = amt - fee;
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-  user.balance = Number(user.balance || 0) - amt;
-  user.history.unshift({
-    title: `Withdraw Pending Admin (${method}: ${account}) | Net = ${netPay.toFixed(2)}`,
-    amount: amt,
-    type: "minus",
-    time
-  });
+  const time = nowTime();
 
   const item = {
     id: "with_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
@@ -176,15 +174,21 @@ app.post("/api/withdrawals", (req, res) => {
     fee,
     netPay,
     status: "pending",
-    deductedFromBalance: true,
+    deductedFromBalance: false,
     time
   };
 
   db.withdrawals.unshift(item);
+  user.history.unshift({
+    title: `Withdraw Pending Admin Approval (${method}: ${account}) | Net = ${netPay.toFixed(2)}`,
+    amount: amt,
+    type: "minus",
+    time
+  });
+
   return res.status(201).json({ ok: true, item, user });
 });
 
-// Admin approve or reject withdrawal
 app.post("/api/admin/withdrawals/:id/decide", (req, res) => {
   const { action } = req.body;
   const item = db.withdrawals.find(w => w.id === req.params.id);
@@ -193,10 +197,17 @@ app.post("/api/admin/withdrawals/:id/decide", (req, res) => {
   }
 
   const user = db.users[item.username];
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   const amt = Number(item.amount || 0);
 
   if (action === "approve") {
+    if (!item.deductedFromBalance) {
+      if (Number(user.balance || 0) < amt) {
+        return res.status(400).json({ error: "User balance is lower than withdrawal amount" });
+      }
+      user.balance = Number(user.balance || 0) - amt;
+      item.deductedFromBalance = true;
+    }
     item.status = "approved";
     user.history.unshift({
       title: `Admin Approved Withdraw (${item.method}) | Net Pay = ${Number(item.netPay).toFixed(2)} ETB`,
@@ -211,7 +222,7 @@ app.post("/api/admin/withdrawals/:id/decide", (req, res) => {
     }
     item.status = "rejected";
     user.history.unshift({
-      title: `Admin Rejected Withdraw (Refunded ${item.method})`,
+      title: `Admin Rejected Withdraw (${item.method})`,
       amount: amt,
       type: "plus",
       time
@@ -221,13 +232,12 @@ app.post("/api/admin/withdrawals/:id/decide", (req, res) => {
   return res.json({ ok: true, item, user });
 });
 
-// Delete withdrawal
 app.delete("/api/admin/withdrawals/:id", (req, res) => {
   db.withdrawals = db.withdrawals.filter(w => w.id !== req.params.id);
   return res.json({ ok: true });
 });
 
-// Referral bonus request
+// 3) Referral: pending only - NO balance increase until Admin approves
 app.post("/api/referrals", (req, res) => {
   const { phone, refLink } = req.body;
   const user = db.users[phone];
@@ -236,7 +246,7 @@ app.post("/api/referrals", (req, res) => {
   }
 
   const bonus = 100;
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   const item = {
     id: "ref_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     username: phone,
@@ -249,7 +259,7 @@ app.post("/api/referrals", (req, res) => {
 
   db.referrals.unshift(item);
   user.history.unshift({
-    title: "Referral Request (+100 ETB) - Pending Admin",
+    title: "Referral Pending Admin Approval (+100 ETB)",
     amount: bonus,
     type: "plus",
     time
@@ -258,7 +268,6 @@ app.post("/api/referrals", (req, res) => {
   return res.status(201).json({ ok: true, item, user });
 });
 
-// Admin approve or reject referral
 app.post("/api/admin/referrals/:id/decide", (req, res) => {
   const { action } = req.body;
   const item = db.referrals.find(r => r.id === req.params.id);
@@ -267,7 +276,7 @@ app.post("/api/admin/referrals/:id/decide", (req, res) => {
   }
 
   const user = db.users[item.username];
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   const bonus = Number(item.amount || 100);
 
   if (action === "approve") {
@@ -287,27 +296,113 @@ app.post("/api/admin/referrals/:id/decide", (req, res) => {
     if (item.appliedToBalance) {
       user.balance = Math.max(0, Number(user.balance || 0) - bonus);
       user.refBonus = Math.max(0, Number(user.refBonus || 0) - bonus);
-      user.history.unshift({
-        title: "Admin Rejected Referral Bonus",
-        amount: bonus,
-        type: "minus",
-        time
-      });
       item.appliedToBalance = false;
     }
     item.status = "rejected";
+    user.history.unshift({
+      title: "Admin Rejected Referral Bonus",
+      amount: bonus,
+      type: "minus",
+      time
+    });
   }
 
   return res.json({ ok: true, item, user });
 });
 
-// Delete referral
 app.delete("/api/admin/referrals/:id", (req, res) => {
   db.referrals = db.referrals.filter(r => r.id !== req.params.id);
   return res.json({ ok: true });
 });
 
-// Manual balance adjustment by Admin
+// 4) Package request: pending only - NO balance deduction until Admin approves
+app.post("/api/packages/buy", (req, res) => {
+  const { phone, cost, pkgName, userProfit, intervalDesc } = req.body;
+  const user = db.users[phone];
+  const amt = Number(cost);
+
+  if (!user || isNaN(amt) || amt <= 0) {
+    return res.status(400).json({ error: "Invalid package amount" });
+  }
+  if (amt > Number(user.balance || 0)) {
+    return res.status(400).json({ error: "Insufficient balance" });
+  }
+
+  const time = nowTime();
+  const item = {
+    id: "pkg_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+    username: phone,
+    pkgName: pkgName || "Investment Package",
+    intervalDesc: intervalDesc || "",
+    userProfit: Number(userProfit || 0),
+    amount: amt,
+    status: "pending",
+    deductedFromBalance: false,
+    time
+  };
+
+  db.packages.unshift(item);
+  user.history.unshift({
+    title: `${item.pkgName} Pending Admin Approval (${item.intervalDesc})`,
+    amount: amt,
+    type: "minus",
+    time
+  });
+
+  return res.status(201).json({ ok: true, item, user });
+});
+
+app.post("/api/admin/packages/:id/decide", (req, res) => {
+  const { action } = req.body;
+  const item = db.packages.find(p => p.id === req.params.id);
+  if (!item || !db.users[item.username]) {
+    return res.status(404).json({ error: "Package request not found" });
+  }
+
+  const user = db.users[item.username];
+  const time = nowTime();
+  const amt = Number(item.amount || 0);
+
+  if (action === "approve") {
+    if (!item.deductedFromBalance) {
+      if (Number(user.balance || 0) < amt) {
+        return res.status(400).json({ error: "User balance is lower than package cost" });
+      }
+      user.balance = Number(user.balance || 0) - amt;
+      user.invested = Number(user.invested || 0) + amt;
+      item.deductedFromBalance = true;
+    }
+    item.status = "approved";
+    user.history.unshift({
+      title: `Admin Approved ${item.pkgName} (+${Number(item.userProfit || 0).toFixed(2)} ROI)`,
+      amount: amt,
+      type: "minus",
+      time
+    });
+  } else if (action === "reject") {
+    if (item.deductedFromBalance) {
+      user.balance = Number(user.balance || 0) + amt;
+      user.invested = Math.max(0, Number(user.invested || 0) - amt);
+      item.deductedFromBalance = false;
+    }
+    item.status = "rejected";
+    user.history.unshift({
+      title: `Admin Rejected ${item.pkgName}`,
+      amount: amt,
+      type: "plus",
+      time
+    });
+  }
+
+  return res.json({ ok: true, item, user });
+});
+
+app.delete("/api/admin/packages/:id", (req, res) => {
+  db.packages = db.packages.filter(p => p.id !== req.params.id);
+  return res.json({ ok: true });
+});
+
+// Admin manual balance adjustment
 app.post("/api/admin/users/:phone/balance", (req, res) => {
   const { amount, mode } = req.body;
   const user = db.users[req.params.phone];
@@ -316,7 +411,7 @@ app.post("/api/admin/users/:phone/balance", (req, res) => {
     return res.status(400).json({ error: "Invalid balance adjustment" });
   }
 
-  const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = nowTime();
   if (mode === "add") {
     user.balance = Number(user.balance || 0) + val;
     user.history.unshift({ title: "Admin Added Balance", amount: val, type: "plus", time });
@@ -337,7 +432,7 @@ app.post("/api/admin/announcements", (req, res) => {
   const ann = {
     id: "ann_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
     message,
-    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    time: nowTime()
   };
   db.announcements.unshift(ann);
   return res.status(201).json({ ok: true, ann });
@@ -350,7 +445,8 @@ app.get("/api/admin/state", (req, res) => {
     requests: {
       deposits: db.deposits,
       withdrawals: db.withdrawals,
-      referrals: db.referrals
+      referrals: db.referrals,
+      packages: db.packages
     },
     announcements: db.announcements
   });
@@ -368,4 +464,3 @@ app.get("/api/user/:phone", (req, res) => {
 app.listen(PORT, () => {
   console.log(`EthioInvest backend running on port ${PORT}`);
 });
-
