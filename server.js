@@ -146,3 +146,136 @@ app.get('/api/users.html', async (req, res) => {
     `);
   } catch (err) {
     res.status(500).send(`Error: ${err.message}`);
+  }
+});
+
+app.post('/api/register', async (req, res) => {
+  try {
+    const fullName = (req.body.fullName || req.body.full_name || '').trim();
+    const phone = (req.body.phone || req.body.phoneNumber || '').trim();
+    const password = req.body.password || '';
+
+    if (!fullName || !phone || !password) {
+      return res.status(400).json({ error: 'ሙሉ ስም፣ ስልክ ቁጥር እና ፓስወርድ ያስፈልጋሉ።' });
+    }
+
+    const existing = await pool.query('SELECT id FROM users WHERE phone = $1', [phone]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: 'ይህ ስልክ ቁጥር ቀደም ብሎ ተመዝግቧል።' });
+    }
+
+    const inserted = await pool.query(
+      `INSERT INTO users (full_name, phone, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, full_name, phone, balance, created_at`,
+      [fullName, phone, password]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'አካውንት በተሳካ ሁኔታ ተፈጥሯል።',
+      user: inserted.rows[0],
+    });
+  } catch (err) {
+    console.error('Register error:', err.message);
+    res.status(500).json({ error: err.message || 'የሰርቨር ወይም የዳታቤዝ ስህተት አጋጥሟል።' });
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  try {
+    const phone = (req.body.phone || req.body.phoneNumber || '').trim();
+    const password = req.body.password || '';
+
+    if (!phone || !password) {
+      return res.status(400).json({ error: 'ስልክ ቁጥር እና ፓስወርድ ያስፈልጋሉ።' });
+    }
+
+    const result = await pool.query(
+      'SELECT id, full_name, phone, balance, created_at FROM users WHERE phone = $1 AND password = $2',
+      [phone, password]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'ስልክ ቁጥር ወይም ፓስወርድ የተሳሳተ ነው።' });
+    }
+
+    res.json({
+      success: true,
+      message: 'በተሳካ ሁኔታ ገብተዋል።',
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ error: 'የሰርቨር ስህተት አጋጥሟል።' });
+  }
+});
+
+async function handleDeposit(req, res) {
+  try {
+    const paymentAccount = (
+      req.body.paymentAccount ||
+      req.body.payment_account ||
+      req.body.account ||
+      ''
+    ).trim();
+    const amount = Number(req.body.amount);
+    const phone = (req.body.phone || req.body.phoneNumber || '').trim() || null;
+    const userId = req.body.userId || req.body.user_id || null;
+    const receiptImage =
+      req.body.receiptImage ||
+      req.body.receipt_image ||
+      req.body.screenshot ||
+      req.body.image ||
+      null;
+
+    if (!paymentAccount || !amount || Number.isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'የክፍያ አካውንት እና ትክክለኛ የገንዘብ መጠን ያስፈልጋሉ።' });
+    }
+
+    const inserted = await pool.query(
+      `INSERT INTO deposits (user_id, phone, payment_account, amount, receipt_image)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, user_id, phone, payment_account, amount, status, created_at`,
+      [userId, phone, paymentAccount, amount, receiptImage]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'የ Deposit ጥያቄ በተሳካ ሁኔታ ተልኳል።',
+      deposit: inserted.rows[0],
+    });
+  } catch (err) {
+    console.error('Deposit error:', err.message);
+    res.status(500).json({ error: err.message || 'የ Deposit መረጃ ማስቀመጥ አልተቻለም።' });
+  }
+}
+
+app.post('/api/deposits', handleDeposit);
+app.post('/api/deposit', handleDeposit);
+app.post('/deposit', handleDeposit);
+
+app.get('/api/deposits', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, user_id, phone, payment_account, amount, status, created_at FROM deposits ORDER BY id DESC'
+    );
+    res.json({
+      success: true,
+      count: result.rows.length,
+      deposits: result.rows,
+    });
+  } catch (err) {
+    console.error('Get deposits error:', err.message);
+    res.status(500).json({ error: err.message || 'የ Deposit ዝርዝር ማምጣት አልተቻለም።' });
+  }
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`EthioInvest backend running on port ${PORT}`);
+  initDB();
+});
