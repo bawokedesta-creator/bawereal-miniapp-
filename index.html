@@ -757,6 +757,23 @@
       return s === "package" ? "investment" : s;
     }
 
+    function isJunkActivityTitle(title) {
+      const t = String(title || "").toLowerCase();
+      return (
+        t.includes("downloaded png receipt") ||
+        t.includes("downloaded receipt") ||
+        t.includes("attached screenshot") ||
+        t.includes("theme switched") ||
+        t.includes("balance hidden") ||
+        t.includes("balance shown") ||
+        t.includes("refreshed balance") ||
+        t.includes("logged in") ||
+        t.includes("logged out") ||
+        t.includes("opened notifications") ||
+        t.includes("copied ")
+      );
+    }
+
     function saveSessionState() {
       try {
         if (!currentUser) {
@@ -814,8 +831,9 @@
         const raw = localStorage.getItem(getActivityStorageKey());
         const parsed = raw ? JSON.parse(raw) : [];
         localActivities = Array.isArray(parsed)
-          ? parsed.filter(item => isTrackedTxSection(item.section))
+          ? parsed.filter(item => isTrackedTxSection(item.section) && !isJunkActivityTitle(item.title))
           : [];
+        saveLocalActivities();
       } catch (_) {
         localActivities = [];
       }
@@ -859,7 +877,7 @@
         const res = await apiRequest(`/api/activities/${encodeURIComponent(currentUser)}`);
         if (!res || !Array.isArray(res.activities)) return;
         const dbItems = res.activities
-          .filter(row => isTrackedTxSection(row.section))
+          .filter(row => isTrackedTxSection(row.section) && !isJunkActivityTitle(row.title))
           .map(row => {
             const sec = normalizeTxSection(row.section);
             const status = String(row.status || (row.tx_type === "pending" ? "pending" : row.tx_type === "rejected" ? "rejected" : "approved")).toLowerCase();
@@ -885,7 +903,7 @@
 
     function addActivityEntry(section, title, amount, type, extraTime, initialStatus) {
       const normSec = normalizeTxSection(section);
-      if (!isTrackedTxSection(normSec)) return null;
+      if (!isTrackedTxSection(normSec) || isJunkActivityTitle(title)) return null;
       loadLocalActivities();
       const status = String(initialStatus || "pending").toLowerCase();
       const entry = {
@@ -1589,7 +1607,7 @@
       const container = document.getElementById("historyList");
       loadLocalActivities();
 
-      const trackedItems = localActivities.filter(item => isTrackedTxSection(item.section));
+      const trackedItems = localActivities.filter(item => isTrackedTxSection(item.section) && !isJunkActivityTitle(item.title));
       if (!trackedItems.length) {
         container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">No transactions yet.</p>`;
         return;
