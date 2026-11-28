@@ -53,29 +53,6 @@ async function initDB() {
       )
     `);
     await client.query(`
-      CREATE TABLE IF NOT EXISTS withdrawals (
-        id SERIAL PRIMARY KEY,
-        phone TEXT NOT NULL,
-        method TEXT NOT NULL,
-        account TEXT NOT NULL,
-        amount NUMERIC(12, 2) NOT NULL,
-        status TEXT DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS investments (
-        id SERIAL PRIMARY KEY,
-        phone TEXT NOT NULL,
-        pkg_name TEXT NOT NULL,
-        amount NUMERIC(12, 2) NOT NULL,
-        expected_profit NUMERIC(12, 2) DEFAULT 0,
-        interval_desc TEXT,
-        status TEXT DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-    await client.query(`
       CREATE TABLE IF NOT EXISTS user_activities (
         id SERIAL PRIMARY KEY,
         phone TEXT NOT NULL,
@@ -364,9 +341,6 @@ app.get('/api/activities/:phone', async (req, res) => {
 app.post('/api/admin/approve', async (req, res) => {
   try {
     const activityId = req.body.id;
-    const phone = String(req.body.phone || '').trim();
-    const section = String(req.body.section || 'deposit').trim().toLowerCase();
-
     if (!activityId) {
       return res.status(400).json({ error: 'activity id is required' });
     }
@@ -383,8 +357,8 @@ app.post('/api/admin/approve', async (req, res) => {
     }
 
     const act = actRes.rows[0];
-    const targetPhone = phone || act.phone;
-    const targetSection = section || act.section;
+    const targetPhone = String(req.body.phone || act.phone || '').trim();
+    const targetSection = String(req.body.section || act.section || 'deposit').trim().toLowerCase();
     const amt = Number(act.amount || 0);
 
     if (act.status !== 'approved' && targetPhone && amt > 0) {
@@ -435,6 +409,32 @@ app.post('/api/admin/approve', async (req, res) => {
     });
   } catch (err) {
     console.error('Approve activity error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/reject', async (req, res) => {
+  try {
+    const activityId = req.body.id;
+    if (!activityId) {
+      return res.status(400).json({ error: 'activity id is required' });
+    }
+
+    const updatedAct = await pool.query(
+      `UPDATE user_activities
+       SET status = 'rejected', tx_type = 'rejected'
+       WHERE id = $1
+       RETURNING id, phone, section, title, amount, tx_type, status, created_label, created_at`,
+      [activityId]
+    );
+
+    if (updatedAct.rows.length === 0) {
+      return res.status(404).json({ error: 'Activity not found' });
+    }
+
+    res.json({ success: true, activity: updatedAct.rows[0] });
+  } catch (err) {
+    console.error('Reject activity error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
