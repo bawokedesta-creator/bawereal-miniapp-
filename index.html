@@ -231,11 +231,21 @@
 
     .tx-item {
       background: var(--bg-input); padding: 9px 10px; border-radius: 8px; margin-bottom: 7px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; border: 1px solid var(--border-subtle); gap: 6px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; border: 1px solid var(--border-subtle); gap: 8px;
     }
+    .tx-sub-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+    .tx-ok-deposit { color: #22c55e; }
+    .tx-ok-withdrawal { color: #38bdf8; }
+    .tx-ok-investment { color: #facc15; }
     .tx-pending { color: #facc15; font-weight: 700; white-space: nowrap; }
-    .tx-plus { color: #4ade80; font-weight: 700; white-space: nowrap; }
-    .tx-minus { color: #f87171; font-weight: 700; white-space: nowrap; }
+    .tx-rejected { color: #f87171; font-weight: 700; white-space: nowrap; }
+    .tx-plus { color: #22c55e; font-weight: 800; white-space: nowrap; }
+    .tx-minus-blue { color: #38bdf8; font-weight: 800; white-space: nowrap; }
+    .tx-minus-yellow { color: #facc15; font-weight: 800; white-space: nowrap; }
 
     .section-activity-footer {
       margin-top: 14px;
@@ -616,7 +626,6 @@
             <button class="copy-sign-btn" onclick="copyReferralReplaceSign(this)" title="Copy">⧉</button>
           </div>
           <button class="btn-success" onclick="simulateReferralBonus()">+100 ETB</button>
-          <div id="referralSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
@@ -663,7 +672,6 @@
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             Telebirr: 0964488470<br />CBE: 1000298833585<br />Abyssinia: 166455979
           </p>
-          <div id="supportSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
@@ -676,7 +684,6 @@
         <div id="panel-notifications" class="inner-panel">
           <h3>Notifications</h3>
           <div id="notificationsList"></div>
-          <div id="notificationsSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
@@ -691,7 +698,6 @@
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             • Screenshot (*) is required.<br />• Withdrawal fee is 5%.
           </p>
-          <div id="faqSectionActivity" class="section-activity-footer"></div>
           <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
@@ -715,7 +721,7 @@
       </div>
 
       <div id="ethio-success-view" style="display: none;">
-        <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit pending</div>
+        <div style="font-size: 18px; font-weight: 700; color: #facc15;">Deposit pending</div>
         <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
         <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download PNG</button>
         <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
@@ -742,12 +748,12 @@
     let lastReceipt = null;
     let localActivities = [];
 
-    function isApprovalTrackedSection(section) {
+    function isTrackedTxSection(section) {
       return ["deposit", "withdrawal", "investment", "package"].includes(String(section || "").toLowerCase());
     }
 
-    function normalizeSectionKey(section) {
-      const s = String(section || "general").toLowerCase();
+    function normalizeTxSection(section) {
+      const s = String(section || "").toLowerCase();
       return s === "package" ? "investment" : s;
     }
 
@@ -807,7 +813,9 @@
       try {
         const raw = localStorage.getItem(getActivityStorageKey());
         const parsed = raw ? JSON.parse(raw) : [];
-        localActivities = Array.isArray(parsed) ? parsed : [];
+        localActivities = Array.isArray(parsed)
+          ? parsed.filter(item => isTrackedTxSection(item.section))
+          : [];
       } catch (_) {
         localActivities = [];
       }
@@ -850,22 +858,24 @@
       try {
         const res = await apiRequest(`/api/activities/${encodeURIComponent(currentUser)}`);
         if (!res || !Array.isArray(res.activities)) return;
-        const dbItems = res.activities.map(row => {
-          const sec = normalizeSectionKey(row.section);
-          const status = String(row.status || (row.tx_type === "pending" ? "pending" : "approved")).toLowerCase();
-          const txType = status === "approved"
-            ? (sec === "deposit" ? "plus" : "minus")
-            : "pending";
-          return {
-            id: row.id,
-            section: sec,
-            title: row.title || "Activity",
-            amount: row.amount !== null && row.amount !== undefined ? Number(row.amount) : null,
-            type: txType,
-            status,
-            time: row.created_label || new Date(row.created_at).toLocaleString()
-          };
-        });
+        const dbItems = res.activities
+          .filter(row => isTrackedTxSection(row.section))
+          .map(row => {
+            const sec = normalizeTxSection(row.section);
+            const status = String(row.status || (row.tx_type === "pending" ? "pending" : row.tx_type === "rejected" ? "rejected" : "approved")).toLowerCase();
+            const txType = status === "approved"
+              ? (sec === "deposit" ? "plus" : "minus")
+              : status;
+            return {
+              id: row.id,
+              section: sec,
+              title: row.title || "Activity",
+              amount: row.amount !== null && row.amount !== undefined ? Number(row.amount) : null,
+              type: txType,
+              status,
+              time: row.created_label || new Date(row.created_at).toLocaleString()
+            };
+          });
         localActivities = dbItems.slice(0, 100);
         saveLocalActivities();
         renderAllSectionActivities();
@@ -874,14 +884,15 @@
     }
 
     function addActivityEntry(section, title, amount, type, extraTime, initialStatus) {
+      const normSec = normalizeTxSection(section);
+      if (!isTrackedTxSection(normSec)) return null;
       loadLocalActivities();
-      const normSec = normalizeSectionKey(section);
-      const status = initialStatus || (isApprovalTrackedSection(normSec) ? "pending" : "approved");
+      const status = String(initialStatus || "pending").toLowerCase();
       const entry = {
         section: normSec,
         title: title || "Activity",
-        amount: amount !== undefined && amount !== null && amount !== "" ? Number(amount) : null,
-        type: status === "approved" ? (type || (normSec === "deposit" ? "plus" : "minus")) : "pending",
+        amount: amount !== undefined && amount !== null && amount !== "" ? Number(amount) : 0,
+        type: status === "approved" ? (type || (normSec === "deposit" ? "plus" : "minus")) : status,
         status,
         time: extraTime || new Date().toLocaleString()
       };
@@ -935,7 +946,7 @@
           <div><strong>Receipt ID:</strong> ${receipt.id}</div>
           <div><strong>Account:</strong> ${receipt.account}</div>
           <div><strong>Amount:</strong> ${receipt.amount} ETB</div>
-          <div><strong>Status:</strong> Pending</div>
+          <div><strong>Status:</strong> Deposit pending</div>
           <div><strong>Date:</strong> ${receipt.date}</div>
         `;
       }, 3000);
@@ -973,7 +984,7 @@
         ["Full Name", getActiveFullName()],
         ["Account", receipt.account],
         ["Amount", `${receipt.amount} ETB`],
-        ["Status", "Pending"],
+        ["Status", "Deposit pending"],
         ["Date", receipt.date]
       ];
 
@@ -1395,6 +1406,11 @@
       reader.readAsDataURL(file);
     }
 
+    function formatAmtNumber(val) {
+      const n = Number(val || 0);
+      return Number.isInteger(n) ? String(n) : n.toFixed(2);
+    }
+
     async function submitDeposit() {
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
@@ -1408,14 +1424,15 @@
         return;
       }
 
+      const amtText = formatAmtNumber(amount);
       const receiptObj = {
         id: "RCP-" + Date.now(),
         account: method,
-        amount: amount.toFixed(2),
+        amount: amtText,
         date: new Date().toLocaleString()
       };
 
-      addActivityEntry("deposit", `Deposit (${method})`, amount, "pending", receiptObj.date, "pending");
+      addActivityEntry("deposit", `Deposit ${amtText} (${method})`, amount, "pending", receiptObj.date, "pending");
       openDepositSpinnerAndReceipt(receiptObj);
 
       try {
@@ -1468,7 +1485,8 @@
         return;
       }
 
-      addActivityEntry("withdrawal", `Withdrawal (${method} - ${userAcc})`, amount, "pending", new Date().toLocaleString(), "pending");
+      const amtText = formatAmtNumber(amount);
+      addActivityEntry("withdrawal", `Withdrawal ${amtText} (${method})`, amount, "pending", new Date().toLocaleString(), "pending");
       document.getElementById("withAmount").value = "";
       calculateNetPay();
       alert("Withdrawal pending admin approval.");
@@ -1480,7 +1498,8 @@
         alert("Insufficient balance.");
         return;
       }
-      addActivityEntry("investment", `Investment: ${pkgName}`, cost, "pending", new Date().toLocaleString(), "pending");
+      const amtText = formatAmtNumber(cost);
+      addActivityEntry("investment", `Investment ${amtText} (${pkgName})`, cost, "pending", new Date().toLocaleString(), "pending");
       alert(`${pkgName} investment pending admin approval.`);
     }
 
@@ -1501,71 +1520,45 @@
       }
     }
 
-    function getStatusDisplayLabel(item) {
-      const sec = normalizeSectionKey(item.section);
-      const status = String(item.status || (item.type === "pending" ? "pending" : "approved")).toLowerCase();
+    function formatThreePartTransactionHtml(item) {
+      const sec = normalizeTxSection(item.section);
+      const status = String(item.status || (item.type === "pending" ? "pending" : item.type === "rejected" ? "rejected" : "approved")).toLowerCase();
+      const amtText = formatAmtNumber(item.amount);
 
-      if (status !== "approved") {
-        if (sec === "deposit") return "Deposit pending";
-        if (sec === "withdrawal") return "Withdrawal pending";
-        if (sec === "investment") return "Investment pending";
-        return "Pending";
-      }
+      let rightHtml = "";
+      let bottomSuccessHtml = "";
 
-      const amtText = item.amount !== null && item.amount !== undefined && !isNaN(Number(item.amount))
-        ? `${sec === "deposit" ? "+" : "-"}${Number(item.amount).toFixed(2)} ETB`
-        : "";
-
-      if (sec === "deposit") {
-        return `Deposit successful${amtText ? ` (${amtText})` : ""}`;
-      }
-      if (sec === "withdrawal") {
-        return `Withdrawal successful${amtText ? ` (${amtText})` : ""}`;
-      }
-      if (sec === "investment") {
-        return `Investment successful${amtText ? ` (${amtText})` : ""}`;
-      }
-      return amtText;
-    }
-
-    function formatActivityRowHtml(item) {
-      const sec = normalizeSectionKey(item.section);
-      const status = String(item.status || (item.type === "pending" ? "pending" : "approved")).toLowerCase();
-      let badgeHtml = "";
-
-      if (isApprovalTrackedSection(sec)) {
-        if (status !== "approved") {
-          const pendingText =
-            sec === "deposit"
-              ? "Deposit pending"
-              : sec === "withdrawal"
-                ? "Withdrawal pending"
-                : "Investment pending";
-          badgeHtml = `<span class="tx-pending">${pendingText}</span>`;
+      if (status === "approved") {
+        if (sec === "deposit") {
+          rightHtml = `<span class="tx-plus">+${amtText}</span>`;
+          bottomSuccessHtml = `<div class="tx-sub-status tx-ok-deposit">Deposit successfully</div>`;
+        } else if (sec === "withdrawal") {
+          rightHtml = `<span class="tx-minus-blue">-${amtText}</span>`;
+          bottomSuccessHtml = `<div class="tx-sub-status tx-ok-withdrawal">Withdrawal successful</div>`;
         } else {
-          const sign = sec === "deposit" ? "+" : "-";
-          const cls = sec === "deposit" ? "tx-plus" : "tx-minus";
-          const okText =
-            sec === "deposit"
-              ? "Deposit successful"
-              : sec === "withdrawal"
-                ? "Withdrawal successful"
-                : "Investment successful";
-          const amtStr = item.amount !== null && item.amount !== undefined && !isNaN(Number(item.amount))
-            ? ` ${sign}${Number(item.amount).toFixed(2)} ETB`
-            : "";
-          badgeHtml = `<span class="${cls}">${okText}${amtStr}</span>`;
+          rightHtml = `<span class="tx-minus-yellow">-${amtText}</span>`;
+          bottomSuccessHtml = `<div class="tx-sub-status tx-ok-investment">Investment successful</div>`;
         }
-      } else if (item.amount !== null && item.amount !== undefined && !isNaN(Number(item.amount))) {
-        const sign = item.type === "plus" ? "+" : "-";
-        const cls = item.type === "plus" ? "tx-plus" : "tx-minus";
-        badgeHtml = `<span class="${cls}">${sign}${Number(item.amount).toFixed(2)} ETB</span>`;
+      } else if (status === "rejected") {
+        rightHtml = `<span class="tx-rejected">Rejected</span>`;
+      } else {
+        const pendingLabel =
+          sec === "deposit"
+            ? "Deposit pending"
+            : sec === "withdrawal"
+              ? "Withdrawal pending"
+              : "Investment pending";
+        rightHtml = `<span class="tx-pending">${pendingLabel}</span>`;
       }
 
       return `
         <div class="tx-item">
-          <div><div>${item.title}</div><small style="color:var(--text-muted);">${item.time}</small></div>
-          ${badgeHtml}
+          <div>
+            <div>${item.title}</div>
+            <small style="color:var(--text-muted);">${item.time}</small>
+            ${bottomSuccessHtml}
+          </div>
+          ${rightHtml}
         </div>
       `;
     }
@@ -1582,11 +1575,11 @@
         const el = document.getElementById(elId);
         if (!el) return;
         const { sec, label } = map[elId];
-        const items = localActivities.filter(a => normalizeSectionKey(a.section) === sec);
+        const items = localActivities.filter(a => normalizeTxSection(a.section) === sec);
         el.innerHTML = `
           <div class="section-activity-footer-title">${label} (${items.length})</div>
           ${items.length
-            ? items.map(formatActivityRowHtml).join("")
+            ? items.map(formatThreePartTransactionHtml).join("")
             : `<p style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">No transactions yet.</p>`}
         `;
       });
@@ -1596,12 +1589,12 @@
       const container = document.getElementById("historyList");
       loadLocalActivities();
 
-      const trackedItems = localActivities.filter(item => isApprovalTrackedSection(item.section));
+      const trackedItems = localActivities.filter(item => isTrackedTxSection(item.section));
       if (!trackedItems.length) {
         container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">No transactions yet.</p>`;
         return;
       }
-      container.innerHTML = trackedItems.map(formatActivityRowHtml).join("");
+      container.innerHTML = trackedItems.map(formatThreePartTransactionHtml).join("");
     }
 
     function copyReplaceSign(btnEl, textToCopy) {
