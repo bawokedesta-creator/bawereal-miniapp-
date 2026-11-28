@@ -72,9 +72,6 @@
       display: none; align-items: center; justify-content: center; line-height: 1;
     }
     .notif-red-badge.show { display: inline-flex; }
-    .lang-box { display: flex; flex-direction: row; background: var(--bg-input); border-radius: 8px; padding: 2px; border: 1px solid var(--border-subtle); }
-    .lang-btn { background: transparent; color: var(--text-muted); border: none; padding: 5px 8px; font-size: 0.75rem; font-weight: 700; border-radius: 6px; cursor: pointer; }
-    .lang-btn.active { background: var(--btn-blue); color: #ffffff; }
     .logout-btn { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-input); padding: 6px 9px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
 
     .auth-box { background: var(--bg-card); padding: 18px 15px; border-radius: 14px; border: 1px solid var(--border-subtle); margin-top: 10px; }
@@ -190,6 +187,28 @@
       padding: 5px 9px; border-radius: 7px; font-size: 0.9rem; line-height: 1.2; cursor: pointer; min-width: 54px; text-align: center; flex-shrink: 0;
     }
     .copy-sign-btn.is-copied { background: rgba(22, 163, 74, 0.25); border-color: #4ade80; color: #4ade80; font-size: 0.72rem; font-weight: 700; }
+
+    .preset-amounts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-bottom: 8px;
+    }
+    .preset-amt-btn {
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border-input);
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .preset-amt-btn.selected {
+      background: var(--btn-blue);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
 
     .screenshot-section-title { display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
     .req-star { color: #f87171; font-weight: 900; margin-left: 3px; }
@@ -339,83 +358,79 @@
         <span class="notif-red-badge" id="topNotifRedBadge">0</span>
       </div>
       <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleColorMode()" title="Dark / Light Mode">🌙</button>
-      <div class="lang-box">
-        <button class="lang-btn active" id="btnEnTop" onclick="setLanguage('en')">EN</button>
-        <button class="lang-btn" id="btnAmTop" onclick="setLanguage('am')">አማ</button>
-      </div>
-      <button class="logout-btn" id="headerLogoutBtn" onclick="logoutUser()" style="display: none;" data-i18n="logoutBtn">Logout</button>
+      <button class="logout-btn" id="headerLogoutBtn" onclick="logoutUser()" style="display: none;">Logout</button>
     </div>
   </div>
 
   <div id="auth-section">
     <div class="auth-box">
-      <div class="pre-reg-notice" data-i18n="preRegisterNotice">
+      <div class="pre-reg-notice">
         Before going to login, first register and create a password
       </div>
 
       <div class="auth-switcher">
-        <button class="auth-switch-btn active" id="switchRegBtn" onclick="switchAuthMode('register')" data-i18n="regTab">Register</button>
-        <button class="auth-switch-btn" id="switchLoginBtn" onclick="switchAuthMode('login')" data-i18n="loginTab">Login</button>
+        <button class="auth-switch-btn active" id="switchRegBtn" onclick="switchAuthMode('register')">Register</button>
+        <button class="auth-switch-btn" id="switchLoginBtn" onclick="switchAuthMode('login')">Login</button>
       </div>
 
       <div id="register-form" class="auth-form active">
         <div class="form-group">
-          <label data-i18n="fullNameLabel">Full Name</label>
+          <label>Full Name</label>
           <input type="text" id="regFullName" placeholder="Full Name" />
         </div>
         <div class="form-group">
-          <label data-i18n="phoneLabel">Phone Number</label>
+          <label>Phone Number</label>
           <input type="text" id="regUser" placeholder="09..." />
         </div>
         <div class="form-group">
-          <label data-i18n="passLabel">Password</label>
+          <label>Password</label>
           <input type="password" id="regPass" placeholder="******" />
         </div>
         <div class="form-group">
-          <label data-i18n="confirmPassLabel">Confirm Password</label>
+          <label>Confirm Password</label>
           <input type="password" id="regConfirm" placeholder="******" />
         </div>
 
         <label class="agree-rect-box" for="agreePolicyCheckbox">
           <input type="checkbox" id="agreePolicyCheckbox" onchange="updateRegisterButtonState()" />
-          <span class="agree-rect-text" data-i18n="agreePolicyText">I agree to the Privacy Policy & Terms of EthioInvest</span>
+          <span class="agree-rect-text">I agree to the Privacy Policy & Terms of EthioInvest</span>
         </label>
 
-        <button class="btn-success" id="createAccountBtn" onclick="registerUser()" disabled data-i18n="regBtn">Create Account</button>
+        <button class="btn-success" id="createAccountBtn" onclick="registerUser()" disabled>Create Account</button>
       </div>
 
       <div id="login-form" class="auth-form">
         <div class="form-group">
-          <label data-i18n="phoneLabel">Phone Number</label>
+          <label>Phone Number</label>
           <input type="text" id="loginUser" placeholder="09..." />
         </div>
         <div class="form-group">
-          <label data-i18n="passLabel">Password</label>
+          <label>Password</label>
           <input type="password" id="loginPass" placeholder="******" />
         </div>
 
-        <button class="btn-primary" onclick="loginUser()" data-i18n="loginBtn">Login</button>
+        <button class="btn-primary" onclick="loginUser()">Login</button>
 
         <div class="reset-toggle-wrap">
-          <button type="button" class="reset-link-btn" onclick="toggleOtpResetBox()" data-i18n="resetPassLink">Password Reset (OTP)</button>
+          <button type="button" class="reset-link-btn" onclick="toggleOtpResetBox()">Password Reset (OTP)</button>
         </div>
 
         <div id="otpResetBox" class="otp-reset-box">
           <div class="form-group">
-            <label data-i18n="resetPhoneLabel">Registered Phone Number</label>
+            <label>Registered Phone Number</label>
             <input type="text" id="resetPhoneInput" placeholder="09..." />
           </div>
-          <button type="button" class="btn-secondary" onclick="sendOtpToPhone()" data-i18n="sendOtpBtn">Send OTP to Phone</button>
+          <button type="button" class="btn-secondary" onclick="sendOtpToPhone()">Send OTP to Phone</button>
           <div id="otpDeliveryBanner" class="otp-note-box"></div>
           <div class="form-group" style="margin-top: 8px;">
-            <label data-i18n="otpCodeLabel">Enter OTP Code</label>
+            <label>Enter OTP Code</label>
             <input type="text" id="otpCodeInput" placeholder="123456" />
           </div>
           <div class="form-group">
-            <label data-i18n="newPassLabel">New Password</label>
+            <label>New Password</label>
             <input type="password" id="newPasswordInput" placeholder="******" />
           </div>
-          <button type="button" class="btn-success" onclick="confirmOtpPasswordReset()" data-i18n="confirmResetBtn">Reset Password</button>
+          <button type="button" class="btn-success" onclick="confirmOtpPasswordReset()">Reset Password</button>
         </div>
       </div>
     </div>
@@ -425,10 +440,10 @@
   <div id="dashboard-section">
     <div class="balance-banner">
       <div class="balance-banner-top">
-        <span class="balance-banner-title" data-i18n="currentBalTitle">Current Balance</span>
+        <span class="balance-banner-title">Current Balance</span>
         <button class="refresh-balance-pill" id="refreshBalanceBtn" onclick="refreshBalanceCard()">
           <span class="spin-icon">↻</span>
-          <span data-i18n="refreshBalBtn">Refresh Balance</span>
+          <span>Refresh Balance</span>
         </button>
       </div>
       <div class="balance-line-row">
@@ -445,10 +460,10 @@
       <div class="tile-slot" id="slot-deposit">
         <button type="button" class="tile-card" id="tile-deposit" onclick="toggleInnerPanel('deposit')">
           <span class="tile-icon">💳</span>
-          <span data-i18n="tabDeposit">Deposit</span>
+          <span>Deposit</span>
         </button>
         <div id="panel-deposit" class="inner-panel">
-          <h3 data-i18n="depHeader">Deposit ETB</h3>
+          <h3>Deposit ETB</h3>
 
           <div class="bank-card">
             <div class="bank-left">
@@ -499,7 +514,7 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="selectMethodLabel">Select Payment Account</label>
+            <label>Select Payment Account</label>
             <select id="depMethod">
               <option value="Telebirr (0964488470)">Telebirr - 0964488470</option>
               <option value="CBE (1000298833585)">CBE - 1000298833585</option>
@@ -508,39 +523,47 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="amountLabel">Amount (ETB)</label>
-            <input type="number" id="depAmount" placeholder="1000" />
+            <label>Select Amount or Enter Custom Amount (ETB)</label>
+            <div class="preset-amounts-grid" id="presetAmountsGrid">
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(500, this)">500</button>
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(600, this)">600</button>
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(7000, this)">7000</button>
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(1000, this)">1000</button>
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(1500, this)">1500</button>
+              <button type="button" class="preset-amt-btn" onclick="selectPresetAmount(2000, this)">2000</button>
+            </div>
+            <input type="number" id="depAmount" placeholder="Enter amount (ETB)" oninput="clearPresetSelection()" />
           </div>
 
           <div class="form-group">
             <span class="screenshot-section-title">
-              <span data-i18n="addPaymentScreenshotTitle">Add payment screenshot</span><span class="req-star">*</span>
+              <span>Add payment screenshot</span><span class="req-star">*</span>
             </span>
             <div class="wide-screenshot-box">
-              <label for="depReceiptInput" class="add-file-trigger" data-i18n="addFileBtn">Add file</label>
+              <label for="depReceiptInput" class="add-file-trigger">Add file</label>
               <input type="file" id="depReceiptInput" accept="image/*" style="display: none;" onchange="handleReceiptFile(this)" />
-              <span class="file-name-text" id="receiptFileName" data-i18n="noFileSelected">No screenshot selected (*)</span>
+              <span class="file-name-text" id="receiptFileName">No screenshot selected (*)</span>
               <img id="receiptPreview" class="receipt-preview" alt="Payment Screenshot" />
             </div>
           </div>
 
-          <button class="btn-success" onclick="submitDeposit()" data-i18n="confirmDepBtn">Confirm</button>
+          <button class="btn-success" onclick="submitDeposit()">Confirm</button>
 
           <div id="depositSectionActivity" class="section-activity-footer"></div>
 
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-withdrawal">
         <button type="button" class="tile-card" id="tile-withdrawal" onclick="toggleInnerPanel('withdrawal')">
           <span class="tile-icon">💸</span>
-          <span data-i18n="tabWithdraw">Withdrawal</span>
+          <span>Withdrawal</span>
         </button>
         <div id="panel-withdrawal" class="inner-panel">
-          <h3 data-i18n="withHeader">Withdrawal</h3>
+          <h3>Withdrawal</h3>
           <div class="form-group">
-            <label data-i18n="withMethodLabel">Method</label>
+            <label>Method</label>
             <select id="withMethod">
               <option value="Telebirr">Telebirr</option>
               <option value="CBE">CBE</option>
@@ -548,62 +571,62 @@
             </select>
           </div>
           <div class="form-group">
-            <label data-i18n="userAccLabel">Account / Phone</label>
+            <label>Account / Phone</label>
             <input type="text" id="withUserAccount" placeholder="09... / 1000..." />
           </div>
           <div class="form-group">
-            <label data-i18n="withAmountLabel">Amount (ETB)</label>
+            <label>Amount (ETB)</label>
             <input type="number" id="withAmount" oninput="calculateNetPay()" placeholder="1000" />
           </div>
           <div class="calc-box">
             <div class="calc-row">
-              <span data-i18n="feeLabel">Fee (5%):</span>
+              <span>Fee (5%):</span>
               <span id="calcFee" style="color: #f87171;">-0.00 ETB</span>
             </div>
             <div class="net-pay-row"><span>Net Pay =</span><span id="calcNetPay">0.00 ETB</span></div>
           </div>
-          <button class="btn-primary" onclick="submitWithdrawal()" data-i18n="confirmWithBtn">Submit</button>
+          <button class="btn-primary" onclick="submitWithdrawal()">Submit</button>
           <div id="withdrawalSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-history">
         <button type="button" class="tile-card" id="tile-history" onclick="toggleInnerPanel('history')">
           <span class="tile-icon">📋</span>
-          <span data-i18n="tabHistory">History</span>
+          <span>History</span>
         </button>
         <div id="panel-history" class="inner-panel">
-          <h3 data-i18n="histHeader">History</h3>
+          <h3>History</h3>
           <div id="historyList"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-referral">
         <button type="button" class="tile-card" id="tile-referral" onclick="toggleInnerPanel('referral')">
           <span class="tile-icon">👥</span>
-          <span data-i18n="tabReferral">Referral</span>
+          <span>Referral</span>
         </button>
         <div id="panel-referral" class="inner-panel">
-          <h3 data-i18n="refHeader">Referral</h3>
+          <h3>Referral</h3>
           <div class="bank-card">
-            <div class="bank-info"><strong data-i18n="yourRefLink">Link</strong><span id="refLinkText" style="font-size: 0.7rem;">https://ethioinvest.app/?ref=user</span></div>
+            <div class="bank-info"><strong>Link</strong><span id="refLinkText" style="font-size: 0.7rem;">https://ethioinvest.app/?ref=user</span></div>
             <button class="copy-sign-btn" onclick="copyReferralReplaceSign(this)" title="Copy">⧉</button>
           </div>
-          <button class="btn-success" onclick="simulateReferralBonus()" data-i18n="claimRefBtn">+100 ETB</button>
+          <button class="btn-success" onclick="simulateReferralBonus()">+100 ETB</button>
           <div id="referralSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-package">
         <button type="button" class="tile-card" id="tile-package" onclick="toggleInnerPanel('package')">
           <span class="tile-icon">📦</span>
-          <span data-i18n="tabPackage">Packages</span>
+          <span>Packages</span>
         </button>
         <div id="panel-package" class="inner-panel">
-          <h3 data-i18n="pkgHeader">Packages (≤200k)</h3>
+          <h3>Packages (≤200k)</h3>
           <div class="pkg-item">
             <div class="pkg-head"><span>Starter (1,000)</span><span class="pkg-badge">1d × 7</span></div>
             <div class="pkg-meta">+140 ETB (+14%)</div>
@@ -625,50 +648,50 @@
             <button class="btn-primary" onclick="buyPackage(200000, 'Executive Max Plan', 90000, 'Every 10 Days (6 intervals)')">200,000 ETB</button>
           </div>
           <div id="packageSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-support">
         <button type="button" class="tile-card" id="tile-support" onclick="toggleInnerPanel('support')">
           <span class="tile-icon">💬</span>
-          <span data-i18n="tabSupport">Support</span>
+          <span>Support</span>
         </button>
         <div id="panel-support" class="inner-panel">
-          <h3 data-i18n="tabSupport">Support</h3>
+          <h3>Support</h3>
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             Telebirr: 0964488470<br />CBE: 1000298833585<br />Abyssinia: 166455979
           </p>
           <div id="supportSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-notifications">
         <button type="button" class="tile-card" id="tile-notifications" onclick="toggleInnerPanel('notifications')">
           <span class="tile-icon">🔔</span>
-          <span data-i18n="tabNotifications">Notifications</span>
+          <span>Notifications</span>
         </button>
         <div id="panel-notifications" class="inner-panel">
-          <h3 data-i18n="tabNotifications">Notifications</h3>
+          <h3>Notifications</h3>
           <div id="notificationsList"></div>
           <div id="notificationsSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
 
       <div class="tile-slot" id="slot-faq">
         <button type="button" class="tile-card" id="tile-faq" onclick="toggleInnerPanel('faq')">
           <span class="tile-icon">❓</span>
-          <span data-i18n="tabFaq">Help / FAQ</span>
+          <span>Help / FAQ</span>
         </button>
         <div id="panel-faq" class="inner-panel">
-          <h3 data-i18n="tabFaq">Help / FAQ</h3>
+          <h3>Help / FAQ</h3>
           <p style="font-size: 0.74rem; color: var(--text-label); line-height: 1.45;">
             • Screenshot (*) is required.<br />• Withdrawal fee is 5%.
           </p>
           <div id="faqSectionActivity" class="section-activity-footer"></div>
-          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')" data-i18n="backBtn">Back</button>
+          <button type="button" class="back-to-tiles-btn" onclick="closeAllInnerPanels('bnav-home')">Back</button>
         </div>
       </div>
     </div>
@@ -693,7 +716,7 @@
       <div id="ethio-success-view" style="display: none;">
         <div style="font-size: 18px; font-weight: 700; color: #34d399;">Deposit successfully</div>
         <div id="ethio-receipt-details" class="ethio-receipt-card"></div>
-        <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download Receipt</button>
+        <button type="button" id="ethio-download-btn" class="ethio-btn-download">Download PNG</button>
         <button type="button" id="ethio-close-btn" class="ethio-btn-close">Done</button>
       </div>
     </div>
@@ -701,8 +724,8 @@
 
   <script>
     const API_BASE = "https://ethioinvest-lvsr.onrender.com";
+    const SESSION_STORAGE_KEY = "ethioinvest_active_session_v1";
 
-    let currentLang = "en";
     let currentUser = null;
     let currentFullName = "";
     let currentUserRecord = null;
@@ -717,6 +740,54 @@
     let pendingOtpPhone = null;
     let lastReceipt = null;
     let localActivities = [];
+
+    function saveSessionState() {
+      try {
+        if (!currentUser) {
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+          return;
+        }
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+          phone: currentUser,
+          fullName: getActiveFullName(),
+          userRecord: currentUserRecord || null
+        }));
+      } catch (_) {}
+    }
+
+    function restoreSessionState() {
+      try {
+        const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.phone) return false;
+        currentUser = parsed.phone;
+        currentFullName = parsed.fullName || localStorage.getItem("ethio_name_" + parsed.phone) || "";
+        currentUserRecord = parsed.userRecord || {
+          phone: parsed.phone,
+          fullName: currentFullName,
+          balance: 0,
+          history: []
+        };
+        loadLocalActivities();
+        showDashboardUI();
+        applyUserRecordToUI(currentUserRecord, currentAnnouncements);
+        loadUserDataFromServer();
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function selectPresetAmount(amt, btnEl) {
+      document.querySelectorAll(".preset-amt-btn").forEach(b => b.classList.remove("selected"));
+      if (btnEl) btnEl.classList.add("selected");
+      document.getElementById("depAmount").value = String(amt);
+    }
+
+    function clearPresetSelection() {
+      document.querySelectorAll(".preset-amt-btn").forEach(b => b.classList.remove("selected"));
+    }
 
     function getActivityStorageKey() {
       return "ethioinvest_activities_" + (currentUser || "guest");
@@ -739,6 +810,48 @@
       } catch (_) {}
     }
 
+    async function syncActivityToDb(entry) {
+      if (!currentUser) return;
+      try {
+        await apiRequest("/api/activities", {
+          method: "POST",
+          body: JSON.stringify({
+            phone: currentUser,
+            section: entry.section,
+            title: entry.title,
+            amount: entry.amount,
+            type: entry.type,
+            time: entry.time
+          })
+        });
+      } catch (_) {}
+    }
+
+    async function loadActivitiesFromDb() {
+      if (!currentUser) return;
+      try {
+        const res = await apiRequest(`/api/activities/${encodeURIComponent(currentUser)}`);
+        if (!res || !Array.isArray(res.activities)) return;
+        const dbItems = res.activities.map(row => ({
+          section: row.section || "general",
+          title: row.title || "Activity",
+          amount: row.amount !== null && row.amount !== undefined ? Number(row.amount) : null,
+          type: row.tx_type || "info",
+          time: row.created_label || new Date(row.created_at).toLocaleString()
+        }));
+        loadLocalActivities();
+        const merged = [...dbItems];
+        localActivities.forEach(loc => {
+          const exists = merged.some(m => m.title === loc.title && m.time === loc.time && String(m.amount) === String(loc.amount));
+          if (!exists) merged.push(loc);
+        });
+        localActivities = merged.slice(0, 100);
+        saveLocalActivities();
+        renderAllSectionActivities();
+        if (currentUserRecord) renderHistory(currentUserRecord.history || []);
+      } catch (_) {}
+    }
+
     function addActivityEntry(section, title, amount, type, extraTime) {
       loadLocalActivities();
       const entry = {
@@ -754,6 +867,7 @@
       if (currentUserRecord) {
         renderHistory(currentUserRecord.history || []);
       }
+      syncActivityToDb(entry);
       return entry;
     }
 
@@ -768,55 +882,6 @@
       }
       return data;
     }
-
-    const i18n = {
-      en: {
-        preRegisterNotice: "Before going to login, first register and create a password",
-        regTab: "Register", loginTab: "Login",
-        fullNameLabel: "Full Name", phoneLabel: "Phone Number", passLabel: "Password", confirmPassLabel: "Confirm Password",
-        agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
-        regBtn: "Create Account", loginBtn: "Login",
-        resetPassLink: "Password Reset (OTP)", resetPhoneLabel: "Registered Phone Number",
-        sendOtpBtn: "Send OTP to Phone", otpCodeLabel: "Enter OTP Code",
-        newPassLabel: "New Password", confirmResetBtn: "Reset Password",
-        logoutBtn: "Logout", currentBalTitle: "Current Balance", refreshBalBtn: "Refresh Balance",
-        tabDeposit: "Deposit", tabWithdraw: "Withdrawal", tabHistory: "History",
-        tabReferral: "Referral", tabPackage: "Packages", tabSupport: "Support",
-        tabNotifications: "Notifications", tabFaq: "Help / FAQ",
-        depHeader: "Deposit ETB", selectMethodLabel: "Select Payment Account",
-        amountLabel: "Amount (ETB)", addPaymentScreenshotTitle: "Add payment screenshot",
-        addFileBtn: "Add file", noFileSelected: "No screenshot selected (*)",
-        confirmDepBtn: "Confirm", withHeader: "Withdrawal", withMethodLabel: "Method",
-        userAccLabel: "Account / Phone", withAmountLabel: "Amount (ETB)",
-        feeLabel: "Fee (5%):", confirmWithBtn: "Submit", pkgHeader: "Packages (≤200k)",
-        refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
-        histHeader: "History", noHistory: "No transactions yet.", backBtn: "Back",
-        ratePrefix: "ETB Rate (1 USD) =", loadingMsg: "Loading...", regRedirectMsg: "Going to Login..."
-      },
-      am: {
-        preRegisterNotice: "ወደ login ከመሄድዎ በፊት መጀመሪያ ተመዝግበው ፓስዋርድ ይፍጠሩ",
-        regTab: "Register", loginTab: "Login",
-        fullNameLabel: "ሙሉ ስም (Full Name)", phoneLabel: "ስልክ ቁጥር (Phone)", passLabel: "የይለፍ ቃል (Password)", confirmPassLabel: "የይለፍ ቃል ያረጋግጡ",
-        agreePolicyText: "I agree to the Privacy Policy & Terms of EthioInvest",
-        regBtn: "ተመዝገብ", loginBtn: "ግባ",
-        resetPassLink: "Password Reset (OTP)", resetPhoneLabel: "የተመዘገበ ስልክ ቁጥር",
-        sendOtpBtn: "OTP ወደ ስልክ ላክ", otpCodeLabel: "OTP ኮድ ያስገቡ",
-        newPassLabel: "አዲስ የይለፍ ቃል", confirmResetBtn: "Password ቀይር",
-        logoutBtn: "Logout", currentBalTitle: "Current Balance", refreshBalBtn: "Refresh Balance",
-        tabDeposit: "Deposit", tabWithdraw: "Withdrawal", tabHistory: "History",
-        tabReferral: "Referral", tabPackage: "Packages", tabSupport: "Support",
-        tabNotifications: "Notifications", tabFaq: "Help / FAQ",
-        depHeader: "ገንዘብ ማስገቢያ", selectMethodLabel: "የከፈሉበትን መንገድ ይምረጡ",
-        amountLabel: "የገንዘብ መጠን (ETB)", addPaymentScreenshotTitle: "የክፍያ ስክሪንሾት ያክሉ",
-        addFileBtn: "ፋይል ያክሉ", noFileSelected: "ስክሪንሾት አልተመረጠም (*)",
-        confirmDepBtn: "አረጋግጥ", withHeader: "ገንዘብ ማውጫ", withMethodLabel: "ባንክ / ቴሌብር",
-        userAccLabel: "አካውንት / ስልክ", withAmountLabel: "መጠን (ETB)",
-        feeLabel: "Fee (5%):", confirmWithBtn: "ላክ", pkgHeader: "Packages (≤200k)",
-        refHeader: "Referral", yourRefLink: "Link", claimRefBtn: "+100 ETB",
-        histHeader: "ታሪክ (History)", noHistory: "እንቅስቃሴ የለም።", backBtn: "ተመለስ",
-        ratePrefix: "የብር ዋጋ (1 USD) =", loadingMsg: "በመጫን ላይ...", regRedirectMsg: "ወደ Login በመሄድ ላይ..."
-      }
-    };
 
     function getActiveFullName() {
       return (
@@ -852,28 +917,69 @@
       }, 3000);
     }
 
+    function downloadReceiptAsPng(receipt) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 640;
+      canvas.height = 400;
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#1e293b";
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 3;
+      ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+      ctx.fillStyle = "#34d399";
+      ctx.font = "bold 26px sans-serif";
+      ctx.fillText("ETHIOINVEST - DEPOSIT RECEIPT", 44, 72);
+
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(44, 94);
+      ctx.lineTo(canvas.width - 44, 94);
+      ctx.stroke();
+
+      ctx.font = "18px sans-serif";
+      const rows = [
+        ["Receipt ID", receipt.id],
+        ["Full Name", getActiveFullName()],
+        ["Account", receipt.account],
+        ["Amount", `${receipt.amount} ETB`],
+        ["Status", "Deposit successfully"],
+        ["Date", receipt.date]
+      ];
+
+      rows.forEach(([label, value], idx) => {
+        const y = 134 + idx * 40;
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText(`${label}:`, 44, y);
+        ctx.fillStyle = idx === 3 || idx === 4 ? "#4ade80" : "#f8fafc";
+        ctx.font = idx === 3 || idx === 4 ? "bold 18px sans-serif" : "18px sans-serif";
+        ctx.fillText(String(value), 190, y);
+        ctx.font = "18px sans-serif";
+      });
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${receipt.id}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        addActivityEntry("deposit", `Downloaded PNG Receipt (${receipt.id})`, null, "info");
+      }, "image/png");
+    }
+
     document.getElementById("ethio-download-btn").addEventListener("click", () => {
       if (!lastReceipt) return;
-      const text = [
-        "ETHIOINVEST - DEPOSIT RECEIPT",
-        "--------------------------------",
-        `Receipt ID : ${lastReceipt.id}`,
-        `Account    : ${lastReceipt.account}`,
-        `Amount     : ${lastReceipt.amount} ETB`,
-        `Status     : Deposit successfully`,
-        `Date       : ${lastReceipt.date}`,
-      ].join("\n");
-
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${lastReceipt.id}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      addActivityEntry("deposit", `Downloaded Receipt (${lastReceipt.id})`, null, "info");
+      downloadReceiptAsPng(lastReceipt);
     });
 
     document.getElementById("ethio-close-btn").addEventListener("click", () => {
@@ -912,14 +1018,12 @@
       const phone = document.getElementById("resetPhoneInput").value.trim();
       const banner = document.getElementById("otpDeliveryBanner");
       if (!phone) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ ቁጥር ያስገቡ!" : "Please enter a phone number!", true);
+        showAuthMsg("Please enter a phone number!", true);
         return;
       }
       pendingOtpPhone = phone;
       banner.classList.add("show");
-      banner.innerText = currentLang === "am"
-        ? `የ OTP ጥያቄ ለ ${phone} ተመዝግቧል። አዲስ ፓስዋርድ አስገብተው ይቀይሩ።`
-        : `OTP reset ready for ${phone}. Enter your new password below.`;
+      banner.innerText = `OTP reset ready for ${phone}. Enter your new password below.`;
     }
 
     async function confirmOtpPasswordReset() {
@@ -927,7 +1031,7 @@
       const otpInput = document.getElementById("otpCodeInput").value.trim();
       const newPass = document.getElementById("newPasswordInput").value;
       if (!pendingOtpPhone || phone !== pendingOtpPhone || !otpInput || !newPass || newPass.length < 4) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ትክክለኛ መረጃ ያስገቡ!" : "Please enter valid reset fields!", true);
+        showAuthMsg("Please enter valid reset fields!", true);
         return;
       }
       try {
@@ -941,7 +1045,7 @@
         document.getElementById("otpDeliveryBanner").classList.remove("show");
         document.getElementById("otpResetBox").classList.remove("open");
         document.getElementById("loginUser").value = phone;
-        showAuthMsg(currentLang === "am" ? "የይለፍ ቃል ተቀይሯል! አሁን ይግቡ።" : "Password updated! You can now log in.", false);
+        showAuthMsg("Password updated! You can now log in.", false);
       } catch (err) {
         showAuthMsg(err.message, true);
       }
@@ -956,20 +1060,6 @@
       document.getElementById("authMessage").style.display = "none";
     }
 
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.documentElement.lang = lang;
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (i18n[lang][key]) el.innerText = i18n[lang][key];
-      });
-      document.getElementById("btnEnTop").classList.toggle("active", lang === "en");
-      document.getElementById("btnAmTop").classList.toggle("active", lang === "am");
-      renderExchangeRate();
-      renderAllSectionActivities();
-      if (currentUserRecord) renderHistory(currentUserRecord.history || []);
-    }
-
     async function fetchRealExchangeRate() {
       try {
         const res = await fetch("https://open.er-api.com/v6/latest/USD");
@@ -982,11 +1072,7 @@
       } catch (err) {}
       const nowStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       document.getElementById("rateUpdatedTime").innerText = `Updated: ${nowStr}`;
-      renderExchangeRate();
-    }
-
-    function renderExchangeRate() {
-      document.getElementById("exchangeRateText").innerText = `${i18n[currentLang].ratePrefix} ${exchangeRate.toFixed(2)} ETB`;
+      document.getElementById("exchangeRateText").innerText = `ETB Rate (1 USD) = ${exchangeRate.toFixed(2)} ETB`;
     }
 
     setInterval(fetchRealExchangeRate, 3600000);
@@ -1011,7 +1097,7 @@
       if (isRegisteringRedirect) return;
       isRegisteringRedirect = true;
       const loader = document.getElementById("reg-to-login-loader");
-      document.getElementById("regLoaderText").innerText = i18n[currentLang].regRedirectMsg;
+      document.getElementById("regLoaderText").innerText = "Going to Login...";
       document.getElementById("regLoaderPercent").innerText = "50%";
       loader.classList.add("active");
       setTimeout(() => { document.getElementById("regLoaderPercent").innerText = "100%"; }, 500);
@@ -1033,15 +1119,15 @@
 
       if (!agreed) {
         updateRegisterButtonState();
-        showAuthMsg(currentLang === "am" ? "መጀመሪያ ሳጥኑን tick ያድርጉ!" : "Tick the checkbox first!", true);
+        showAuthMsg("Tick the checkbox first!", true);
         return;
       }
       if (!fullName || !phone || !pass) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ሙሉ ስም፣ ስልክ እና ፓስዋርድ ያስገቡ!" : "Please enter full name, phone, and password!", true);
+        showAuthMsg("Please enter full name, phone, and password!", true);
         return;
       }
       if (pass !== confirm) {
-        showAuthMsg(currentLang === "am" ? "የይለፍ ቃሉ አይመሳሰልም!" : "Passwords do not match!", true);
+        showAuthMsg("Passwords do not match!", true);
         return;
       }
 
@@ -1057,7 +1143,7 @@
         document.getElementById("regConfirm").value = "";
         document.getElementById("agreePolicyCheckbox").checked = false;
         updateRegisterButtonState();
-        runOneSecondToLogin(phone, currentLang === "am" ? "ምዝገባው ተሳክቷል! በፓስዋርድ ይግቡ።" : "Registered! Log in with your password.");
+        runOneSecondToLogin(phone, "Registered! Log in with your password.");
       } catch (err) {
         showAuthMsg(err.message, true);
       }
@@ -1076,7 +1162,7 @@
         setTimeout(() => {
           pctEl.innerText = `${pct}%`;
           fillEl.style.width = `${pct}%`;
-          statusEl.innerText = `${i18n[currentLang].loadingMsg} ${pct}%`;
+          statusEl.innerText = `Loading... ${pct}%`;
           if (pct === 100) {
             setTimeout(() => {
               screen.classList.remove("active");
@@ -1094,7 +1180,7 @@
       const phone = document.getElementById("loginUser").value.trim();
       const pass = document.getElementById("loginPass").value;
       if (!phone || !pass) {
-        showAuthMsg(currentLang === "am" ? "እባክዎ ስልክ እና ፓስዋርድ ያስገቡ!" : "Please enter phone and password!", true);
+        showAuthMsg("Please enter phone and password!", true);
         return;
       }
 
@@ -1111,12 +1197,14 @@
           if (data.user) data.user.fullName = savedName;
         }
         currentUserRecord = data.user;
+        saveSessionState();
         addActivityEntry("general", "Logged in to account", null, "info");
         document.getElementById("authMessage").style.display = "none";
         runLoginLoadingScreen(() => {
           showDashboardUI();
           applyUserRecordToUI(currentUserRecord, currentAnnouncements);
           loadUserDataFromServer();
+          loadActivitiesFromDb();
         });
       } catch (err) {
         showAuthMsg(err.message, true);
@@ -1142,6 +1230,7 @@
       addActivityEntry("general", "Logged out", null, "info");
       currentUser = null;
       currentUserRecord = null;
+      saveSessionState();
       closeAllInnerPanels("bnav-home");
       document.getElementById("dashboard-section").style.display = "none";
       document.getElementById("bottomNavBar").classList.remove("visible");
@@ -1202,6 +1291,7 @@
           currentFullName = userObj.fullName;
         }
         currentUserRecord = userObj;
+        saveSessionState();
         document.getElementById("headerUserSub").innerText = formatUserHeaderLabel();
         renderBalanceText();
         document.getElementById("refLinkText").innerText = `https://ethioinvest.app/?ref=${encodeURIComponent(currentUser)}`;
@@ -1270,7 +1360,7 @@
       if (!file) {
         selectedReceiptName = "";
         selectedReceiptDataUrl = "";
-        nameSpan.innerText = i18n[currentLang].noFileSelected;
+        nameSpan.innerText = "No screenshot selected (*)";
         previewImg.style.display = "none";
         return;
       }
@@ -1287,16 +1377,15 @@
     }
 
     async function submitDeposit() {
-      if (!currentUser) return;
       const method = document.getElementById("depMethod").value;
       const amount = parseFloat(document.getElementById("depAmount").value);
 
       if (isNaN(amount) || amount <= 0) {
-        alert(currentLang === "am" ? "እባክዎ ትክክለኛ የገንዘብ መጠን ያስገቡ።" : "Please enter a valid deposit amount.");
+        alert("Please enter a valid deposit amount.");
         return;
       }
       if (!selectedReceiptName || !selectedReceiptDataUrl) {
-        alert(currentLang === "am" ? "የክፍያ ስክሪንሾት (*) ግዴታ ነው!" : "Payment screenshot (*) is required!");
+        alert("Payment screenshot (*) is required!");
         return;
       }
 
@@ -1314,21 +1403,22 @@
         const res = await apiRequest("/api/deposits", {
           method: "POST",
           body: JSON.stringify({
-            phone: currentUser,
+            phone: currentUser || "guest",
             method,
             amount,
             screenshotName: selectedReceiptName,
             screenshotDataUrl: selectedReceiptDataUrl
           })
         });
-        applyUserRecordToUI(res.user);
+        if (res && res.user) applyUserRecordToUI(res.user);
       } catch (_) {}
 
       document.getElementById("depAmount").value = "";
+      clearPresetSelection();
       document.getElementById("depReceiptInput").value = "";
       selectedReceiptName = "";
       selectedReceiptDataUrl = "";
-      document.getElementById("receiptFileName").innerText = i18n[currentLang].noFileSelected;
+      document.getElementById("receiptFileName").innerText = "No screenshot selected (*)";
       document.getElementById("receiptPreview").style.display = "none";
     }
 
@@ -1351,11 +1441,11 @@
       const amount = parseFloat(document.getElementById("withAmount").value);
 
       if (!userAcc || isNaN(amount) || amount <= 0) {
-        alert(currentLang === "am" ? "እባክዎ አካውንት እና የብር መጠን ያስገቡ።" : "Please enter account and valid amount.");
+        alert("Please enter account and valid amount.");
         return;
       }
       if (amount > Number(currentUserRecord?.balance || 0)) {
-        alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም!" : "Insufficient balance!");
+        alert("Insufficient balance!");
         return;
       }
 
@@ -1369,7 +1459,7 @@
         document.getElementById("withAmount").value = "";
         calculateNetPay();
         const netPay = amount - amount * 0.05;
-        alert(currentLang === "am" ? `የወጪ ጥያቄ ተልኳል! Net Pay = ${netPay.toFixed(2)} ETB` : `Withdrawal sent! Net Pay = ${netPay.toFixed(2)} ETB`);
+        alert(`Withdrawal sent! Net Pay = ${netPay.toFixed(2)} ETB`);
       } catch (err) {
         alert(err.message);
       }
@@ -1378,7 +1468,7 @@
     async function buyPackage(cost, pkgName, userProfit, intervalDesc) {
       if (!currentUser) return;
       if (Number(currentUserRecord?.balance || 0) < cost) {
-        alert(currentLang === "am" ? "በቂ ቀሪ ሂሳብ የለዎትም።" : "Insufficient balance.");
+        alert("Insufficient balance.");
         return;
       }
       try {
@@ -1388,7 +1478,7 @@
         });
         applyUserRecordToUI(res.user);
         addActivityEntry("package", `Package: ${pkgName}`, cost, "minus");
-        alert(currentLang === "am" ? `${pkgName} ጥያቄ ተልኳል!` : `${pkgName} request sent!`);
+        alert(`${pkgName} request sent!`);
       } catch (err) {
         alert(err.message);
       }
@@ -1406,7 +1496,7 @@
         });
         applyUserRecordToUI(res.user);
         addActivityEntry("referral", "Referral bonus request", 100, "plus");
-        alert(currentLang === "am" ? "የሪፈራል ጥያቄ ወደ Admin ተልኳል!" : "Referral request sent to Admin!");
+        alert("Referral request sent to Admin!");
       } catch (err) {
         alert(err.message);
       }
@@ -1430,13 +1520,13 @@
     function renderAllSectionActivities() {
       loadLocalActivities();
       const map = {
-        depositSectionActivity: { sec: "deposit", label: currentLang === "am" ? "የ Deposit እንቅስቃሴዎች" : "Deposit Activity" },
-        withdrawalSectionActivity: { sec: "withdrawal", label: currentLang === "am" ? "የ Withdrawal እንቅስቃሴዎች" : "Withdrawal Activity" },
-        referralSectionActivity: { sec: "referral", label: currentLang === "am" ? "የ Referral እንቅስቃሴዎች" : "Referral Activity" },
-        packageSectionActivity: { sec: "package", label: currentLang === "am" ? "የ Package እንቅስቃሴዎች" : "Package Activity" },
-        supportSectionActivity: { sec: "support", label: currentLang === "am" ? "የ Support እንቅስቃሴዎች" : "Support Activity" },
-        notificationsSectionActivity: { sec: "notifications", label: currentLang === "am" ? "የ Notifications እንቅስቃሴዎች" : "Notifications Activity" },
-        faqSectionActivity: { sec: "faq", label: currentLang === "am" ? "የ Help / FAQ እንቅስቃሴዎች" : "Help / FAQ Activity" }
+        depositSectionActivity: { sec: "deposit", label: "Deposit Activity" },
+        withdrawalSectionActivity: { sec: "withdrawal", label: "Withdrawal Activity" },
+        referralSectionActivity: { sec: "referral", label: "Referral Activity" },
+        packageSectionActivity: { sec: "package", label: "Package Activity" },
+        supportSectionActivity: { sec: "support", label: "Support Activity" },
+        notificationsSectionActivity: { sec: "notifications", label: "Notifications Activity" },
+        faqSectionActivity: { sec: "faq", label: "Help / FAQ Activity" }
       };
 
       Object.keys(map).forEach(elId => {
@@ -1448,7 +1538,7 @@
           <div class="section-activity-footer-title">${label} (${items.length})</div>
           ${items.length
             ? items.map(formatActivityRowHtml).join("")
-            : `<p style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">${i18n[currentLang].noHistory}</p>`}
+            : `<p style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">No transactions yet.</p>`}
         `;
       });
     }
@@ -1466,7 +1556,7 @@
 
       const combined = [...localActivities, ...serverItems];
       if (!combined.length) {
-        container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">${i18n[currentLang].noHistory}</p>`;
+        container.innerHTML = `<p style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">No transactions yet.</p>`;
         return;
       }
       container.innerHTML = combined.map(formatActivityRowHtml).join("");
@@ -1493,6 +1583,7 @@
     setInterval(() => {
       if (currentUser && document.getElementById("dashboard-section").style.display === "block") {
         loadUserDataFromServer();
+        loadActivitiesFromDb();
       }
     }, 3000);
 
@@ -1500,6 +1591,9 @@
     fetchRealExchangeRate();
     syncNotificationsUI();
     renderAllSectionActivities();
+    if (restoreSessionState()) {
+      loadActivitiesFromDb();
+    }
   </script>
 </body>
 </html>
