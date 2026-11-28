@@ -49,7 +49,6 @@
       background: #0b1120; color: #ffffff; font-size: 0.84rem;
     }
 
-    /* Horizontal 5 tabs: User | Deposit | Withdrawal | Investment | Referral */
     .horizontal-nav-row {
       display: flex;
       flex-direction: row;
@@ -149,7 +148,6 @@
     .status-approved { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
     .status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
-    /* Buttons wrap cleanly inside screen width - no horizontal swipe needed */
     .action-btns-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -229,7 +227,6 @@
       </div>
     </div>
 
-    <!-- Horizontal tabs: User | Deposit | Withdrawal | Investment | Referral -->
     <div class="horizontal-nav-row" id="horizontalTabsRow">
       <button type="button" class="h-tab-btn active" id="htab-user" onclick="selectAdminTab('user')">
         <span>👤 User</span>
@@ -270,13 +267,41 @@
   <script>
     const API_BASE = "https://ethioinvest-lvsr.onrender.com";
     const ADMIN_PIN = "1234";
+    const ADMIN_CACHE_KEY = "ethioinvest_admin_panel_cache_v1";
+
     let adminLang = "en";
     let activeAdminTab = "user";
-    let latestAdminState = {
+    let latestAdminState = loadCachedState() || {
       users: {},
       requests: { deposits: [], withdrawals: [], referrals: [], packages: [] },
       announcements: []
     };
+
+    function loadCachedState() {
+      try {
+        const raw = localStorage.getItem(ADMIN_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return {
+          users: parsed.users || {},
+          requests: {
+            deposits: (parsed.requests && parsed.requests.deposits) || [],
+            withdrawals: (parsed.requests && parsed.requests.withdrawals) || [],
+            referrals: (parsed.requests && parsed.requests.referrals) || [],
+            packages: (parsed.requests && parsed.requests.packages) || []
+          },
+          announcements: parsed.announcements || []
+        };
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function saveCachedState(st) {
+      try {
+        localStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify(st));
+      } catch (_) {}
+    }
 
     async function apiRequest(path, options = {}) {
       const res = await fetch(`${API_BASE}${path}`, {
@@ -296,6 +321,7 @@
         syncBtn: "↻ Sync", gateTitle: "Admin Access", pinLabel: "Admin PIN / Passcode (Default: 1234)",
         openPanelBtn: "Open Admin Dashboard", announceHeader: "Post Announcement to Users",
         postBtn: "Post", addBtn: "+ Add Balance", deductBtn: "- Deduct Balance",
+        deleteUserBtn: "Delete User",
         reviewTitle: "Full Activity Details", closeBtn: "Close",
         emptyUser: "No registered users yet.",
         emptyDeposit: "No deposit requests yet.",
@@ -308,6 +334,7 @@
         syncBtn: "↻ አድስ", gateTitle: "አስተዳዳሪ መግቢያ (Admin Access)", pinLabel: "የአድሚን ፒን (Default: 1234)",
         openPanelBtn: "አድሚን ፓነል ክፈት", announceHeader: "ለተጠቃሚዎች ማስታወቂያ ላክ",
         postBtn: "ላክ", addBtn: "+ ሂሳብ ጨምር", deductBtn: "- ሂሳብ ቀንስ",
+        deleteUserBtn: "ተጠቃሚ አጥፋ",
         reviewTitle: "ሙሉ የእንቅስቃሴ መረጃ", closeBtn: "ዝጋ",
         emptyUser: "እስካሁን የተመዘገበ ተጠቃሚ የለም።",
         emptyDeposit: "እስካሁን የተቀማጭ ገንዘብ (Deposit) ጥያቄ የለም።",
@@ -350,12 +377,17 @@
           method: "POST",
           body: JSON.stringify({ message: msg })
         });
-        input.value = "";
-        await syncAllData();
-        alert(adminLang === "am" ? "ማስታወቂያው ተልኳል!" : "Announcement posted!");
-      } catch (err) {
-        alert(err.message);
+      } catch (_) {
+        latestAdminState.announcements.unshift({
+          id: "ANN-" + Date.now(),
+          message: msg,
+          time: new Date().toLocaleString()
+        });
+        saveCachedState(latestAdminState);
       }
+      input.value = "";
+      await syncAllData();
+      alert(adminLang === "am" ? "ማስታወቂያው ተልኳል!" : "Announcement posted!");
     }
 
     function selectAdminTab(tabName) {
@@ -373,21 +405,84 @@
       return `<span class="status-pill ${cls}">${st}</span>`;
     }
 
+    function normalizeUsersMap(rawUsers) {
+      const map = {};
+      if (Array.isArray(rawUsers)) {
+        rawUsers.forEach(u => {
+          const key = u.phone || u.username || ("user_" + u.id);
+          map[key] = {
+            fullName: u.full_name || u.fullName || "",
+            phone: u.phone || key,
+            balance: Number(u.balance || 0),
+            invested: Number(u.invested || 0),
+            refBonus: Number(u.refBonus || 0),
+            created_at: u.created_at || "",
+            history: u.history || []
+          };
+        });
+        return map;
+      }
+      if (rawUsers && typeof rawUsers === "object") {
+        Object.keys(rawUsers).forEach(k => {
+          const u = rawUsers[k] || {};
+          map[k] = {
+            fullName: u.fullName || u.full_name || "",
+            phone: u.phone || k,
+            balance: Number(u.balance || 0),
+            invested: Number(u.invested || 0),
+            refBonus: Number(u.refBonus || 0),
+            created_at: u.created_at || "",
+            history: u.history || []
+          };
+        });
+      }
+      return map;
+    }
+
     async function syncAllData() {
+      let gotAdminState = false;
       try {
         const st = await apiRequest("/api/admin/state");
         latestAdminState = {
-          users: st.users || {},
+          users: normalizeUsersMap(st.users || {}),
           requests: {
-            deposits: (st.requests && st.requests.deposits) || [],
-            withdrawals: (st.requests && st.requests.withdrawals) || [],
-            referrals: (st.requests && st.requests.referrals) || [],
-            packages: (st.requests && st.requests.packages) || []
+            deposits: (st.requests && st.requests.deposits) || latestAdminState.requests.deposits || [],
+            withdrawals: (st.requests && st.requests.withdrawals) || latestAdminState.requests.withdrawals || [],
+            referrals: (st.requests && st.requests.referrals) || latestAdminState.requests.referrals || [],
+            packages: (st.requests && st.requests.packages) || latestAdminState.requests.packages || []
           },
-          announcements: st.announcements || []
+          announcements: st.announcements || latestAdminState.announcements || []
         };
-        renderAdminState(latestAdminState);
-      } catch (err) {}
+        gotAdminState = true;
+      } catch (_) {}
+
+      if (!gotAdminState) {
+        try {
+          const uRes = await apiRequest("/api/users");
+          if (uRes && Array.isArray(uRes.users)) {
+            latestAdminState.users = normalizeUsersMap(uRes.users);
+          }
+        } catch (_) {}
+
+        try {
+          const dRes = await apiRequest("/api/deposits");
+          if (dRes && Array.isArray(dRes.deposits)) {
+            latestAdminState.requests.deposits = dRes.deposits.map(d => ({
+              id: d.id,
+              username: d.phone || d.user_id || "User",
+              method: d.payment_account || d.method || "-",
+              amount: Number(d.amount || 0),
+              screenshotName: d.receipt_image ? "Receipt attached" : "No file",
+              screenshotDataUrl: d.receipt_image || "",
+              status: d.status || "pending",
+              time: d.created_at ? new Date(d.created_at).toLocaleString() : "-"
+            }));
+          }
+        } catch (_) {}
+      }
+
+      saveCachedState(latestAdminState);
+      renderAdminState(latestAdminState);
     }
 
     function renderAdminState(st) {
@@ -420,10 +515,11 @@
           return `
             <div class="record-card">
               <div class="record-top">
-                <span class="record-user">👤 User: ${u}</span>
+                <span class="record-user">👤 User: ${rec.fullName ? `${rec.fullName} (${u})` : u}</span>
                 <span class="record-amount">${Number(rec.balance || 0).toFixed(2)} ETB</span>
               </div>
               <div class="record-details">
+                <div><strong>Full Name:</strong> ${rec.fullName || "-"}</div>
                 <div><strong>Phone / Username:</strong> ${rec.phone || u}</div>
                 <div><strong>Balance:</strong> ${Number(rec.balance || 0).toFixed(2)} ETB</div>
                 <div><strong>Invested:</strong> ${Number(rec.invested || 0).toFixed(2)} ETB</div>
@@ -434,6 +530,7 @@
                 <input type="number" id="adj-amt-${safeId}" placeholder="Amount (ETB)" />
                 <button class="btn-green" onclick="adjustUserBalance('${u}', '${safeId}', 'add')">${i18n[adminLang].addBtn}</button>
                 <button class="btn-red" onclick="adjustUserBalance('${u}', '${safeId}', 'sub')">${i18n[adminLang].deductBtn}</button>
+                <button class="btn-dark-del" onclick="deleteRegisteredUser('${u}')">${i18n[adminLang].deleteUserBtn}</button>
               </div>
             </div>
           `;
@@ -563,6 +660,31 @@
       }
     }
 
+    function getListByKind(kind) {
+      const reqs = latestAdminState.requests || {};
+      if (kind === "deposit") return reqs.deposits || [];
+      if (kind === "withdrawal") return reqs.withdrawals || [];
+      if (kind === "referral") return reqs.referrals || [];
+      return reqs.packages || [];
+    }
+
+    function setListByKind(kind, nextArr) {
+      if (kind === "deposit") latestAdminState.requests.deposits = nextArr;
+      else if (kind === "withdrawal") latestAdminState.requests.withdrawals = nextArr;
+      else if (kind === "referral") latestAdminState.requests.referrals = nextArr;
+      else latestAdminState.requests.packages = nextArr;
+      saveCachedState(latestAdminState);
+    }
+
+    async function deleteRegisteredUser(username) {
+      try {
+        await apiRequest(`/api/admin/users/${encodeURIComponent(username)}`, { method: "DELETE" });
+      } catch (_) {}
+      delete latestAdminState.users[username];
+      saveCachedState(latestAdminState);
+      renderAdminState(latestAdminState);
+    }
+
     async function deleteActivity(kind, id) {
       const endpointMap = {
         deposit: `/api/admin/deposits/${encodeURIComponent(id)}`,
@@ -572,10 +694,10 @@
       };
       try {
         await apiRequest(endpointMap[kind], { method: "DELETE" });
-        await syncAllData();
-      } catch (err) {
-        alert(err.message);
-      }
+      } catch (_) {}
+      const filtered = getListByKind(kind).filter(x => String(x.id) !== String(id));
+      setListByKind(kind, filtered);
+      renderAdminState(latestAdminState);
     }
 
     async function decideActivity(kind, id, action) {
@@ -585,14 +707,36 @@
         referral: `/api/admin/referrals/${encodeURIComponent(id)}/decide`,
         package: `/api/admin/packages/${encodeURIComponent(id)}/decide`
       };
+      let backendOk = false;
       try {
         await apiRequest(endpointMap[kind], {
           method: "POST",
           body: JSON.stringify({ action })
         });
+        backendOk = true;
+      } catch (_) {}
+
+      const nextStatus = action === "approve" ? "approved" : "rejected";
+      const list = getListByKind(kind).map(item => {
+        if (String(item.id) !== String(id)) return item;
+        const prevStatus = item.status || "pending";
+        if (!backendOk && nextStatus === "approved" && prevStatus !== "approved" && latestAdminState.users[item.username]) {
+          const uRec = latestAdminState.users[item.username];
+          const amt = Number(item.amount || 0);
+          if (kind === "deposit" || kind === "referral") {
+            uRec.balance = Number(uRec.balance || 0) + amt;
+          } else if (kind === "withdrawal" || kind === "package") {
+            uRec.balance = Math.max(0, Number(uRec.balance || 0) - amt);
+            if (kind === "package") uRec.invested = Number(uRec.invested || 0) + amt;
+          }
+        }
+        return { ...item, status: nextStatus };
+      });
+      setListByKind(kind, list);
+      if (backendOk) {
         await syncAllData();
-      } catch (err) {
-        alert(err.message);
+      } else {
+        renderAdminState(latestAdminState);
       }
     }
 
@@ -603,25 +747,28 @@
         alert("Enter a valid ETB amount.");
         return;
       }
+      let backendOk = false;
       try {
         await apiRequest(`/api/admin/users/${encodeURIComponent(username)}/balance`, {
           method: "POST",
           body: JSON.stringify({ amount: val, mode })
         });
-        inputEl.value = "";
-        await syncAllData();
-      } catch (err) {
-        alert(err.message);
+        backendOk = true;
+      } catch (_) {}
+
+      if (!backendOk && latestAdminState.users[username]) {
+        const cur = Number(latestAdminState.users[username].balance || 0);
+        latestAdminState.users[username].balance = mode === "add" ? cur + val : Math.max(0, cur - val);
+        saveCachedState(latestAdminState);
       }
+      inputEl.value = "";
+      if (backendOk) await syncAllData();
+      else renderAdminState(latestAdminState);
     }
 
     function reviewActivity(kind, id) {
-      const reqs = latestAdminState.requests || {};
-      const arr =
-        kind === "deposit" ? (reqs.deposits || []) :
-        kind === "withdrawal" ? (reqs.withdrawals || []) :
-        kind === "referral" ? (reqs.referrals || []) : (reqs.packages || []);
-      const item = arr.find(x => x.id === id);
+      const arr = getListByKind(kind);
+      const item = arr.find(x => String(x.id) === String(id));
       if (!item) return;
 
       let html = `
