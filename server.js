@@ -23,6 +23,8 @@ const pool = new Pool({
   },
 });
 
+let announcementsStore = [];
+
 async function initDB() {
   if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL is not set in Environment Variables');
@@ -151,60 +153,44 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-app.get('/api/users.html', async (req, res) => {
+app.get('/api/user/:phone', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, full_name, phone, balance, created_at FROM users ORDER BY id DESC'
+    const phone = decodeURIComponent(req.params.phone || '').trim();
+    const uRes = await pool.query(
+      'SELECT id, full_name, phone, balance, created_at FROM users WHERE phone = $1',
+      [phone]
     );
-    const rowsHtml = result.rows
-      .map(
-        (u) => `
-          <tr>
-            <td>${u.id}</td>
-            <td>${u.full_name}</td>
-            <td>${u.phone}</td>
-            <td>${u.balance} ETB</td>
-            <td>${new Date(u.created_at).toLocaleString()}</td>
-          </tr>`
-      )
-      .join('');
-
-    res.send(`
-      <!DOCTYPE html>
-      <html lang="am">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>EthioInvest - Registered Users</title>
-        <style>
-          body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
-          h2 { margin-bottom: 12px; }
-          table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 8px; overflow: hidden; }
-          th, td { padding: 10px 12px; border-bottom: 1px solid #334155; text-align: left; font-size: 14px; }
-          th { background: #065f46; color: #ecfdf5; }
-        </style>
-      </head>
-      <body>
-        <h2>የተመዘገቡ ተጠቃሚዎች (${result.rows.length})</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Phone</th>
-              <th>Balance</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml || '<tr><td colspan="5">እስካሁን የተመዘገበ ተጠቃሚ የለም።</td></tr>'}
-          </tbody>
-        </table>
-      </body>
-      </html>
-    `);
+    const aRes = await pool.query(
+      `SELECT id, phone, section, title, amount, tx_type, status, created_label, created_at
+       FROM user_activities
+       WHERE phone = $1
+       ORDER BY id DESC
+       LIMIT 100`,
+      [phone]
+    );
+    const uRow = uRes.rows[0] || { phone, full_name: phone, balance: 0 };
+    const history = aRes.rows.map((r) => ({
+      id: r.id,
+      section: r.section,
+      title: r.title,
+      amount: Number(r.amount || 0),
+      type: r.status === 'approved' ? (r.section === 'deposit' ? 'plus' : 'minus') : r.status || 'pending',
+      status: r.status || 'pending',
+      time: r.created_label || new Date(r.created_at).toLocaleString(),
+    }));
+    res.json({
+      success: true,
+      user: {
+        id: uRow.id,
+        fullName: uRow.full_name,
+        phone: uRow.phone,
+        balance: Number(uRow.balance || 0),
+        history,
+      },
+      announcements: announcementsStore,
+    });
   } catch (err) {
-    res.status(500).send(`Error: ${err.message}`);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -280,7 +266,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/activities', async (req, res) => {
   try {
     const phone = String(req.body.phone || '').trim();
-    const section = String(req.body.section || 'general').trim();
+    const section = String(req.body.section || 'general').trim().toLowerCase();
     const title = String(req.body.title || 'Activity').trim();
     const rawAmt = req.body.amount;
     const amount =
@@ -295,7 +281,7 @@ app.post('/api/activities', async (req, res) => {
           ? section === 'deposit'
             ? 'plus'
             : 'minus'
-          : 'pending')
+          : status)
     ).trim();
     const timeLabel = String(req.body.time || new Date().toLocaleString()).trim();
 
@@ -338,105 +324,217 @@ app.get('/api/activities/:phone', async (req, res) => {
   }
 });
 
-app.post('/api/admin/approve', async (req, res) => {
+app.get('/api/admin/state', async (req, res) => {
   try {
-    const activityId = req.body.id;
-    if (!activityId) {
-      return res.status(400).json({ error: 'activity id is required' });
+    const uRes = await pool.query(
+      'SELECT id, full_name, phone, balance, created_at FROM users ORDER BY id DESC'
+    );
+    const aRes = await pool.query(
+      `SELECT id, phone, section, title, amount, tx_type, status, created_label, created_at
+       FROM user_activities
+       ORDER BY id DESC
+       LIMIT 200`
+    );
+
+    const usersMap = {};
+    uRes.rows.forEach((u) => {
+      usersMap[u.phone] = {
+        id: u.id,
+        fullName: u.full_name,
+        phone: u.phone,
+        balance: Number(u.balance || 0),
+        invested: 0,
+        refBonus: 0,
+        history: [],
+      };
+    });
+
+    const deposits = [];
+    const withdrawals = [];
+    const packages = [];
+    const referrals = [];
+
+    aRes.rows.forEach((row) => {
+      const sec = String(row.section || '').toLowerCase();
+      const status = String(row.status || 'pending').toLowerCase();
+      const amt = Number(row.amount || 0);
+      const time = row.created_label || new Date(row.created_at).toLocaleString();
+
+      if (usersMap[row.phone]) {
+        usersMap[row.phone].history.push({
+          id: row.id,
+          section: sec,
+          title: row.title,
+          amount: amt,
+          status,
+          type: status === 'approved' ? (sec === 'deposit' ? 'plus' : 'minus') : status,
+          time,
+        });
+        if (status === 'approved' && (sec === 'investment' || sec === 'package')) {
+          usersMap[row.phone].invested += amt;
+        }
+      }
+
+      const item = {
+        id: row.id,
+        username: row.phone,
+        phone: row.phone,
+        title: row.title,
+        amount: amt,
+        status,
+        time,
+      };
+
+      if (sec === 'deposit') {
+        item.method = row.title;
+        deposits.push(item);
+      } else if (sec === 'withdrawal') {
+        item.method = row.title;
+        item.fee = amt * 0.05;
+        item.netPay = amt - amt * 0.05;
+        withdrawals.push(item);
+      } else if (sec === 'investment' || sec === 'package') {
+        item.pkgName = row.title;
+        packages.push(item);
+      } else if (sec === 'referral') {
+        referrals.push(item);
+      }
+    });
+
+    res.json({
+      success: true,
+      users: usersMap,
+      requests: {
+        deposits,
+        withdrawals,
+        packages,
+        referrals,
+      },
+      announcements: announcementsStore,
+    });
+  } catch (err) {
+    console.error('Admin state error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+async function handleDecideRequest(req, res, forcedKind = null) {
+  try {
+    const id = req.params.id || req.body.id;
+    const action = String(req.body.action || '').trim().toLowerCase();
+    if (!id || !['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ error: 'Valid id and action (approve/reject) are required' });
     }
 
     const actRes = await pool.query(
       `SELECT id, phone, section, title, amount, status
        FROM user_activities
        WHERE id = $1`,
-      [activityId]
+      [id]
     );
-
     if (actRes.rows.length === 0) {
       return res.status(404).json({ error: 'Activity not found' });
     }
 
     const act = actRes.rows[0];
-    const targetPhone = String(req.body.phone || act.phone || '').trim();
-    const targetSection = String(req.body.section || act.section || 'deposit').trim().toLowerCase();
+    const sec = String(forcedKind || act.section || 'deposit').toLowerCase();
+    const phone = String(act.phone || '').trim();
     const amt = Number(act.amount || 0);
+    const prevStatus = String(act.status || 'pending').toLowerCase();
 
-    if (act.status !== 'approved' && targetPhone && amt > 0) {
-      if (targetSection === 'deposit') {
+    if (action === 'approve' && prevStatus !== 'approved' && phone && amt > 0) {
+      if (sec === 'deposit') {
         await pool.query(
           `UPDATE users SET balance = COALESCE(balance, 0) + $1 WHERE phone = $2`,
-          [amt, targetPhone]
+          [amt, phone]
         );
-      } else if (targetSection === 'withdrawal' || targetSection === 'investment' || targetSection === 'package') {
+      } else if (sec === 'withdrawal' || sec === 'investment' || sec === 'package') {
         await pool.query(
           `UPDATE users SET balance = GREATEST(0, COALESCE(balance, 0) - $1) WHERE phone = $2`,
-          [amt, targetPhone]
+          [amt, phone]
         );
       }
     }
 
-    const approvedSign = targetSection === 'deposit' ? 'plus' : 'minus';
-    const updatedAct = await pool.query(
+    const nextStatus = action === 'approve' ? 'approved' : 'rejected';
+    const nextTxType =
+      nextStatus === 'approved'
+        ? sec === 'deposit'
+          ? 'plus'
+          : 'minus'
+        : 'rejected';
+
+    const updated = await pool.query(
       `UPDATE user_activities
-       SET status = 'approved', tx_type = $1
-       WHERE id = $2
+       SET status = $1, tx_type = $2
+       WHERE id = $3
        RETURNING id, phone, section, title, amount, tx_type, status, created_label, created_at`,
-      [approvedSign, activityId]
+      [nextStatus, nextTxType, id]
     );
 
-    let updatedUser = null;
-    if (targetPhone) {
-      const uRes = await pool.query(
-        'SELECT id, full_name, phone, balance, created_at FROM users WHERE phone = $1',
-        [targetPhone]
-      );
-      if (uRes.rows.length > 0) {
-        const u = uRes.rows[0];
-        updatedUser = {
-          id: u.id,
-          fullName: u.full_name,
-          phone: u.phone,
-          balance: Number(u.balance || 0),
-          created_at: u.created_at,
-        };
-      }
-    }
-
-    res.json({
-      success: true,
-      activity: updatedAct.rows[0],
-      user: updatedUser,
-    });
+    res.json({ success: true, activity: updated.rows[0] });
   } catch (err) {
-    console.error('Approve activity error:', err.message);
+    console.error('Decide request error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+}
+
+app.post('/api/admin/deposits/:id/decide', (req, res) => handleDecideRequest(req, res, 'deposit'));
+app.post('/api/admin/withdrawals/:id/decide', (req, res) => handleDecideRequest(req, res, 'withdrawal'));
+app.post('/api/admin/packages/:id/decide', (req, res) => handleDecideRequest(req, res, 'investment'));
+app.post('/api/admin/referrals/:id/decide', (req, res) => handleDecideRequest(req, res, 'referral'));
+app.post('/api/admin/approve', (req, res) => handleDecideRequest(req, res, null));
+
+app.post('/api/admin/users/:phone/balance', async (req, res) => {
+  try {
+    const phone = decodeURIComponent(req.params.phone || '').trim();
+    const amt = Number(req.body.amount || 0);
+    const mode = String(req.body.mode || 'add').toLowerCase();
+    if (!phone || Number.isNaN(amt) || amt <= 0) {
+      return res.status(400).json({ error: 'Invalid phone or amount' });
+    }
+    const query =
+      mode === 'sub'
+        ? 'UPDATE users SET balance = GREATEST(0, COALESCE(balance, 0) - $1) WHERE phone = $2 RETURNING id, full_name, phone, balance'
+        : 'UPDATE users SET balance = COALESCE(balance, 0) + $1 WHERE phone = $2 RETURNING id, full_name, phone, balance';
+    const r = await pool.query(query, [amt, phone]);
+    res.json({ success: true, user: r.rows[0] });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/admin/reject', async (req, res) => {
+app.delete('/api/admin/users/:phone', async (req, res) => {
   try {
-    const activityId = req.body.id;
-    if (!activityId) {
-      return res.status(400).json({ error: 'activity id is required' });
-    }
-
-    const updatedAct = await pool.query(
-      `UPDATE user_activities
-       SET status = 'rejected', tx_type = 'rejected'
-       WHERE id = $1
-       RETURNING id, phone, section, title, amount, tx_type, status, created_label, created_at`,
-      [activityId]
-    );
-
-    if (updatedAct.rows.length === 0) {
-      return res.status(404).json({ error: 'Activity not found' });
-    }
-
-    res.json({ success: true, activity: updatedAct.rows[0] });
+    const phone = decodeURIComponent(req.params.phone || '').trim();
+    await pool.query('DELETE FROM user_activities WHERE phone = $1', [phone]);
+    await pool.query('DELETE FROM users WHERE phone = $1', [phone]);
+    res.json({ success: true });
   } catch (err) {
-    console.error('Reject activity error:', err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+app.delete('/api/admin/:kind/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await pool.query('DELETE FROM user_activities WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/announcements', (req, res) => {
+  const msg = String(req.body.message || '').trim();
+  if (!msg) return res.status(400).json({ error: 'Message is required' });
+  const item = {
+    id: 'ANN-' + Date.now(),
+    message: msg,
+    time: new Date().toLocaleString(),
+  };
+  announcementsStore.unshift(item);
+  res.status(201).json({ success: true, announcement: item });
 });
 
 async function handleDeposit(req, res) {
