@@ -271,6 +271,7 @@
 
     let adminLang = "en";
     let activeAdminTab = "user";
+    let isSyncing = false;
     let latestAdminState = loadCachedState() || {
       users: {},
       requests: { deposits: [], withdrawals: [], referrals: [], packages: [] },
@@ -439,50 +440,42 @@
       return map;
     }
 
+    function mergeStatusPreservingDecisions(prevArr, nextArr) {
+      const prevMap = {};
+      (prevArr || []).forEach(p => {
+        if (p && p.id !== undefined) prevMap[String(p.id)] = p.status;
+      });
+      return (nextArr || []).map(item => {
+        const localSt = prevMap[String(item.id)];
+        if (localSt && (localSt === "approved" || localSt === "rejected") && (!item.status || item.status === "pending")) {
+          return { ...item, status: localSt };
+        }
+        return item;
+      });
+    }
+
     async function syncAllData() {
-      let gotAdminState = false;
+      if (isSyncing) return;
+      isSyncing = true;
       try {
         const st = await apiRequest("/api/admin/state");
         latestAdminState = {
           users: normalizeUsersMap(st.users || {}),
           requests: {
-            deposits: (st.requests && st.requests.deposits) || latestAdminState.requests.deposits || [],
-            withdrawals: (st.requests && st.requests.withdrawals) || latestAdminState.requests.withdrawals || [],
-            referrals: (st.requests && st.requests.referrals) || latestAdminState.requests.referrals || [],
-            packages: (st.requests && st.requests.packages) || latestAdminState.requests.packages || []
+            deposits: mergeStatusPreservingDecisions(latestAdminState.requests.deposits, (st.requests && st.requests.deposits) || []),
+            withdrawals: mergeStatusPreservingDecisions(latestAdminState.requests.withdrawals, (st.requests && st.requests.withdrawals) || []),
+            referrals: mergeStatusPreservingDecisions(latestAdminState.requests.referrals, (st.requests && st.requests.referrals) || []),
+            packages: mergeStatusPreservingDecisions(latestAdminState.requests.packages, (st.requests && st.requests.packages) || [])
           },
           announcements: st.announcements || latestAdminState.announcements || []
         };
-        gotAdminState = true;
-      } catch (_) {}
-
-      if (!gotAdminState) {
-        try {
-          const uRes = await apiRequest("/api/users");
-          if (uRes && Array.isArray(uRes.users)) {
-            latestAdminState.users = normalizeUsersMap(uRes.users);
-          }
-        } catch (_) {}
-
-        try {
-          const dRes = await apiRequest("/api/deposits");
-          if (dRes && Array.isArray(dRes.deposits)) {
-            latestAdminState.requests.deposits = dRes.deposits.map(d => ({
-              id: d.id,
-              username: d.phone || d.user_id || "User",
-              method: d.payment_account || d.method || "-",
-              amount: Number(d.amount || 0),
-              screenshotName: d.receipt_image ? "Receipt attached" : "No file",
-              screenshotDataUrl: d.receipt_image || "",
-              status: d.status || "pending",
-              time: d.created_at ? new Date(d.created_at).toLocaleString() : "-"
-            }));
-          }
-        } catch (_) {}
+        saveCachedState(latestAdminState);
+        renderAdminState(latestAdminState);
+      } catch (_) {
+        renderAdminState(latestAdminState);
+      } finally {
+        isSyncing = false;
       }
-
-      saveCachedState(latestAdminState);
-      renderAdminState(latestAdminState);
     }
 
     function renderAdminState(st) {
@@ -554,7 +547,6 @@
             <div class="record-details">
               <div><strong>Method:</strong> ${d.method || "-"}</div>
               <div><strong>Amount:</strong> ${Number(d.amount || 0).toFixed(2)} ETB</div>
-              <div><strong>Screenshot File:</strong> ${d.screenshotName || "No file"}</div>
               <div><strong>Time:</strong> ${d.time || "-"}</div>
             </div>
             <div class="action-btns-grid four-cols">
@@ -583,7 +575,6 @@
             </div>
             <div class="record-details">
               <div><strong>Method:</strong> ${w.method || "-"}</div>
-              <div><strong>User Account / Phone:</strong> ${w.account || "-"}</div>
               <div><strong>Amount:</strong> ${Number(w.amount || 0).toFixed(2)} ETB</div>
               <div><strong>Fee (5%):</strong> -${Number(w.fee || 0).toFixed(2)} ETB</div>
               <div><strong>Net Pay:</strong> ${Number(w.netPay || 0).toFixed(2)} ETB</div>
@@ -615,8 +606,6 @@
             </div>
             <div class="record-details">
               <div><strong>Package:</strong> ${p.pkgName || "-"}</div>
-              <div><strong>Schedule:</strong> ${p.intervalDesc || "-"}</div>
-              <div><strong>Expected Profit (ROI):</strong> +${Number(p.userProfit || 0).toFixed(2)} ETB</div>
               <div><strong>Invested Amount:</strong> ${Number(p.amount || 0).toFixed(2)} ETB</div>
               <div><strong>Time:</strong> ${p.time || "-"}</div>
             </div>
@@ -645,7 +634,6 @@
               <div>${renderBadge(r.status)} <span class="record-amount">+${Number(r.amount || 100).toFixed(2)} ETB</span></div>
             </div>
             <div class="record-details">
-              <div><strong>Referral Link:</strong> ${r.refLink || "-"}</div>
               <div><strong>Bonus Amount:</strong> +${Number(r.amount || 100).toFixed(2)} ETB</div>
               <div><strong>Time:</strong> ${r.time || "-"}</div>
             </div>
@@ -707,20 +695,12 @@
         referral: `/api/admin/referrals/${encodeURIComponent(id)}/decide`,
         package: `/api/admin/packages/${encodeURIComponent(id)}/decide`
       };
-      let backendOk = false;
-      try {
-        await apiRequest(endpointMap[kind], {
-          method: "POST",
-          body: JSON.stringify({ action })
-        });
-        backendOk = true;
-      } catch (_) {}
-
       const nextStatus = action === "approve" ? "approved" : "rejected";
+
       const list = getListByKind(kind).map(item => {
         if (String(item.id) !== String(id)) return item;
         const prevStatus = item.status || "pending";
-        if (!backendOk && nextStatus === "approved" && prevStatus !== "approved" && latestAdminState.users[item.username]) {
+        if (nextStatus === "approved" && prevStatus !== "approved" && latestAdminState.users[item.username]) {
           const uRec = latestAdminState.users[item.username];
           const amt = Number(item.amount || 0);
           if (kind === "deposit" || kind === "referral") {
@@ -733,11 +713,15 @@
         return { ...item, status: nextStatus };
       });
       setListByKind(kind, list);
-      if (backendOk) {
+      renderAdminState(latestAdminState);
+
+      try {
+        await apiRequest(endpointMap[kind], {
+          method: "POST",
+          body: JSON.stringify({ action })
+        });
         await syncAllData();
-      } else {
-        renderAdminState(latestAdminState);
-      }
+      } catch (_) {}
     }
 
     async function adjustUserBalance(username, safeId, mode) {
@@ -747,23 +731,20 @@
         alert("Enter a valid ETB amount.");
         return;
       }
-      let backendOk = false;
+      if (latestAdminState.users[username]) {
+        const cur = Number(latestAdminState.users[username].balance || 0);
+        latestAdminState.users[username].balance = mode === "add" ? cur + val : Math.max(0, cur - val);
+        saveCachedState(latestAdminState);
+        renderAdminState(latestAdminState);
+      }
+      inputEl.value = "";
       try {
         await apiRequest(`/api/admin/users/${encodeURIComponent(username)}/balance`, {
           method: "POST",
           body: JSON.stringify({ amount: val, mode })
         });
-        backendOk = true;
+        await syncAllData();
       } catch (_) {}
-
-      if (!backendOk && latestAdminState.users[username]) {
-        const cur = Number(latestAdminState.users[username].balance || 0);
-        latestAdminState.users[username].balance = mode === "add" ? cur + val : Math.max(0, cur - val);
-        saveCachedState(latestAdminState);
-      }
-      inputEl.value = "";
-      if (backendOk) await syncAllData();
-      else renderAdminState(latestAdminState);
     }
 
     function reviewActivity(kind, id) {
@@ -778,12 +759,9 @@
         <div><strong>Status:</strong> ${item.status}</div>
         <div><strong>Time:</strong> ${item.time || ""}</div>
       `;
-      if (item.pkgName) html += `<div><strong>Package:</strong> ${item.pkgName} (${item.intervalDesc || ""})</div>`;
+      if (item.pkgName) html += `<div><strong>Package:</strong> ${item.pkgName}</div>`;
       if (item.method) html += `<div><strong>Method:</strong> ${item.method}</div>`;
-      if (item.account) html += `<div><strong>User Account:</strong> ${item.account}</div>`;
       if (typeof item.netPay !== "undefined") html += `<div><strong>Net Pay (5% fee):</strong> ${Number(item.netPay).toFixed(2)} ETB</div>`;
-      if (item.refLink) html += `<div><strong>Referral Link:</strong> ${item.refLink}</div>`;
-      if (item.screenshotDataUrl) html += `<div><strong>Payment Screenshot:</strong></div><img src="${item.screenshotDataUrl}" class="modal-img" alt="Screenshot" />`;
       document.getElementById("reviewModalBody").innerHTML = html;
       document.getElementById("review-modal").classList.add("active");
     }
