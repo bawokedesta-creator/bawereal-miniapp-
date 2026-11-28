@@ -70,9 +70,6 @@
       box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
       cursor: pointer;
     }
-    .getting-app-corner-btn.hidden-standalone {
-      display: none;
-    }
     .getting-app-spinner {
       width: 14px;
       height: 14px;
@@ -84,6 +81,68 @@
     }
     @keyframes gettingAppSpin {
       to { transform: rotate(360deg); }
+    }
+
+    /* 3-second app launch splash screen */
+    #app-launch-splash {
+      position: fixed;
+      inset: 0;
+      background: #0b1120;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: opacity 0.25s ease;
+    }
+    #app-launch-splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+    .splash-card {
+      width: 100%;
+      max-width: 320px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 26px 20px;
+      color: #f8fafc;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+    }
+    .splash-brand {
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .splash-sub {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+    .splash-bar-track {
+      width: 100%;
+      height: 10px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      margin-bottom: 10px;
+    }
+    .splash-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #4ade80);
+      border-radius: 999px;
+      transition: width 3s linear;
+    }
+    .splash-status {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      font-weight: 600;
     }
 
     #reg-to-login-loader, #login-loading-screen {
@@ -397,6 +456,17 @@
     <span class="getting-app-spinner" id="gettingAppSpinner"></span>
     <span id="gettingAppLabel">Getting app</span>
   </a>
+
+  <div id="app-launch-splash" aria-live="polite">
+    <div class="splash-card">
+      <div class="splash-brand">EthioInvest</div>
+      <div class="splash-sub">ETB Investment Platform</div>
+      <div class="splash-bar-track">
+        <div class="splash-bar-fill" id="splashBarFill"></div>
+      </div>
+      <div class="splash-status" id="splashStatusText">Loading app...</div>
+    </div>
+  </div>
 
   <div id="reg-to-login-loader" aria-live="polite">
     <div class="loader-card">
@@ -805,17 +875,6 @@
     let lastReceipt = null;
     let localActivities = [];
 
-    function initCornerAppButton() {
-      const btn = document.getElementById("gettingAppCornerBtn");
-      if (!btn) return;
-      const isStandalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone === true;
-      if (isStandalone) {
-        btn.classList.add("hidden-standalone");
-      }
-    }
-
     function triggerAppDownload(event) {
       if (event) event.preventDefault();
       const labelEl = document.getElementById("gettingAppLabel");
@@ -831,6 +890,25 @@
       setTimeout(() => {
         if (labelEl) labelEl.innerText = "Getting app";
       }, 2500);
+    }
+
+    function runThreeSecondSplashScreen() {
+      const splash = document.getElementById("app-launch-splash");
+      const bar = document.getElementById("splashBarFill");
+      const status = document.getElementById("splashStatusText");
+      if (!splash) return;
+
+      requestAnimationFrame(() => {
+        if (bar) bar.style.width = "100%";
+      });
+
+      setTimeout(() => {
+        if (status) status.innerText = "Starting EthioInvest...";
+      }, 1500);
+
+      setTimeout(() => {
+        splash.classList.add("hidden");
+      }, 3000);
     }
 
     function isTrackedTxSection(section) {
@@ -1722,7 +1800,7 @@
       }
     }, 3000);
 
-    initCornerAppButton();
+    runThreeSecondSplashScreen();
     updateRegisterButtonState();
     fetchRealExchangeRate();
     syncNotificationsUI();
