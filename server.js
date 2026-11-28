@@ -53,16 +53,43 @@ async function initDB() {
       )
     `);
     await client.query(`
+      CREATE TABLE IF NOT EXISTS withdrawals (
+        id SERIAL PRIMARY KEY,
+        phone TEXT NOT NULL,
+        method TEXT NOT NULL,
+        account TEXT NOT NULL,
+        amount NUMERIC(12, 2) NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS investments (
+        id SERIAL PRIMARY KEY,
+        phone TEXT NOT NULL,
+        pkg_name TEXT NOT NULL,
+        amount NUMERIC(12, 2) NOT NULL,
+        expected_profit NUMERIC(12, 2) DEFAULT 0,
+        interval_desc TEXT,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await client.query(`
       CREATE TABLE IF NOT EXISTS user_activities (
         id SERIAL PRIMARY KEY,
         phone TEXT NOT NULL,
         section TEXT DEFAULT 'general',
         title TEXT NOT NULL,
         amount NUMERIC(12, 2),
-        tx_type TEXT DEFAULT 'info',
+        tx_type TEXT DEFAULT 'pending',
+        status TEXT DEFAULT 'pending',
         created_label TEXT,
         created_at TIMESTAMP DEFAULT NOW()
       )
+    `);
+    await client.query(`
+      ALTER TABLE user_activities ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending'
     `);
     client.release();
     console.log('Aiven PostgreSQL Connected & tables ready');
@@ -80,6 +107,7 @@ function extractAmount(body) {
     body.money,
     body.etb,
     body.value,
+    body.cost,
   ];
   for (const val of candidates) {
     if (val !== undefined && val !== null && String(val).trim() !== '') {
@@ -278,10 +306,20 @@ app.post('/api/activities', async (req, res) => {
     const section = String(req.body.section || 'general').trim();
     const title = String(req.body.title || 'Activity').trim();
     const rawAmt = req.body.amount;
-    const amount = rawAmt !== undefined && rawAmt !== null && rawAmt !== '' && !Number.isNaN(Number(rawAmt))
-      ? Number(rawAmt)
-      : null;
-    const txType = String(req.body.type || req.body.tx_type || 'info').trim();
+    const amount =
+      rawAmt !== undefined && rawAmt !== null && rawAmt !== '' && !Number.isNaN(Number(rawAmt))
+        ? Number(rawAmt)
+        : null;
+    const status = String(req.body.status || 'pending').trim().toLowerCase();
+    const txType = String(
+      req.body.type ||
+        req.body.tx_type ||
+        (status === 'approved'
+          ? section === 'deposit'
+            ? 'plus'
+            : 'minus'
+          : 'pending')
+    ).trim();
     const timeLabel = String(req.body.time || new Date().toLocaleString()).trim();
 
     if (!phone || !title) {
@@ -289,10 +327,10 @@ app.post('/api/activities', async (req, res) => {
     }
 
     const inserted = await pool.query(
-      `INSERT INTO user_activities (phone, section, title, amount, tx_type, created_label)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, phone, section, title, amount, tx_type, created_label, created_at`,
-      [phone, section, title, amount, txType, timeLabel]
+      `INSERT INTO user_activities (phone, section, title, amount, tx_type, status, created_label)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, phone, section, title, amount, tx_type, status, created_label, created_at`,
+      [phone, section, title, amount, txType, status, timeLabel]
     );
 
     res.status(201).json({ success: true, activity: inserted.rows[0] });
@@ -309,7 +347,7 @@ app.get('/api/activities/:phone', async (req, res) => {
       return res.status(400).json({ error: 'phone is required' });
     }
     const result = await pool.query(
-      `SELECT id, phone, section, title, amount, tx_type, created_label, created_at
+      `SELECT id, phone, section, title, amount, tx_type, status, created_label, created_at
        FROM user_activities
        WHERE phone = $1
        ORDER BY id DESC
@@ -319,6 +357,84 @@ app.get('/api/activities/:phone', async (req, res) => {
     res.json({ success: true, activities: result.rows });
   } catch (err) {
     console.error('Get activities error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/approve', async (req, res) => {
+  try {
+    const activityId = req.body.id;
+    const phone = String(req.body.phone || '').trim();
+    const section = String(req.body.section || 'deposit').trim().toLowerCase();
+
+    if (!activityId) {
+      return res.status(400).json({ error: 'activity id is required' });
+    }
+
+    const actRes = await pool.query(
+      `SELECT id, phone, section, title, amount, status
+       FROM user_activities
+       WHERE id = $1`,
+      [activityId]
+    );
+
+    if (actRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Activity not found' });
+    }
+
+    const act = actRes.rows[0];
+    const targetPhone = phone || act.phone;
+    const targetSection = section || act.section;
+    const amt = Number(act.amount || 0);
+
+    if (act.status !== 'approved' && targetPhone && amt > 0) {
+      if (targetSection === 'deposit') {
+        await pool.query(
+          `UPDATE users SET balance = COALESCE(balance, 0) + $1 WHERE phone = $2`,
+          [amt, targetPhone]
+        );
+      } else if (targetSection === 'withdrawal' || targetSection === 'investment' || targetSection === 'package') {
+        await pool.query(
+          `UPDATE users SET balance = GREATEST(0, COALESCE(balance, 0) - $1) WHERE phone = $2`,
+          [amt, targetPhone]
+        );
+      }
+    }
+
+    const approvedSign = targetSection === 'deposit' ? 'plus' : 'minus';
+    const updatedAct = await pool.query(
+      `UPDATE user_activities
+       SET status = 'approved', tx_type = $1
+       WHERE id = $2
+       RETURNING id, phone, section, title, amount, tx_type, status, created_label, created_at`,
+      [approvedSign, activityId]
+    );
+
+    let updatedUser = null;
+    if (targetPhone) {
+      const uRes = await pool.query(
+        'SELECT id, full_name, phone, balance, created_at FROM users WHERE phone = $1',
+        [targetPhone]
+      );
+      if (uRes.rows.length > 0) {
+        const u = uRes.rows[0];
+        updatedUser = {
+          id: u.id,
+          fullName: u.full_name,
+          phone: u.phone,
+          balance: Number(u.balance || 0),
+          created_at: u.created_at,
+        };
+      }
+    }
+
+    res.json({
+      success: true,
+      activity: updatedAct.rows[0],
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error('Approve activity error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -343,15 +459,15 @@ async function handleDeposit(req, res) {
     }
 
     const inserted = await pool.query(
-      `INSERT INTO deposits (user_id, phone, payment_account, amount, receipt_image)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO deposits (user_id, phone, payment_account, amount, receipt_image, status)
+       VALUES ($1, $2, $3, $4, $5, 'pending')
        RETURNING id, user_id, phone, payment_account, amount, status, created_at`,
       [userId, phone, paymentAccount, amount, receiptImage]
     );
 
     res.status(201).json({
       success: true,
-      message: 'የ Deposit ጥያቄ በተሳካ ሁኔታ ተልኳል።',
+      message: 'Deposit pending',
       deposit: inserted.rows[0],
     });
   } catch (err) {
