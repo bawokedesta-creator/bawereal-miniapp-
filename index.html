@@ -50,6 +50,42 @@
       padding: 14px 14px 86px 14px; max-width: 500px; margin: 0 auto; min-height: 100vh;
     }
 
+    /* Corner rotating "Getting app" download pill */
+    .getting-app-corner-btn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9500;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #0284c7, #16a34a);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
+      cursor: pointer;
+    }
+    .getting-app-corner-btn.hidden-standalone {
+      display: none;
+    }
+    .getting-app-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2.5px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: gettingAppSpin 0.95s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes gettingAppSpin {
+      to { transform: rotate(360deg); }
+    }
+
     #reg-to-login-loader, #login-loading-screen {
       display: none; position: fixed; inset: 0; background: rgba(11, 17, 32, 0.95);
       z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;
@@ -63,7 +99,7 @@
 
     .top-header {
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 14px; padding: 10px 12px; background: var(--bg-card);
+      margin-bottom: 14px; margin-top: 34px; padding: 10px 12px; background: var(--bg-card);
       border-radius: 14px; border: 1px solid var(--border-subtle); gap: 6px;
     }
     .brand-block .brand-name { font-size: 1.12rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
@@ -350,6 +386,17 @@
   </style>
 </head>
 <body>
+
+  <a
+    id="gettingAppCornerBtn"
+    class="getting-app-corner-btn"
+    href="https://bawokedesta-creator.github.io/bawereal-miniapp-/EthioInvest.apk"
+    download="EthioInvest.apk"
+    onclick="triggerAppDownload(event)"
+  >
+    <span class="getting-app-spinner" id="gettingAppSpinner"></span>
+    <span id="gettingAppLabel">Getting app</span>
+  </a>
 
   <div id="reg-to-login-loader" aria-live="polite">
     <div class="loader-card">
@@ -740,6 +787,7 @@
 
   <script>
     const API_BASE = "https://ethioinvest-lvsr.onrender.com";
+    const APK_URL = "./EthioInvest.apk";
     const SESSION_STORAGE_KEY = "ethioinvest_active_session_v1";
 
     let currentUser = null;
@@ -756,6 +804,34 @@
     let pendingOtpPhone = null;
     let lastReceipt = null;
     let localActivities = [];
+
+    function initCornerAppButton() {
+      const btn = document.getElementById("gettingAppCornerBtn");
+      if (!btn) return;
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+      if (isStandalone) {
+        btn.classList.add("hidden-standalone");
+      }
+    }
+
+    function triggerAppDownload(event) {
+      if (event) event.preventDefault();
+      const labelEl = document.getElementById("gettingAppLabel");
+      if (labelEl) labelEl.innerText = "Downloading...";
+      const a = document.createElement("a");
+      a.href = APK_URL;
+      a.download = "EthioInvest.apk";
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => {
+        if (labelEl) labelEl.innerText = "Getting app";
+      }, 2500);
+    }
 
     function isTrackedTxSection(section) {
       return ["deposit", "withdrawal", "investment", "package"].includes(String(section || "").toLowerCase());
@@ -1646,6 +1722,7 @@
       }
     }, 3000);
 
+    initCornerAppButton();
     updateRegisterButtonState();
     fetchRealExchangeRate();
     syncNotificationsUI();
