@@ -52,6 +52,18 @@ async function initDB() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_activities (
+        id SERIAL PRIMARY KEY,
+        phone TEXT NOT NULL,
+        section TEXT DEFAULT 'general',
+        title TEXT NOT NULL,
+        amount NUMERIC(12, 2),
+        tx_type TEXT DEFAULT 'info',
+        created_label TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
     client.release();
     console.log('Aiven PostgreSQL Connected & tables ready');
   } catch (err) {
@@ -242,14 +254,72 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'ስልክ ቁጥር ወይም ፓስወርድ የተሳሳተ ነው።' });
     }
 
+    const row = result.rows[0];
     res.json({
       success: true,
       message: 'በተሳካ ሁኔታ ገብተዋል።',
-      user: result.rows[0],
+      user: {
+        id: row.id,
+        fullName: row.full_name,
+        phone: row.phone,
+        balance: Number(row.balance || 0),
+        created_at: row.created_at,
+      },
     });
   } catch (err) {
     console.error('Login error:', err.message);
     res.status(500).json({ error: 'የሰርቨር ስህተት አጋጥሟል።' });
+  }
+});
+
+app.post('/api/activities', async (req, res) => {
+  try {
+    const phone = String(req.body.phone || '').trim();
+    const section = String(req.body.section || 'general').trim();
+    const title = String(req.body.title || 'Activity').trim();
+    const rawAmt = req.body.amount;
+    const amount = rawAmt !== undefined && rawAmt !== null && rawAmt !== '' && !Number.isNaN(Number(rawAmt))
+      ? Number(rawAmt)
+      : null;
+    const txType = String(req.body.type || req.body.tx_type || 'info').trim();
+    const timeLabel = String(req.body.time || new Date().toLocaleString()).trim();
+
+    if (!phone || !title) {
+      return res.status(400).json({ error: 'phone and title are required' });
+    }
+
+    const inserted = await pool.query(
+      `INSERT INTO user_activities (phone, section, title, amount, tx_type, created_label)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, phone, section, title, amount, tx_type, created_label, created_at`,
+      [phone, section, title, amount, txType, timeLabel]
+    );
+
+    res.status(201).json({ success: true, activity: inserted.rows[0] });
+  } catch (err) {
+    console.error('Save activity error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/activities/:phone', async (req, res) => {
+  try {
+    const phone = decodeURIComponent(req.params.phone || '').trim();
+    if (!phone) {
+      return res.status(400).json({ error: 'phone is required' });
+    }
+    const result = await pool.query(
+      `SELECT id, phone, section, title, amount, tx_type, created_label, created_at
+       FROM user_activities
+       WHERE phone = $1
+       ORDER BY id DESC
+       LIMIT 100`,
+      [phone]
+    );
+    res.json({ success: true, activities: result.rows });
+  } catch (err) {
+    console.error('Get activities error:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -265,6 +335,7 @@ async function handleDeposit(req, res) {
       body.receipt_image ||
       body.screenshot ||
       body.image ||
+      body.screenshotDataUrl ||
       null;
 
     if (!amount) {
